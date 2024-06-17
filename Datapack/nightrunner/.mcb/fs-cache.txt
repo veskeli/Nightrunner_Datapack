@@ -1,0 +1,4 @@
+data/nightrunner/function/on_load.mcfunction:c87049512a1e7dc87632d6b75a9c62666254ac12
+data/nightrunner/function/open_settings.mcfunction:69b07257a058700d74383fc77551fb58b86e816d
+data/nightrunner/function/settings/settings.mcfunction:82729044fd1168a45f28092d08850da2e1dd396c
+data/minecraft/tags/function/load.json:8894930c9eb5b3c98baf1a7ba0b4a37ff0468080

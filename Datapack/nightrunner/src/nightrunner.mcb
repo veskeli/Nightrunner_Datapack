@@ -1,0 +1,21 @@
+import ./templates/messages.mcbt
+import ./templates/scoreboard/settings_scoreboard.mcbt
+import ./templates/settings/settings_page.mcbt
+import ./templates/log.mcbt
+# Nightrunner (NRDiff)
+function on_load minecraft:load{
+    # Load all scoreboards
+    scoreboard objectives add nightrunner.internal dummy
+    settings_scoreboard 1
+
+    # Show the welcome message
+    welcome 1 New Start
+}
+function open_settings{
+    function nightrunner:settings/settings
+}
+dir settings{
+    function settings{
+        settings_page 1
+    }
+}

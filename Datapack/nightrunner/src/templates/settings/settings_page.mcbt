@@ -1,0 +1,26 @@
+# 20 lines
+template settings_page{
+    with page:float{
+        # Header
+        tellraw @s [{"text":"=====","color":"yellow"},{"text":"Nightrunner settings","bold":true,"color":"gold"},{"text":"=====","color":"yellow"}]
+        <%%
+            switch(page){
+                case 0:
+                case 1:
+                    for (let i = 0; i < 17; i++)
+                    {
+                        emit('tellraw @s [{"text": " "}]')
+                    }
+                    emit('tellraw @s [{"text":"=====","color":"yellow"},{"text":" 1 / 2 ","bold":true,"color":"gold"},{"text":"=====","color":"yellow"}]')
+                    break
+                case 2:
+                    for (let i = 0; i < 17; i++)
+                    {
+                        emit('tellraw @s [{"text": " "}]')
+                    }
+                    emit('tellraw @s [{"text":"=====","color":"yellow"},{"text":" 2 / 2 ","bold":true,"color":"gold"},{"text":"=====","color":"yellow"}]')
+                    break
+            }
+        %%>
+    }
+}

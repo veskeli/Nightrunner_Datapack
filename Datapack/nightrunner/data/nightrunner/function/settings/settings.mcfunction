@@ -1,0 +1,22 @@
+# Generated with MC-Build
+
+# Header
+tellraw @s [{"text":"=====","color":"yellow"},{"text":"Nightrunner settings","bold":true,"color":"gold"},{"text":"=====","color":"yellow"}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text": " "}]
+tellraw @s [{"text":"=====","color":"yellow"},{"text":" 1 / 2 ","bold":true,"color":"gold"},{"text":"=====","color":"yellow"}]

@@ -3,6 +3,8 @@
 #=================================================
 # Scoreboards
 #=================================================
+# Use Revive system
+scoreboard objectives add Nightrunner_UseRevive dummy
 # Total Death count
 scoreboard objectives add Nightrunner_DeathCount deathCount
 # This is used to check if player died (And gets reset every time the player dies)

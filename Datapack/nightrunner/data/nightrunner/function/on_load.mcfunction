@@ -15,6 +15,12 @@ scoreboard objectives add Open_Nightrunner_Settings trigger
 scoreboard objectives add Nightrunner_Joined dummy
 scoreboard objectives add Nightrunner_ID dummy
 #=================================================
+# Gamerules
+#=================================================
+gamerule commandBlockOutput false
+gamerule playersSleepingPercentage 50
+gamerule doInsomnia false
+#=================================================
 # Show the welcome message
 #=================================================
 # Show the welcome message (Takes build number [int] and update message [raw])
@@ -34,8 +40,8 @@ tellraw @a {"text":"Nightrunner loaded!","bold":true,"color":"gold"}
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
-tellraw @a ["",{"text":"New Start","color":"aqua"},{"text":" update"}]
-tellraw @a ["",{"text":"(Build "},{"text":"1","underlined":true,"color":"yellow"},{"text":")"}]
+tellraw @a ["",{"text":"Someting someting","color":"aqua"},{"text":" update"}]
+tellraw @a ["",{"text":"(Build "},{"text":"2","underlined":true,"color":"yellow"},{"text":")"}]
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]

@@ -23,10 +23,17 @@ function on_load minecraft:load{
     scoreboard objectives add Nightrunner_ID dummy
 
     #=================================================
+    # Gamerules
+    #=================================================
+    gamerule commandBlockOutput false
+    gamerule playersSleepingPercentage 50
+    gamerule doInsomnia false
+
+    #=================================================
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 1 New Start
+    welcome 2 Someting someting
 }
 #=================================================
 # MARK: Settings
@@ -72,6 +79,8 @@ dir health_system{
         #=================================================
         # Scoreboards
         #=================================================
+        # Use Revive system
+        scoreboard objectives add Nightrunner_UseRevive dummy
         # Total Death count
         scoreboard objectives add Nightrunner_DeathCount deathCount
         # This is used to check if player died (And gets reset every time the player dies)
@@ -156,8 +165,36 @@ dir mobs{
     dir monsters{
         #=================================================
         # Zombie
-        function zombie{
+        function zombie minecraft:tick{
+            execute if predicate nightrunner:10change run execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.follow_range",base:70},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
 
+            execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CustomName:'"test"',CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.follow_range",base:70},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+            # Speedboy
+            # execute if predicate nightmare:10change run data_speedboy zombie 5 0.55 Quickstep Zombie
+            # Strongboy
+            # execute if predicate nightmare:10change run data_normal_named zombie 12 0.23 Sturdy Zombie
+            # Vanilla
+            # data_damage_speed zombie 9 0.31
+            # execute as @e[type=<%entity_type%>,tag=!Nightrunner,limit=1] run data merge entity @s {Attributes:[{Base:<%attack_damage%>,Name:"generic.attack_damage"},{Base:<%move_speed%>,Name:"generic.movement_speed"}], CanPickUpLoot:1b,Tags:["nightmare"], CustomName:'{"text":"<%entity_name%>"}',CustomNameVisible:0b}
+        }
+        function creeper minecraft:tick{
+            execute as @e[type=creeper,tag=!Nightrunner,limit=1] run data merge entity @s {Fuse:10,CustomName:'"test"',ExplosionRadius:2b}
+            execute as @e[type=creeper,tag=!Nightrunner,limit=1] run tag @s add Nightrunner
         }
     }
+}
+#=================================================
+# MARK: Crafting
+#=================================================
+
+#=================================================
+# MARK: Advacements
+#=================================================
+
+#=================================================
+# MARK: Predicates
+#=================================================
+predicate 10change{
+  "condition": "minecraft:random_chance",
+  "chance": 0.1
 }

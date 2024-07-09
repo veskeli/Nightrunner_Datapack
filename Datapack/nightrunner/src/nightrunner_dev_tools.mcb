@@ -1,5 +1,6 @@
 function load minecraft:load{
-
+  # Mob count for the kill all tool
+  scoreboard objectives add Nightrunner_MobCount dummy
 }
 function open_for_all_ops{
     # Allow the player to open the settings if they are op
@@ -15,6 +16,7 @@ function open_dev_tools{
             case 0:
             case 1:
                 emit('tellraw @s ["",{"text":"Highlight Mobs tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_highlight"}},{"text":"]"}]')
+                emit('tellraw @s ["",{"text":"Kill all mobs with Nightrunner tag tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_kill_all"}},{"text":"]"}]')
                 for (let i = 0; i < 16; i++)
                 {
                     emit('tellraw @s [{"text": " "}]')
@@ -24,13 +26,16 @@ function open_dev_tools{
         }
     %%>
 }
+#=================================================
+# Highlight mobs tool
+#=================================================
 function give_highlight{
     give @s minecraft:breeze_rod[food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:2147483647},minecraft:custom_data={highlight_dev_tool:true},item_name='{"text":"Highlight dev tool","color":"red","italic":false}',lore=['{"text":"Right click to highlight mobs for 2 seconds"}']]
 }
 function apply_highlight{
-    effect give @e minecraft:glowing 2 0 true
     # reset advancement
     advancement revoke @s only nightrunner_dev_tools:used_highlight
+    effect give @e minecraft:glowing 2 0 true
 }
 advancement used_highlight{
     "criteria": {
@@ -47,5 +52,40 @@ advancement used_highlight{
   },
   "rewards": {
     "function": "nightrunner_dev_tools:apply_highlight"
+  }
+}
+#=================================================
+# Kill all mobs with Nightrunner tag tool
+#=================================================
+function give_kill_all{
+    give @s minecraft:blaze_rod[food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:2147483647},minecraft:custom_data={kill_all_dev_tool:true},item_name='{"text":"Kill all dev tool","color":"red","italic":false}',lore=['{"text":"Right click to kill all mobs with Nightrunner tag"}']]
+}
+function apply_kill_all{
+    # reset advancement
+    advancement revoke @s only nightrunner_dev_tools:used_kill_all
+    # reset mob count
+    scoreboard players set $NightRunner_MobCount Nightrunner_MobCount 0
+    # Add +1 to $NightRunner_MobCount for each mob with
+    execute as @e[tag=Nightrunner] run scoreboard players add $NightRunner_MobCount Nightrunner_MobCount 1
+    # Send message to player with the amount of mobs killed
+    tellraw @s [{"text":"Killed "},{"score":{"name":"$NightRunner_MobCount","objective":"Nightrunner_MobCount"}},{"text":" mobs with Nightrunner tag"}]
+    # kill all
+    kill @e[tag=Nightrunner]
+}
+advancement used_kill_all{
+    "criteria": {
+    "use_item": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "predicates": {
+            "minecraft:custom_data": {"kill_all_dev_tool":true}
+          }
+        }
+      }
+    }
+  },
+  "rewards": {
+    "function": "nightrunner_dev_tools:apply_kill_all"
   }
 }

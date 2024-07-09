@@ -40,7 +40,7 @@ tellraw @a {"text":"Nightrunner loaded!","bold":true,"color":"gold"}
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
-tellraw @a ["",{"text":"Someting someting","color":"aqua"},{"text":" update"}]
+tellraw @a ["",{"text":"More dev tools","color":"aqua"},{"text":" update"}]
 tellraw @a ["",{"text":"(Build "},{"text":"2","underlined":true,"color":"yellow"},{"text":")"}]
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]

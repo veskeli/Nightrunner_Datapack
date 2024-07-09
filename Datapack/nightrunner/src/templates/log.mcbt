@@ -20,18 +20,23 @@ template log {
 
             switch (log_type) {
                 case "info":
+                case "i":
                     log_json.push({"text":"info","color":"aqua"})
                     break
 
                 case "warning":
+                case "warn":
+                case "w":
                     log_json.push({"text":"warn","color":"gold"})
                     break
 
                 case "error":
+                case "e":
                     log_json.push({"text":"error","color":"red"})
                     break
 
                 case "debug":
+                case "d":
                     log_json.push({"text":"debug","color":"blue"})
                     break
 

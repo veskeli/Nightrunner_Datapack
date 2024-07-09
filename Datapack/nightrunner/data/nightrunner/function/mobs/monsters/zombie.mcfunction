@@ -1,7 +1,7 @@
 # Generated with MC-Build
 
-execute if predicate nightrunner:10change run execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.follow_range",base:70},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
-execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CustomName:'"test"',CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.follow_range",base:70},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+execute if predicate nightrunner:10change run execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CustomName:'"test"',CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
 # Speedboy
 # execute if predicate nightmare:10change run data_speedboy zombie 5 0.55 Quickstep Zombie
 # Strongboy

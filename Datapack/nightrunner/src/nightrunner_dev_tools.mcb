@@ -1,6 +1,9 @@
+import ./templates/dev/summon_tool.mcbt
 function load minecraft:load{
-  # Mob count for the kill all tool
-  scoreboard objectives add Nightrunner_MobCount dummy
+    # Mob count for the kill all tool
+    scoreboard objectives add Nightrunner_MobCount dummy
+    # Selected summon for the mass summon tool
+    scoreboard objectives add Nightrunner_SelectedMassSummon dummy
 }
 function open_for_all_ops{
     # Allow the player to open the settings if they are op
@@ -17,6 +20,7 @@ function open_dev_tools{
             case 1:
                 emit('tellraw @s ["",{"text":"Highlight Mobs tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_highlight"}},{"text":"]"}]')
                 emit('tellraw @s ["",{"text":"Kill all mobs with Nightrunner tag tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_kill_all"}},{"text":"]"}]')
+                emit('tellraw @s ["",{"text":"Mass summon tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_mass_summon"}},{"text":"]"}]')
                 for (let i = 0; i < 16; i++)
                 {
                     emit('tellraw @s [{"text": " "}]')
@@ -35,6 +39,13 @@ function give_highlight{
 function apply_highlight{
     # reset advancement
     advancement revoke @s only nightrunner_dev_tools:used_highlight
+    # mob count for the highlight tool
+    scoreboard players set $NightRunner_MobCount_highlight Nightrunner_MobCount 0
+    # Add +1 to $NightRunner_MobCount for each mob with the glowing effect
+    execute as @e run scoreboard players add $NightRunner_MobCount_highlight Nightrunner_MobCount 1
+    # Show amount in player action bar
+    title @s actionbar [{"text":"Highlighted "},{"score":{"name":"$NightRunner_MobCount_highlight","objective":"Nightrunner_MobCount"}},{"text":" mobs"}]
+    # Give glowing effect to all mobs
     effect give @e minecraft:glowing 2 0 true
 }
 advancement used_highlight{
@@ -87,5 +98,160 @@ advancement used_kill_all{
   },
   "rewards": {
     "function": "nightrunner_dev_tools:apply_kill_all"
+  }
+}
+#=================================================
+# Mass summon tool
+#=================================================
+function give_mass_summon{
+    give @s minecraft:stick[food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:2147483647},minecraft:custom_data={mass_summon_dev_tool:true},item_name='{"text":"Mass summon dev tool","color":"red","italic":false}',lore=['{"text":"Right click to summon mobs"}']]
+}
+function apply_mass_summon{
+    # reset advancement
+    advancement revoke @s only nightrunner_dev_tools:used_mass_summon
+    # if player is sneaking say they can't use the tool
+    execute if entity @s[predicate=nightrunner_dev_tools:is_sneaking] run return run function nightrunner_dev_tools:open_mass_summon_settings
+
+    # Summon based on the selected summon score [zombie=1, skeleton=2, creeper=3, spider=4, enderman=5, witch=6, wither_skeleton=7, zombie_villager=8, husk=9, stray=10, villager=11, iron_golem=12]
+    execute if score @s Nightrunner_SelectedMassSummon matches 1 run return run function block {
+        summon_tool zombie
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 2 run return run function block {
+        summon_tool skeleton
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 3 run return run function block {
+        summon_tool creeper
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 4 run return run function block {
+        summon_tool spider
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 5 run return run function block {
+        summon_tool enderman
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 6 run return run function block {
+        summon_tool witch
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 7 run return run function block {
+        summon_tool wither_skeleton
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 8 run return run function block {
+        summon_tool zombie_villager
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 9 run return run function block {
+        summon_tool husk
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 10 run return run function block {
+        summon_tool stray
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 11 run return run function block {
+        summon_tool villager
+    }
+    execute if score @s Nightrunner_SelectedMassSummon matches 12 run return run function block {
+        summon_tool iron_golem
+    }
+}
+function open_mass_summon_settings{
+    # Header
+    tellraw @s [{"text":"=====","color":"yellow"},{"text":"Select summon","bold":true,"color":"green"},{"text":"=====","color":"yellow"}]
+    <%%
+        // Add click event for each mob to set the selected summon score for the player [zombie=1, skeleton=2, creeper=3, spider=4, enderman=5, witch=6, wither_skeleton=7, zombie_villager=8, husk=9, stray=10, villager=11]
+
+        // Zombie
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 1 run tellraw @s ["",{"text":"Zombie ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:1}"}},{"text":"]"}]')
+        // Zombie selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 1 run tellraw @s ["",{"text":"Zombie ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Skeleton
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 2 run tellraw @s ["",{"text":"Skeleton ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:2}"}},{"text":"]"}]')
+        // Skeleton selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 2 run tellraw @s ["",{"text":"Skeleton ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Creeper
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 3 run tellraw @s ["",{"text":"Creeper ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:3}"}},{"text":"]"}]')
+        // Creeper selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 3 run tellraw @s ["",{"text":"Creeper ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Spider
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 4 run tellraw @s ["",{"text":"Spider ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:4}"}},{"text":"]"}]')
+        // Spider selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 4 run tellraw @s ["",{"text":"Spider ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Enderman
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 5 run tellraw @s ["",{"text":"Enderman ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:5}"}},{"text":"]"}]')
+        // Enderman selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 5 run tellraw @s ["",{"text":"Enderman ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Witch
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 6 run tellraw @s ["",{"text":"Witch ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:6}"}},{"text":"]"}]')
+        // Witch selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 6 run tellraw @s ["",{"text":"Witch ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Wither Skeleton
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 7 run tellraw @s ["",{"text":"Wither Skeleton ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:7}"}},{"text":"]"}]')
+        // Wither Skeleton selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 7 run tellraw @s ["",{"text":"Wither Skeleton ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Zombie Villager
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 8 run tellraw @s ["",{"text":"Zombie Villager ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:8}"}},{"text":"]"}]')
+        // Zombie Villager selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 8 run tellraw @s ["",{"text":"Zombie Villager ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Husk
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 9 run tellraw @s ["",{"text":"Husk ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:9}"}},{"text":"]"}]')
+        // Husk selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 9 run tellraw @s ["",{"text":"Husk ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Stray
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 10 run tellraw @s ["",{"text":"Stray ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:10}"}},{"text":"]"}]')
+        // Stray selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 10 run tellraw @s ["",{"text":"Stray ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Villager
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 11 run tellraw @s ["",{"text":"Villager ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:11}"}},{"text":"]"}]')
+        // Villager selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 11 run tellraw @s ["",{"text":"Villager ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        // Iron Golem
+        emit('execute unless score @s Nightrunner_SelectedMassSummon matches 12 run tellraw @s ["",{"text":"Iron Golem ["},{"text":"Click to select","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:set_mass_summon {new:12}"}},{"text":"]"}]')
+        // Iron Golem selected
+        emit('execute if score @s Nightrunner_SelectedMassSummon matches 12 run tellraw @s ["",{"text":"Iron Golem ["},{"text":"Selected","color":"blue"},{"text":"]"}]')
+
+        for (let i = 0; i < 6; i++)
+        {
+            emit('tellraw @s [{"text": " "}]')
+        }
+        emit('tellraw @s [{"text":"=====","color":"yellow"},{"text":" ==== ","bold":true,"color":"green"},{"text":"=====","color":"yellow"}]')
+    %%>
+}
+function set_mass_summon{
+    # Set the selected summon score for the player
+    $scoreboard players set @s Nightrunner_SelectedMassSummon $(new)
+    # open mass summon settings again
+    function nightrunner_dev_tools:open_mass_summon_settings
+}
+advancement used_mass_summon{
+    "criteria": {
+    "use_item": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "predicates": {
+            "minecraft:custom_data": {"mass_summon_dev_tool":true}
+          }
+        }
+      }
+    }
+  },
+  "rewards": {
+    "function": "nightrunner_dev_tools:apply_mass_summon"
+  }
+}
+predicate is_sneaking{
+  "condition": "minecraft:entity_properties",
+  "entity": "this",
+  "predicate": {
+    "flags": {
+      "is_sneaking": true
+    }
   }
 }

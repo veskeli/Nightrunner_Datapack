@@ -33,7 +33,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 2 Someting someting
+    welcome 2 More dev tools
 }
 #=================================================
 # MARK: Settings
@@ -70,6 +70,20 @@ dir settings{
             function nightrunner:settings/settings
         }
     }
+    dir toggles{
+        function toggle_health_system{
+            # Toggle the health system
+            execute if score $Nightrunner Nightrunner_UseReviveSystem matches 1 run {
+                scoreboard players set $Nightrunner Nightrunner_UseReviveSystem 0
+                # open settings again
+                function ../settings
+            } else run {
+                scoreboard players set $Nightrunner Nightrunner_UseReviveSystem 1
+                # open settings again
+                function ../settings
+            }
+        }
+    }
 }
 #=================================================
 # MARK: Health system
@@ -80,7 +94,7 @@ dir health_system{
         # Scoreboards
         #=================================================
         # Use Revive system
-        scoreboard objectives add Nightrunner_UseRevive dummy
+        scoreboard objectives add Nightrunner_UseReviveSystem dummy
         # Total Death count
         scoreboard objectives add Nightrunner_DeathCount deathCount
         # This is used to check if player died (And gets reset every time the player dies)
@@ -97,10 +111,18 @@ dir health_system{
         #=================================================
         # Set immediate respawn gamerule
         gamerule doImmediateRespawn false
+
+        #=================================================
+        # Check scoreboard settings
+        #=================================================
+        execute unless score $Nightrunner Nightrunner_UseReviveSystem matches 9999.. run scoreboard players set $Nightrunner Nightrunner_UseReviveSystem 1
     }
     function tick minecraft:tick{
+        # TODO: Dont use tick and use schedule instead
+        # Check if the revive system is enabled
+        execute if score $Nightrunner Nightrunner_UseReviveSystem matches 0 run return 1
         # Check if the player is dead
-        execute as @a[scores={Nightrunner_Death=1}] run block death_screen{
+        execute as @a[scores={Nightrunner_Death=..1}] run block death_screen{
             # execute the death function
             function ./death
             # Reset the dead status
@@ -166,9 +188,9 @@ dir mobs{
         #=================================================
         # Zombie
         function zombie minecraft:tick{
-            execute if predicate nightrunner:10change run execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.follow_range",base:70},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+            execute if predicate nightrunner:10change run execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
 
-            execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CustomName:'"test"',CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.follow_range",base:70},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+            execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CustomName:'"test"',CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
             # Speedboy
             # execute if predicate nightmare:10change run data_speedboy zombie 5 0.55 Quickstep Zombie
             # Strongboy
@@ -177,10 +199,66 @@ dir mobs{
             # data_damage_speed zombie 9 0.31
             # execute as @e[type=<%entity_type%>,tag=!Nightrunner,limit=1] run data merge entity @s {Attributes:[{Base:<%attack_damage%>,Name:"generic.attack_damage"},{Base:<%move_speed%>,Name:"generic.movement_speed"}], CanPickUpLoot:1b,Tags:["nightmare"], CustomName:'{"text":"<%entity_name%>"}',CustomNameVisible:0b}
         }
-        function creeper minecraft:tick{
-            execute as @e[type=creeper,tag=!Nightrunner,limit=1] run data merge entity @s {Fuse:10,CustomName:'"test"',ExplosionRadius:2b}
-            execute as @e[type=creeper,tag=!Nightrunner,limit=1] run tag @s add Nightrunner
+        function drowned minecraft:tick{
+           execute as @e[type=drowned,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+
+
         }
+        function husk minecraft:tick{
+            execute as @e[type=husk,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+
+
+        }
+        function zombie_villager minecraft:tick{
+            execute as @e[type=zombie_villager,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+
+
+        }
+        function skeleton minecraft:tick{
+            # execute as @e[type=husk,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},,{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+        }
+        function stray minecraft:tick{
+            execute as @e[type=stray,tag=!Nightrunner,limit=1] run block data/stray{
+                # Store a random value
+                execute store result score @s nightrunner.internal run random value 1..100
+                # Set the skeleton data based on the random value
+                execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..100 run data merge entity @s {CustomName:'"test"',Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31}]}
+            }
+
+        }
+        function bogged minecraft:tick{
+            execute as @e[type=bogged,tag=!Nightrunner,limit=1] run block data/bogged{
+                # Store a random value
+                execute store result score @s nightrunner.internal run random value 1..100
+                # Set the skeleton data based on the random value
+                execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..100 run data merge entity @s {CustomName:'"test"',Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31}]}
+            }
+
+        }
+        function creeper minecraft:tick{
+            execute as @e[type=creeper,tag=!Nightrunner,limit=1] run block data/creeper{
+                # Store a random value
+                execute store result score @s nightrunner.internal run random value 1..100
+                # Set the skeleton data based on the random value
+                execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..5 run data merge entity @s {CustomName:'"Nuke"',Tags:["Nightrunner"],ExplosionRadius:15b,Fuse:45,attributes:[{id:"minecraft:generic.movement_speed",base:0.20},{id:"minecraft:generic.max_health", base:30},{id:"minecraft:generic.scale",base:1.25}]}
+
+                execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..15 run data merge entity @s {CustomName:'"Lite"',Tags:["Nightrunner"],ExplosionRadius:2b,Fuse:15,attributes:[{id:"minecraft:generic.movement_speed",base:0.3},{id:"minecraft:generic.max_health", base:10},{id:"minecraft:generic.scale",base:0.75}]}
+                
+                execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..100 run data merge entity @s {CustomName:'"Normi"',Tags:["Nightrunner"],ExplosionRadius:5b,Fuse:30,attributes:[{id:"minecraft:generic.movement_speed",base:0.25},{id:"minecraft:generic.max_health", base:20},{id:"minecraft:generic.scale",base:1}]}
+                
+            }
+            
+            # Fuse | explosion | movement speed
+            # Volatile (nuke)
+            # execute if predicate nightmare:10change run data_normal_creeper 35 8 0.2 Volatile Creeper
+            # Quickfuse (insta)
+            # execute if predicate nightmare:10change run data_normal_creeper 15 4 2 Quickfuse Creeper
+            # Creeping
+            # execute if predicate nightmare:10change run data_normal_creeper 35 3 0.3 Creeping Creeper
+            # Vanilla
+            # data merge entity @e[type=creeper,tag=!nightmare,limit=1] {ExplosionRadius:5,Tags:["nightmare"]}
+        }
+
     }
 }
 #=================================================

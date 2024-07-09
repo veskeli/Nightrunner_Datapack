@@ -1,0 +1,1 @@
+{"criteria":{"use_item":{"trigger": "minecraft:using_item","conditions":{"item":{"predicates":{"minecraft:custom_data": {"mass_summon_dev_tool":true}}}}}},"rewards":{"function": "nightrunner_dev_tools:apply_mass_summon"}}

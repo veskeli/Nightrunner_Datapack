@@ -1,9 +1,23 @@
 # Generated with MC-Build
 
+#=================================================
 # Load all scoreboards
+#=================================================
+#================= internal scoreboard
 scoreboard objectives add nightrunner.internal dummy
-scoreboard objectives add NRDiff_BlockMobs dummy
+#================= Settings
+scoreboard objectives add Nightrunner_BlockMobs dummy
+# Operators
+scoreboard objectives add Nightrunner_Op dummy
+# open settings trigger
+scoreboard objectives add Open_Nightrunner_Settings trigger
+#================= Join
+scoreboard objectives add Nightrunner_Joined dummy
+scoreboard objectives add Nightrunner_ID dummy
+#=================================================
 # Show the welcome message
+#=================================================
+# Show the welcome message (Takes build number [int] and update message [raw])
 # 20 lines
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]

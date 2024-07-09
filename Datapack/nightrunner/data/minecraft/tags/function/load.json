@@ -1,1 +1,1 @@
-{"values":["nightrunner:on_load"]}
+{"values":["nightrunner:on_load","nightrunner:settings/join_check","nightrunner:health_system/load","nightrunner_dev_tools:load"]}

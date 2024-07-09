@@ -1,0 +1,51 @@
+function load minecraft:load{
+
+}
+function open_for_all_ops{
+    # Allow the player to open the settings if they are op
+    execute as @a[scores={Nightrunner_Op=1..}] run function ./open_dev_tools
+}
+function open_dev_tools{
+    # Header
+    tellraw @s [{"text":"=====","color":"yellow"},{"text":"Nightrunner Dev tools","bold":true,"color":"red"},{"text":"=====","color":"yellow"}]
+    # Pages
+    <%%
+        let page = 0
+        switch(page){
+            case 0:
+            case 1:
+                emit('tellraw @s ["",{"text":"Highlight Mobs tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_highlight"}},{"text":"]"}]')
+                for (let i = 0; i < 16; i++)
+                {
+                    emit('tellraw @s [{"text": " "}]')
+                }
+                emit('tellraw @s [{"text":"=====","color":"yellow"},{"text":" 1 / 1 ","bold":true,"color":"red"},{"text":"=====","color":"yellow"}]')
+                break
+        }
+    %%>
+}
+function give_highlight{
+    give @s minecraft:breeze_rod[food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:2147483647},minecraft:custom_data={highlight_dev_tool:true},item_name='{"text":"Highlight dev tool","color":"red","italic":false}',lore=['{"text":"Right click to highlight mobs for 2 seconds"}']]
+}
+function apply_highlight{
+    effect give @e minecraft:glowing 2 0 true
+    # reset advancement
+    advancement revoke @s only nightrunner_dev_tools:used_highlight
+}
+advancement used_highlight{
+    "criteria": {
+    "use_item": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "predicates": {
+            "minecraft:custom_data": {"highlight_dev_tool":true}
+          }
+        }
+      }
+    }
+  },
+  "rewards": {
+    "function": "nightrunner_dev_tools:apply_highlight"
+  }
+}

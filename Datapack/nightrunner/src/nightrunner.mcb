@@ -2,20 +2,162 @@ import ./templates/messages.mcbt
 import ./templates/scoreboard/settings_scoreboard.mcbt
 import ./templates/settings/settings_page.mcbt
 import ./templates/log.mcbt
-# Nightrunner (NRDiff)
+# Nightrunner
 function on_load minecraft:load{
+    #=================================================
     # Load all scoreboards
-    scoreboard objectives add nightrunner.internal dummy
-    settings_scoreboard 1
+    #=================================================
 
+    #================= internal scoreboard
+    scoreboard objectives add nightrunner.internal dummy
+
+    #================= Settings
+    scoreboard objectives add Nightrunner_BlockMobs dummy
+    # Operators
+    scoreboard objectives add Nightrunner_Op dummy
+    # open settings trigger
+    scoreboard objectives add Open_Nightrunner_Settings trigger
+
+    #================= Join
+    scoreboard objectives add Nightrunner_Joined dummy
+    scoreboard objectives add Nightrunner_ID dummy
+
+    #=================================================
     # Show the welcome message
+    #=================================================
+    # Show the welcome message (Takes build number [int] and update message [raw])
     welcome 1 New Start
 }
-function open_settings{
-    function nightrunner:settings/settings
-}
+#=================================================
+# MARK: Settings
+#=================================================
 dir settings{
     function settings{
         settings_page 1
+    }
+    clock join_check 1s{
+        # Check if player doesn't have a profile
+        execute as @a run execute unless score @s Nightrunner_Joined matches 1 run block join_setup{
+            # Set the player as joined
+            scoreboard players set @s Nightrunner_Joined 1
+            # +1 to the internal id
+            scoreboard players add $Nightrunner_Internal_ID Nightrunner_ID 1
+            # Set the player id
+            scoreboard players operation @s Nightrunner_ID = $Nightrunner_Internal_ID Nightrunner_ID
+        }
+    }
+    function reset_join{
+        # Reset the joined status
+        scoreboard players reset @a Nightrunner_Joined
+        scoreboard players reset @a Nightrunner_ID
+        # Reset the internal id
+        scoreboard players reset $Nightrunner_Internal_ID Nightrunner_ID
+    }
+    function tick minecraft:tick{
+        # Allow the player to open the settings if they are op
+        execute as @a[scores={Nightrunner_Op=1}] run scoreboard players enable @s Open_Nightrunner_Settings
+
+        # Check if the player ran the settings command
+        execute as @a[scores={Open_Nightrunner_Settings=1}] run block open_settings{
+            scoreboard players reset @s Open_Nightrunner_Settings
+            function nightrunner:settings/settings
+        }
+    }
+}
+#=================================================
+# MARK: Health system
+#=================================================
+dir health_system{
+    function load minecraft:load{
+        #=================================================
+        # Scoreboards
+        #=================================================
+        # Total Death count
+        scoreboard objectives add Nightrunner_DeathCount deathCount
+        # This is used to check if player died (And gets reset every time the player dies)
+        scoreboard objectives add Nightrunner_Death deathCount
+        # Is player dead
+        scoreboard objectives add Nightrunner_CurrentlyDead dummy
+        # Op Revive me trigger
+        scoreboard objectives add Nightrunner_Revive trigger
+        # Op Revive all trigger
+        scoreboard objectives add Nightrunner_ReviveAll trigger
+
+        #=================================================
+        # Load the health system
+        #=================================================
+        # Set immediate respawn gamerule
+        gamerule doImmediateRespawn false
+    }
+    function tick minecraft:tick{
+        # Check if the player is dead
+        execute as @a[scores={Nightrunner_Death=1}] run block death_screen{
+            # execute the death function
+            function ./death
+            # Reset the dead status
+            scoreboard players reset @s Nightrunner_Death
+        }
+    }
+    function death{
+        # if player is not in survival mode then return
+        execute as @s[nbt={playerGameType:1}] run return run block player_is_in_creative{
+            say Player is in creative mode
+        }
+        # Set player respawn location to the death location
+        execute at @s run spawnpoint @s ~ ~ ~
+        # Set the player as dead
+        scoreboard players set @s Nightrunner_CurrentlyDead 1
+        # Set player to spectator
+        gamemode spectator @s
+        # Show title with death message
+        title @s title [{"text":"You died","color":"red"}]
+    }
+    dir revive{
+        function tick minecraft:tick{
+            # Give op the ability to revive themselves and others
+            execute as @a[scores={Nightrunner_Op=1}] run scoreboard players enable @s Nightrunner_Revive
+            execute as @a[scores={Nightrunner_Op=1}] run scoreboard players enable @s Nightrunner_ReviveAll
+
+            # Check if the player ran the revive command
+            execute as @a[scores={Nightrunner_Revive=1}] run block trigger_revive{
+                # Reset the revive status
+                scoreboard players reset @s Nightrunner_Revive
+                # execute the revive function
+                function ./op_revive
+            }
+            # Check if the player ran the revive all command
+            execute as @a[scores={Nightrunner_ReviveAll=1}] run block trigger_revive_all{
+                # Reset the revive all status
+                scoreboard players reset @s Nightrunner_ReviveAll
+                # execute the revive all function
+                function ./op_revive_all
+            }
+        }
+        function op_revive{
+            # set the player as not dead
+            scoreboard players reset @s Nightrunner_CurrentlyDead
+            # Set player to survival
+            gamemode survival @s
+            # Show title with revive message
+            title @s title [{"text":"You have been revived","color":"green"}]
+        }
+        function op_revive_all{
+            # Execute as dead players
+            execute as @a[scores={Nightrunner_CurrentlyDead=1}] run function ./op_revive
+        }
+    }
+}
+#=================================================
+# MARK: Mobs
+#=================================================
+dir mobs{
+    #=================================================
+    # Monsters
+    dir monsters{
+        #=================================================
+        # Zombie
+        function zombie{
+
+        }
     }
 }

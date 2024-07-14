@@ -1,0 +1,3 @@
+# Generated with MC-Build
+
+give @s minecraft:poisonous_potato[custom_data={heartfruit_plus:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit Plus","italic":false}',lore=['{"text":"A rarer variant that grants a temporary heart and a half, up to a maximum of three."}','{"text":"Nightrunner","color":"aqua"}'],enchantment_glint_override=true,rarity=rare,custom_model_data=1123] 1

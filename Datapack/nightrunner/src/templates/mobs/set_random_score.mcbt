@@ -1,0 +1,5 @@
+template set_random_score{
+    with entity_type:word from:int to:int{
+        execute store result score @e[type=<%entity_type%>,tag=!Nightrunner,limit=1] Nightrunner_MobDefiner run random value <%from%>..<%to%>
+    }
+}

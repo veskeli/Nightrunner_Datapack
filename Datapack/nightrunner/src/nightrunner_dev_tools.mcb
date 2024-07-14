@@ -18,10 +18,15 @@ function open_dev_tools{
         switch(page){
             case 0:
             case 1:
+                // Highlight Mobs tool
                 emit('tellraw @s ["",{"text":"Highlight Mobs tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_highlight"}},{"text":"]"}]')
+                // Kill all mobs with Nightrunner tag tool
                 emit('tellraw @s ["",{"text":"Kill all mobs with Nightrunner tag tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_kill_all"}},{"text":"]"}]')
+                // Mass summon tool
                 emit('tellraw @s ["",{"text":"Mass summon tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_mass_summon"}},{"text":"]"}]')
-                for (let i = 0; i < 16; i++)
+                // Heal user tool
+                emit('tellraw @s ["",{"text":"Heal user tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_heal"}},{"text":"]"}]')
+                for (let i = 0; i < 15; i++)
                 {
                     emit('tellraw @s [{"text": " "}]')
                 }
@@ -253,5 +258,34 @@ predicate is_sneaking{
     "flags": {
       "is_sneaking": true
     }
+  }
+}
+#=================================================
+# Heal user tool
+#=================================================
+function give_heal{
+    give @s minecraft:golden_apple[food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:2147483647},minecraft:custom_data={heal_dev_tool:true},item_name='{"text":"Heal dev tool","color":"red","italic":false}',lore=['{"text":"Right click to heal yourself"}']]
+}
+function apply_heal{
+    # reset advancement
+    advancement revoke @s only nightrunner_dev_tools:used_heal
+    # heal player
+    effect give @s minecraft:instant_health 1 10 true
+}
+advancement used_heal{
+    "criteria": {
+    "use_item": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "predicates": {
+            "minecraft:custom_data": {"heal_dev_tool":true}
+          }
+        }
+      }
+    }
+  },
+  "rewards": {
+    "function": "nightrunner_dev_tools:apply_heal"
   }
 }

@@ -6,7 +6,7 @@ tellraw @s [{"text":"=====","color":"yellow"},{"text":"Nightrunner Dev tools","b
 tellraw @s ["",{"text":"Highlight Mobs tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_highlight"}},{"text":"]"}]
 tellraw @s ["",{"text":"Kill all mobs with Nightrunner tag tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_kill_all"}},{"text":"]"}]
 tellraw @s ["",{"text":"Mass summon tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_mass_summon"}},{"text":"]"}]
-tellraw @s [{"text": " "}]
+tellraw @s ["",{"text":"Heal user tool ["},{"text":"Click to get","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner_dev_tools:give_heal"}},{"text":"]"}]
 tellraw @s [{"text": " "}]
 tellraw @s [{"text": " "}]
 tellraw @s [{"text": " "}]

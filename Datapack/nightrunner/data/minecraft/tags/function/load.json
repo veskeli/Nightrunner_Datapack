@@ -1,1 +1,1 @@
-{"values":["nightrunner:on_load","nightrunner:settings/join_check","nightrunner:health_system/load","nightrunner_dev_tools:load"]}
+{"values":["nightrunner:on_load","nightrunner:settings/join_check","nightrunner:crafting/load","nightrunner:health_system/load","nightrunner:health_system/setup","nightrunner:mobs/load","nightrunner_dev_tools:load"]}

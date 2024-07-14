@@ -1,0 +1,8 @@
+template undead_base_values{
+    with entity_type:word scoreboard_name:word mob_target_value:int health:float attack_damage:float movement_speed:float scale:float CanPickUP:int test:raw{
+        execute as @e[type=<%entity_type%>,tag=!Nightrunner,limit=1] run block data/<%entity_type%>{
+            # Set the skeleton data based on the random value
+            execute if score @s[tag=!Nightrunner] <%scoreboard_name%> matches ..<%mob_target_value%> run data merge entity @s {CustomName:'"test"',Tags:["Nightrunner"],CanPickUpLoot:<%CanPickUP%>b,attributes:[{id:"minecraft:generic.attack_damage",base:<%attack_damage%>},{id:"minecraft:generic.movement_speed",base:<%movement_speed%>}],<%test%>}
+        }
+    }
+}

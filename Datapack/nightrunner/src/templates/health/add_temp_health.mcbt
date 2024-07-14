@@ -1,0 +1,25 @@
+template add_temp_health{
+    with temp_health:float max_addition:float{
+        # Store current health
+        execute as @s store result score @s Nightrunner_CheckCurrentAbsorptionAmount run data get entity @s AbsorptionAmount
+
+        # Add temp_health on top of the current temp health
+        scoreboard players add @s Nightrunner_CheckCurrentAbsorptionAmount <%temp_health%>
+
+        # Check if the new temp health is higher than the max_addition
+        execute if score @s Nightrunner_CheckCurrentAbsorptionAmount matches <%max_addition%>.. run scoreboard players set @s Nightrunner_CheckCurrentAbsorptionAmount <%max_addition%>
+
+        # Give the player lvl 100 absorption effect
+        effect give @s minecraft:absorption 1 100 true
+        # Set the players max absorption to the correct amount
+        REPEAT(1,200) as i{
+            execute if score @s Nightrunner_CheckCurrentAbsorptionAmount matches <%i%> run attribute @s minecraft:generic.max_absorption base set <%i%>
+        }
+
+
+        # Clear effect to remove the absorption effect and only keep the max absorption
+        effect clear @s minecraft:absorption
+        # Set the player score to the correct amount
+        scoreboard players operation @s Nightrunner_Absorption = @s Nightrunner_CheckCurrentAbsorptionAmount
+    }
+}

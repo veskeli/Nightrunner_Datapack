@@ -1,0 +1,3 @@
+# Generated with MC-Build
+
+summon item ~ ~ ~ {Item:{id:"minecraft:music_disc_11",count:1,components:{"!minecraft:jukebox_playable":{},"minecraft:item_name":'"Soulstone"',"minecraft:lore":['"Artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living."','{"color":"aqua","text":"Nightrunner"}'],"minecraft:custom_model_data":1125,"minecraft:custom_data":{soulstone:true}}}}

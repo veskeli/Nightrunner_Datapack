@@ -1,0 +1,12 @@
+template set_temp_health{
+    with temp_health:float{
+        # Give the player lvl 100 absorption effect
+        effect give @s minecraft:absorption 1 100 true
+        # Set the players max absorption to the correct amount
+        attribute @s minecraft:generic.max_absorption base set <%temp_health%>
+        # Clear effect to remove the absorption effect and only keep the max absorption
+        effect clear @s minecraft:absorption
+        # Set the player score to the correct amount
+        scoreboard players set @s Nightrunner_Absorption <%temp_health%>
+    }
+}

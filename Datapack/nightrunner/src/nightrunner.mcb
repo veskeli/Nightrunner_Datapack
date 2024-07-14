@@ -2,6 +2,11 @@ import ./templates/messages.mcbt
 import ./templates/scoreboard/settings_scoreboard.mcbt
 import ./templates/settings/settings_page.mcbt
 import ./templates/log.mcbt
+import ./templates/health/set_max_health.mcbt
+import ./templates/health/set_temp_health.mcbt
+import ./templates/health/add_temp_health.mcbt
+import ./templates/mobs/undead_base_values.mcbt
+import ./templates/mobs/set_random_score.mcbt
 # Nightrunner
 function on_load minecraft:load{
     #=================================================
@@ -33,7 +38,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 2 More dev tools
+    welcome 3 Revive system first implementation
 }
 #=================================================
 # MARK: Settings
@@ -55,10 +60,10 @@ dir settings{
     }
     function reset_join{
         # Reset the joined status
-        scoreboard players reset @a Nightrunner_Joined
-        scoreboard players reset @a Nightrunner_ID
-        # Reset the internal id
-        scoreboard players reset $Nightrunner_Internal_ID Nightrunner_ID
+        scoreboard objectives remove Nightrunner_Joined
+        scoreboard objectives remove Nightrunner_ID
+        scoreboard objectives add Nightrunner_Joined dummy
+        scoreboard objectives add Nightrunner_ID dummy
     }
     function tick minecraft:tick{
         # Allow the player to open the settings if they are op
@@ -71,8 +76,8 @@ dir settings{
         }
     }
     dir toggles{
-        function toggle_health_system{
-            # Toggle the health system
+        function toggle_revive_system{
+            # Toggle the revive system
             execute if score $Nightrunner Nightrunner_UseReviveSystem matches 1 run {
                 scoreboard players set $Nightrunner Nightrunner_UseReviveSystem 0
                 # open settings again
@@ -83,16 +88,229 @@ dir settings{
                 function ../settings
             }
         }
+        function toggle_health_system{
+            # Toggle the health system
+            execute if score $Nightrunner Nightrunner_UseHealthSystem matches 1 run {
+                scoreboard players set $Nightrunner Nightrunner_UseHealthSystem 0
+                # open settings again
+                function ../settings
+            } else run {
+                scoreboard players set $Nightrunner Nightrunner_UseHealthSystem 1
+                # open settings again
+                function ../settings
+            }
+        }
+    }
+}
+#=================================================
+# MARK: Crafting
+#=================================================
+dir crafting{
+    function load minecraft:load{
+        # Click check
+        scoreboard objectives add Nightrunner_ClickedBool dummy
+        # Cauldron Check Craftable Amount In Hand
+        scoreboard objectives add Nightrunner_CauldronCraftableAmountInHand dummy
+        # Cauldron craft first amount
+        scoreboard objectives add Nightrunner_CauldronCraftFirstAmount dummy
+        # Cauldron craft crafting timer
+        scoreboard objectives add Nightrunner_CauldronCraftingTimer dummy
+    }
+    dir soulstone{
+        # Soulstone: artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living
+        function give_soulstone{
+            give @s minecraft:music_disc_11[custom_data={soulstone:true},item_name='{"text":"Soulstone","italic":false}',lore=['{"text":"Artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1125,!minecraft:jukebox_playable] 1
+        }
+        function summon_soulstone{
+            summon item ~ ~ ~ {Item:{id:"minecraft:music_disc_11",count:1,components:{"!minecraft:jukebox_playable":{},"minecraft:item_name":'"Soulstone"',"minecraft:lore":['"Artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living."','{"color":"aqua","text":"Nightrunner"}'],"minecraft:custom_model_data":1125,"minecraft:custom_data":{soulstone:true}}}}
+        }
+    }
+    dir cauldroncraft{
+        function cauldroncheck minecraft:tick{
+            execute as @e[type=item_frame,nbt={Tags:["forge_core"],Item:{}}] run block cauldron_check{
+                # Check if its on top of a cauldron
+                execute at @s run execute if block ~ ~-0.5 ~ #minecraft:cauldrons run return run block{
+                    # Check if duplicate
+                    execute as @s run execute if entity @e[type=item_display,nbt={Tags:["forge_core"]},distance=..1] run return run block{
+                        # cancel
+                        execute at @s run function ./cancel_craft
+                        # Kill the item frame
+                        kill @s
+                    }
+
+                    # Summon item display
+                    execute at @s run summon item_display ~ ~0.5 ~ {billboard:"vertical",item:{id:"minecraft:item_frame",count:1,components:{"minecraft:custom_model_data":1124}},Tags:["forge_core"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.6f,0.6f,0.6f]}}
+
+                    # Summon interactable (to detect interaction with brewing stand)
+                    execute at @s run summon interaction ~ ~ ~ {width:0.75,height:0.75,response:0.75,Tags:["CauldronCraftInteractable"]}
+                    # Kill the item frame
+                    kill @s
+                }
+
+                # cancel
+                execute at @s run function ./cancel_craft
+                # Kill the item frame
+                kill @s
+            }
+
+            # if Nightrunner_CauldronCraftingTimer entities exist lower the timer
+            execute as @e[type=interaction,nbt={Tags:["CauldronCraftInteractable"]},scores={Nightrunner_CauldronCraftingTimer=1..}] run scoreboard players remove @s Nightrunner_CauldronCraftingTimer 1
+            # if the timer is 0 then finish the craft
+            execute as @e[type=interaction,nbt={Tags:["CauldronCraftInteractable"]},scores={Nightrunner_CauldronCraftingTimer=..0}] run function ./finish_craft
+        }
+        # Forge Core: A fundamental component essential for all cauldron crafting recipes
+        function give_craft_start{
+            give @p item_frame[entity_data={id:"minecraft:item_frame",Item:{id:"minecraft:music_disc_mall"},Tags:["forge_core"]},custom_model_data=1124,item_name='{"text":"Forge Core","italic":false}',lore=['{"text":"A fundamental component essential for all cauldron crafting recipes."}','{"text":"Nightrunner","color":"aqua"}']] 1
+        }
+        function cancel_craft{
+            # Drop the original item
+            summon item ~ ~ ~ {Item:{id:"minecraft:item_frame",count:1,components:{"minecraft:entity_data":{id:"minecraft:item_frame",Item:{id:"minecraft:music_disc_mall"},Tags:["forge_core"]},"minecraft:custom_model_data":1124,"minecraft:item_name":'{"text":"Forge Core","italic":false}',"minecraft:lore":['"A fundamental component essential for all cauldron crafting recipes."','{"color":"aqua","text":"Nightrunner"}']}}}
+            execute at @s run particle angry_villager ~ ~ ~ 0 0 0 0.1 1 force
+        }
+        function right_clicked{
+            # Reset advancement
+            advancement revoke @s only nightrunner:interacted_with_cauldron_right
+
+            # execute at @s as @n[type=minecraft:interaction,predicate={name of your predicate}] run tag @s add interaction
+            execute at @s as @n[type=minecraft:interaction,predicate=nightrunner:interaction_right_clicked] run tag @s add interaction
+
+            # add tag
+            tag @s add interaction_player
+
+            # Check wich interaction was clicked
+            execute as @e[tag=interaction] run block right_clicked/handle_interaction{
+                execute as @s run block check_craft{
+                    # Check if already crafting
+                    execute as @s run execute if score @s Nightrunner_CauldronCraftingTimer matches 1.. run return 1
+
+                    # Check if the lava cauldron still exists
+                    execute as @s at @s run execute unless block ~ ~-1 ~ lava_cauldron run return 1
+
+                    # Check if the player has the rotten flesh in hand
+                    execute as @a[limit=1,sort=nearest,nbt={SelectedItem:{id:"minecraft:rotten_flesh",components:{"minecraft:custom_data":{dried_rotten_flesh:true}}}}] run block check_amount{
+                        # Store the amount of rotten flesh in hand
+                        execute as @s run execute store result score @s Nightrunner_CauldronCraftableAmountInHand run data get entity @s SelectedItem.count
+                        # if the amount is more then 16 we can continue
+                        execute if score @s Nightrunner_CauldronCraftableAmountInHand matches 16.. run block amount_exceeded{
+                            tag @s add AmountExceeded
+                            # TODO: Save the removed amount and if its somehow wrong give it back
+                            clear @s rotten_flesh[custom_data={dried_rotten_flesh:true}] 16
+                        }
+                    }
+
+                    # Check if craft can continue
+                    execute at @s run execute unless entity @a[distance=..8,limit=1,tag=AmountExceeded] run return 1
+
+                    # Set item display to show rotten flesh
+                    data merge entity @e[type=item_display,limit=1,sort=nearest,tag=cauldroncraft] {CustomNameVisible:0b,start_interpolation:0,interpolation_duration:100,transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,-1f,0f],scale:[0.8f,0.8f,0.8f]},item:{id:"minecraft:rotten_flesh",count:1,components:{"minecraft:custom_model_data":1121}}}
+                    execute as @s run scoreboard players set @s Nightrunner_CauldronCraftingTimer 100
+                }
+
+                # Clear the player who clicked from item display
+                execute as @s run data remove entity @s interaction
+
+                # remove tag
+                tag @s remove interaction
+            }
+            tag @s remove interaction_player
+            tag @s remove AmountExceeded
+        }
+        function finish_craft{
+            # Check if lava cauldron still exists
+            execute as @s at @s run execute unless block ~ ~-1 ~ lava_cauldron run block{
+                # Cancel the craft if the cauldron is missing
+                execute as @s run function ./cancel_craft
+            }
+            execute as @s at @s run execute if block ~ ~-1 ~ lava_cauldron run block{
+                # Convert to empty cauldron
+                execute as @s run setblock ~ ~-1 ~ minecraft:cauldron
+                # Summon the soulstone
+                execute at @s run function ../soulstone/summon_soulstone
+            }
+
+            # Kill item display
+            execute at @s run kill @e[type=item_display,limit=1,sort=nearest,tag=cauldroncraft]
+            # Kill interactable
+            kill @s
+        }
+        function left_clicked{
+            # Reset advancement
+            advancement revoke @s only nightrunner:interacted_with_cauldron_left
+
+            # execute at @s as @n[type=minecraft:interaction,predicate={name of your predicate}] run tag @s add interaction
+            execute at @s as @n[type=minecraft:interaction,predicate=nightrunner:interaction_left_clicked] run tag @s add interaction
+
+            # Check wich interaction was clicked
+            execute as @e[tag=interaction] run block left_clicked/handle_interaction{
+                # Clear the player who clicked from item display
+                execute as @s run data remove entity @s attack
+
+                execute as @s run function ./cancel_craft
+
+                # kill the item display
+                execute at @s run kill @e[type=item_display,nbt={Tags:["forge_core"]},sort=nearest,limit=1]
+                # kill the interactable
+                kill @s
+            }
+        }
+        function destroy_cauldron_crafts{
+            # Kill item frames (Item placer)
+            kill @e[type=item_frame,nbt={Tags:["forge_core"]}]
+            # Kill item displays (Brewing Stand)
+            kill @e[type=item_display,nbt={Tags:["forge_core"]}]
+            # Kill interactables (Brewing Stand)
+            kill @e[type=interaction,nbt={Tags:["CauldronCraftInteractable"]}]
+        }
+    }
+}
+#=================================================
+# MARK: Crafting Recipes
+recipe forge_core{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " i ",
+        " i ",
+        "iSi"
+    ],
+    "key": {
+        "i": {
+            "item": "minecraft:iron_ingot"
+        },
+        "S": {
+            "item": "minecraft:stone"
+        }
+    },
+    "result": {
+        "id": "minecraft:item_frame",
+        "count": 1,
+        "components":{
+            "item_name":"[{\"text\":\"Forge Core\",\"italic\":false}]",
+            "lore": ["{\"text\":\"A fundamental component essential for all cauldron crafting recipes.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+            "custom_model_data": 1124,
+            "entity_data": {
+                "id": "minecraft:item_frame",
+                "Item": {
+                    "id": "minecraft:music_disc_mall"
+                },
+                "Tags": ["forge_core"]
+            }
+        }
     }
 }
 #=================================================
 # MARK: Health system
 #=================================================
+#  Key points:
+#  - No respawns (Player is dead until revived)
+#  - Revive system
+#  - Start with 16 health (8 hearts)
 dir health_system{
     function load minecraft:load{
         #=================================================
         # Scoreboards
         #=================================================
+        # Use Health system
+        scoreboard objectives add Nightrunner_UseHealthSystem dummy
         # Use Revive system
         scoreboard objectives add Nightrunner_UseReviveSystem dummy
         # Total Death count
@@ -105,6 +323,17 @@ dir health_system{
         scoreboard objectives add Nightrunner_Revive trigger
         # Op Revive all trigger
         scoreboard objectives add Nightrunner_ReviveAll trigger
+        # Health
+        scoreboard objectives add Nightrunner_Health health
+        # Health max
+        scoreboard objectives add Nightrunner_MaxHealth dummy
+        # Current absorption amount
+        scoreboard objectives add Nightrunner_Absorption dummy
+        # Check | Current Absorption Amount
+        scoreboard objectives add Nightrunner_CheckCurrentAbsorptionAmount dummy
+        # Grave id
+        scoreboard objectives add Nightrunner_GraveID dummy
+
 
         #=================================================
         # Load the health system
@@ -115,14 +344,33 @@ dir health_system{
         #=================================================
         # Check scoreboard settings
         #=================================================
-        execute unless score $Nightrunner Nightrunner_UseReviveSystem matches 9999.. run scoreboard players set $Nightrunner Nightrunner_UseReviveSystem 1
+        execute unless score $Nightrunner Nightrunner_UseReviveSystem matches ..99999 run scoreboard players set $Nightrunner Nightrunner_UseReviveSystem 1
+        execute unless score $Nightrunner Nightrunner_UseHealthSystem matches ..99999 run scoreboard players set $Nightrunner Nightrunner_UseHealthSystem 1
+    }
+    clock setup 1s{
+        # TODO: Dont use clock and use schedule instead
+        # Check if the health system is enabled
+        execute if score $Nightrunner Nightrunner_UseHealthSystem matches 0 run return 1
+        # Set the player max health if score is null
+        execute as @a unless score @s Nightrunner_Health matches ..0 run block setup_health{
+            # Set the max health
+            set_max_health 16
+        }
+    }
+    function set_temporary_health{
+        # Give the player lvl 100 absorption effect
+        effect give @s minecraft:absorption 1 100 true
+        # Set the players max absorption to the correct amount
+        $attribute @s minecraft:generic.max_absorption base set $(amount)
+        # Clear effect to remove the absorption effect and only keep the max absorption
+        effect clear @s minecraft:absorption
     }
     function tick minecraft:tick{
         # TODO: Dont use tick and use schedule instead
         # Check if the revive system is enabled
         execute if score $Nightrunner Nightrunner_UseReviveSystem matches 0 run return 1
         # Check if the player is dead
-        execute as @a[scores={Nightrunner_Death=..1}] run block death_screen{
+        execute as @a[scores={Nightrunner_Death=1..},limit=1] run block death_screen{
             # execute the death function
             function ./death
             # Reset the dead status
@@ -131,9 +379,11 @@ dir health_system{
     }
     function death{
         # if player is not in survival mode then return
-        execute as @s[nbt={playerGameType:1}] run return run block player_is_in_creative{
-            say Player is in creative mode
-        }
+        execute as @s[nbt={playerGameType:1}] run return run tellraw @s [{"text":"Auto revived while in creative","color":"blue"}]
+
+        # Summon grave
+        execute as @s run function ./summon_grave
+
         # Set player respawn location to the death location
         execute at @s run spawnpoint @s ~ ~ ~
         # Set the player as dead
@@ -142,6 +392,34 @@ dir health_system{
         gamemode spectator @s
         # Show title with death message
         title @s title [{"text":"You died","color":"red"}]
+    }
+    function summon_grave{
+        # Summon a grave block
+        execute at @s run summon block_display ~ ~1 ~ {CustomNameVisible:1b,CustomName:'"Grave"',transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[-0.5f,-1.0f,-0.5f],scale:[1f,1f,1f]},block_state:{Name:"minecraft:stone_brick_wall",Properties:{east:"low",west:"low",up:"true"}},Tags:["Grave"]}
+        # Summon interactable
+        execute as @e[type=minecraft:block_display,sort=nearest,limit=1,nbt={Tags:["Grave"]}] at @s positioned ~ ~-1 ~ summon interaction run data merge entity @s {width:1,height:1,response:1,Tags:[GraveInteractable]}
+
+        # Set the grave id to match the player id
+        execute as @s run scoreboard players operation @e[type=block_display,nbt={Tags:["Grave"]},sort=nearest,limit=1] Nightrunner_GraveID = @s Nightrunner_ID
+        # Set the interactable id to match the player id
+        execute as @s run scoreboard players operation @e[type=interaction,nbt={Tags:["GraveInteractable"]},sort=nearest,limit=1] Nightrunner_GraveID = @s Nightrunner_ID
+    }
+    function interacted_with_grave{
+        # Reset advancement
+        advancement revoke @s only nightrunner:interacted_with_grave
+        say @s interacted with grave
+    }
+    function kill_player_graves{
+        # Kill graves
+        $kill @e[type=block_display,nbt={Tags:["Grave"]},scores={Nightrunner_GraveID=$(id)}]
+        # Kill interactables
+        $kill @e[type=interaction,nbt={Tags:["GraveInteractable"]},scores={Nightrunner_GraveID=$(id)}]
+    }
+    function kill_all_graves{
+        # Kill graves
+        kill @e[type=block_display,nbt={Tags:["Grave"]}]
+        # Kill interactables
+        kill @e[type=interaction,nbt={Tags:["GraveInteractable"]}]
     }
     dir revive{
         function tick minecraft:tick{
@@ -177,11 +455,78 @@ dir health_system{
             execute as @a[scores={Nightrunner_CurrentlyDead=1}] run function ./op_revive
         }
     }
+    dir items{
+        dir consumables{
+            dir heartfruit{
+                # Heartfruit: A common consumable that grants a temporary heart, up to a maximum of two.
+                # Uses sweet berries as a base.
+                function give_heartfruit{
+                    give @s minecraft:poisonous_potato[custom_data={heartfruit:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit","italic":false}',lore=['{"text":"A common consumable that grants a temporary heart, up to a maximum of two."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1122] 1
+                }
+                function apply_heartfruit{
+                    # reset advancement
+                    advancement revoke @s only nightrunner:used_heartfruit
+                    # Apply temporary health
+                    add_temp_health 2 4
+                }
+            }
+            dir heartfruit_plus{
+                # Heartfruit Plus: A rarer variant that grants a temporary heart, up to a maximum of three.
+                # Uses Glow Berries as a base.
+                function give_heartfruit_plus{
+                    give @s minecraft:poisonous_potato[custom_data={heartfruit_plus:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit Plus","italic":false}',lore=['{"text":"A rarer variant that grants a temporary heart and a half, up to a maximum of three."}','{"text":"Nightrunner","color":"aqua"}'],enchantment_glint_override=true,rarity=rare,custom_model_data=1123] 1
+                }
+                function apply_heartfruit_plus{
+                    # reset advancement
+                    advancement revoke @s only nightrunner:used_heartfruit_plus
+                    # Apply temporary health
+                    add_temp_health 3 6
+                }
+            }
+            dir dried_rotten_flesh{
+                # Dried Rotten Flesh: (4 nutrition, 0.8 saturation, 1.5 eat seconds)
+                # Uses rotten flesh as a base.
+                function give_dried_rotten_flesh{
+                    give @s minecraft:rotten_flesh[food={nutrition:4,saturation:0.8,can_always_eat:false,eat_seconds:1.5},item_name='{"text":"Dried Rotten Flesh","italic":false}',lore=['{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1121,custom_data={dried_rotten_flesh:true}] 1
+                }
+                # Smelting rotten flesh to dried rotten flesh
+                recipe smelt_rotten_flesh{
+                    "type": "minecraft:smelting",
+                    "ingredient": {
+                        "item": "minecraft:rotten_flesh"
+                    },
+                    "result": {
+                        "id": "minecraft:rotten_flesh",
+                        "components":{
+                            "item_name":"[{\"text\":\"Dried Rotten Flesh\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "food": {
+                                "nutrition": 4,
+                                "saturation": 0.8,
+                                "can_always_eat": false,
+                                "eat_seconds": 1.5
+                            },
+                            "custom_model_data": 1121,
+                            "custom_data": {
+                                "dried_rotten_flesh": true
+                            }
+                        }
+                    },
+                    "experience": 0.05,
+                    "cookingtime": 100
+                }
+            }
+        }
+    }
 }
 #=================================================
 # MARK: Mobs
 #=================================================
 dir mobs{
+    function load minecraft:load{
+        scoreboard objectives add Nightrunner_MobDefiner dummy
+        
+    }
     #=================================================
     # Monsters
     dir monsters{
@@ -200,8 +545,9 @@ dir mobs{
             # execute as @e[type=<%entity_type%>,tag=!Nightrunner,limit=1] run data merge entity @s {Attributes:[{Base:<%attack_damage%>,Name:"generic.attack_damage"},{Base:<%move_speed%>,Name:"generic.movement_speed"}], CanPickUpLoot:1b,Tags:["nightmare"], CustomName:'{"text":"<%entity_name%>"}',CustomNameVisible:0b}
         }
         function drowned minecraft:tick{
-           execute as @e[type=drowned,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
+            set_random_score drowned 1 100
 
+            undead_base_values drowned Nightrunner_MobDefiner 100 20 10 0.31 1 1 HurtTime:0s
 
         }
         function husk minecraft:tick{
@@ -218,21 +564,26 @@ dir mobs{
             # execute as @e[type=husk,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},,{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
         }
         function stray minecraft:tick{
-            execute as @e[type=stray,tag=!Nightrunner,limit=1] run block data/stray{
+
+            # Store a random value
+            # execute store result score @s Nightrunner_MobDefiner run random value 1..100
+            set_random_score stray 1 100
+            
+            undead_base_values stray Nightrunner_MobDefiner 100 20 10 0.31 1 1 HurtTime:0s
+            
+            # execute as @e[type=stray,tag=!Nightrunner,limit=1] run block data/stray{
                 # Store a random value
-                execute store result score @s nightrunner.internal run random value 1..100
+                # execute store result score @s nightrunner.internal run random value 1..100
                 # Set the skeleton data based on the random value
-                execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..100 run data merge entity @s {CustomName:'"test"',Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31}]}
-            }
+                # execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..100 run data merge entity @s {CustomName:'"test"',Tags:["Nightrunner"],CanPickUpLoot:1b,attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31}]}
+            # }
 
         }
         function bogged minecraft:tick{
-            execute as @e[type=bogged,tag=!Nightrunner,limit=1] run block data/bogged{
-                # Store a random value
-                execute store result score @s nightrunner.internal run random value 1..100
-                # Set the skeleton data based on the random value
-                execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..100 run data merge entity @s {CustomName:'"test"',Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31}]}
-            }
+            # execute store result score @s Nightrunner_MobDefiner run random value 1..100
+            set_random_score bogged 1 100
+            
+            undead_base_values bogged Nightrunner_MobDefiner 100 20 10 0.31 1 1 HurtTime:0s
 
         }
         function creeper minecraft:tick{
@@ -262,17 +613,118 @@ dir mobs{
     }
 }
 #=================================================
-# MARK: Crafting
-#=================================================
-
-#=================================================
 # MARK: Advacements
 #=================================================
-
+# Grave interaction
+advancement interacted_with_grave{
+    "criteria": {
+      "requirement": {
+        "trigger": "minecraft:player_interacted_with_entity",
+        "conditions": {
+          "entity": {
+            "type": "minecraft:interaction",
+            "nbt": "{Tags:[GraveInteractable]}"
+          }
+        }
+      }
+    },
+    "rewards": {
+      "function": "nightrunner:health_system/interacted_with_grave"
+    }
+}
+# Cauldron craft interaction [right click]
+advancement interacted_with_cauldron_right{
+    "criteria": {
+      "requirement": {
+        "trigger": "minecraft:player_interacted_with_entity",
+        "conditions": {
+          "entity": {
+            "type": "minecraft:interaction",
+            "nbt": "{Tags:[CauldronCraftInteractable]}"
+          }
+        }
+      }
+    },
+    "rewards": {
+      "function": "nightrunner:crafting/cauldroncraft/right_clicked"
+    }
+}
+# Cauldron craft interaction [left click]
+advancement interacted_with_cauldron_left{
+    "criteria": {
+      "requirement": {
+        "trigger": "minecraft:player_hurt_entity",
+        "conditions": {
+          "entity": {
+            "type": "minecraft:interaction",
+            "nbt": "{Tags:[CauldronCraftInteractable]}"
+          }
+        }
+      }
+    },
+    "rewards": {
+      "function": "nightrunner:crafting/cauldroncraft/left_clicked"
+    }
+}
+# Heartfruit
+advancement used_heartfruit{
+    "criteria": {
+    "use_item": {
+    "trigger": "minecraft:consume_item",
+    "conditions": {
+        "item": {
+        "predicates": {
+            "minecraft:custom_data": {"heartfruit":true}
+        }
+        }
+    }
+    }
+},
+"rewards": {
+    "function": "nightrunner:health_system/items/consumables/heartfruit/apply_heartfruit"
+}
+}
+# Heartfruit Plus
+advancement used_heartfruit_plus{
+    "criteria": {
+    "use_item": {
+    "trigger": "minecraft:consume_item",
+    "conditions": {
+        "item": {
+        "predicates": {
+            "minecraft:custom_data": {"heartfruit_plus":true}
+        }
+        }
+    }
+    }
+},
+"rewards": {
+    "function": "nightrunner:health_system/items/consumables/heartfruit_plus/apply_heartfruit_plus"
+}
+}
 #=================================================
 # MARK: Predicates
 #=================================================
+# If interaction is right clicked
+predicate interaction_right_clicked{
+  "condition": "minecraft:entity_properties",
+  "entity": "this",
+  "predicate": {
+    "nbt": "{interaction:{}}"
+  }
+}
+# If interaction is left clicked
+predicate interaction_left_clicked{
+  "condition": "minecraft:entity_properties",
+  "entity": "this",
+  "predicate": {
+    "nbt": "{attack:{}}"
+  }
+}
+# 10% chance
 predicate 10change{
   "condition": "minecraft:random_chance",
   "chance": 0.1
 }
+
+# Iron Golem has the following entity data: {Brain: {memories: {}}, HurtByTimestamp: 27715, Invulnerable: 0b, FallFlying: 0b, PortalCooldown: 0, AbsorptionAmount: 0.0f, FallDistance: 0.0f, DeathTime: 0s, WorldUUIDMost: -7580720819105740754L, HandDropChances: [0.085f, 0.085f], Bukkit.Aware: 1b, PersistenceRequired: 0b, Spigot.ticksLived: 612698, UUID: [I; 39879517, 2084847774, -1694864611, -2059684637], AngerTime: 0, Motion: [-0.062486890252097436d, -0.0784000015258789d, 0.026071353097120456d], Health: 100.0f, Bukkit.updateLevel: 2, PlayerCreated: 0b, LeftHanded: 0b, Air: 300s, OnGround: 1b, Rotation: [10.75795f, 0.0f], HandItems: [{}, {}], ArmorDropChances: [0.085f, 0.085f, 0.085f, 0.085f], Pos: [-7877.799999989569d, 69.0d, 2543.8081930395288d], Fire: -1s, ArmorItems: [{}, {}, {}, {}], CanPickUpLoot: 0b, attributes: [{id: "minecraft:generic.max_health", base: 100.0d}, {id: "minecraft:generic.follow_range", modifiers: [{amount: 0.04404645443414565d, id: "minecraft:random_spawn_bonus", operation: "add_multiplied_base"}], base: 16.0d}, {id: "minecraft:generic.movement_speed", base: 0.25d}], HurtTime: 0s, WorldUUIDLeast: -5180699469935483630L}

@@ -38,7 +38,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 3 Revive system first implementation
+    welcome 4 Cauldron Crafting!
 }
 #=================================================
 # MARK: Settings
@@ -109,23 +109,18 @@ dir crafting{
     function load minecraft:load{
         # Click check
         scoreboard objectives add Nightrunner_ClickedBool dummy
-        # Cauldron Check Craftable Amount In Hand
-        scoreboard objectives add Nightrunner_CauldronCraftableAmountInHand dummy
-        # Cauldron craft first amount
-        scoreboard objectives add Nightrunner_CauldronCraftFirstAmount dummy
-        # Cauldron craft crafting timer
-        scoreboard objectives add Nightrunner_CauldronCraftingTimer dummy
-    }
-    dir soulstone{
-        # Soulstone: artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living
-        function give_soulstone{
-            give @s minecraft:music_disc_11[custom_data={soulstone:true},item_name='{"text":"Soulstone","italic":false}',lore=['{"text":"Artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1125,!minecraft:jukebox_playable] 1
-        }
-        function summon_soulstone{
-            summon item ~ ~ ~ {Item:{id:"minecraft:music_disc_11",count:1,components:{"!minecraft:jukebox_playable":{},"minecraft:item_name":'"Soulstone"',"minecraft:lore":['"Artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living."','{"color":"aqua","text":"Nightrunner"}'],"minecraft:custom_model_data":1125,"minecraft:custom_data":{soulstone:true}}}}
-        }
     }
     dir cauldroncraft{
+        function load minecraft:load{
+            # Click check
+            scoreboard objectives add Nightrunner_ClickedBool dummy
+            # Cauldron Check Craftable Amount In Hand
+            scoreboard objectives add Nightrunner_CauldronCraftableAmountInHand dummy
+            # Cauldron craft first amount
+            scoreboard objectives add Nightrunner_CauldronCraftFirstAmount dummy
+            # Cauldron craft crafting timer
+            scoreboard objectives add Nightrunner_CauldronCraftingTimer dummy
+        }
         function cauldroncheck minecraft:tick{
             execute as @e[type=item_frame,nbt={Tags:["forge_core"],Item:{}}] run block cauldron_check{
                 # Check if its on top of a cauldron
@@ -133,7 +128,7 @@ dir crafting{
                     # Check if duplicate
                     execute as @s run execute if entity @e[type=item_display,nbt={Tags:["forge_core"]},distance=..1] run return run block{
                         # cancel
-                        execute at @s run function ./cancel_craft
+                        execute at @s run function *items/forge_core/summon
                         # Kill the item frame
                         kill @s
                     }
@@ -148,7 +143,7 @@ dir crafting{
                 }
 
                 # cancel
-                execute at @s run function ./cancel_craft
+                execute at @s run function *items/forge_core/summon
                 # Kill the item frame
                 kill @s
             }
@@ -157,15 +152,6 @@ dir crafting{
             execute as @e[type=interaction,nbt={Tags:["CauldronCraftInteractable"]},scores={Nightrunner_CauldronCraftingTimer=1..}] run scoreboard players remove @s Nightrunner_CauldronCraftingTimer 1
             # if the timer is 0 then finish the craft
             execute as @e[type=interaction,nbt={Tags:["CauldronCraftInteractable"]},scores={Nightrunner_CauldronCraftingTimer=..0}] run function ./finish_craft
-        }
-        # Forge Core: A fundamental component essential for all cauldron crafting recipes
-        function give_craft_start{
-            give @p item_frame[entity_data={id:"minecraft:item_frame",Item:{id:"minecraft:music_disc_mall"},Tags:["forge_core"]},custom_model_data=1124,item_name='{"text":"Forge Core","italic":false}',lore=['{"text":"A fundamental component essential for all cauldron crafting recipes."}','{"text":"Nightrunner","color":"aqua"}']] 1
-        }
-        function cancel_craft{
-            # Drop the original item
-            summon item ~ ~ ~ {Item:{id:"minecraft:item_frame",count:1,components:{"minecraft:entity_data":{id:"minecraft:item_frame",Item:{id:"minecraft:music_disc_mall"},Tags:["forge_core"]},"minecraft:custom_model_data":1124,"minecraft:item_name":'{"text":"Forge Core","italic":false}',"minecraft:lore":['"A fundamental component essential for all cauldron crafting recipes."','{"color":"aqua","text":"Nightrunner"}']}}}
-            execute at @s run particle angry_villager ~ ~ ~ 0 0 0 0.1 1 force
         }
         function right_clicked{
             # Reset advancement
@@ -184,25 +170,37 @@ dir crafting{
                     execute as @s run execute if score @s Nightrunner_CauldronCraftingTimer matches 1.. run return 1
 
                     # Check if the lava cauldron still exists
-                    execute as @s at @s run execute unless block ~ ~-1 ~ lava_cauldron run return 1
+                    execute as @s at @s run execute unless block ~ ~-1 ~ lava_cauldron run return run block{
+                        # Check if the player has the dried rotten flesh in hand
+                        execute as @a[limit=1,sort=nearest,nbt={SelectedItem:{id:"minecraft:poisonous_potato",components:{"minecraft:custom_data":{dried_rotten_flesh:true}}}}] run block{
+                            tellraw @s [{"text":"The cauldron needs to be filled with lava before crafting with this item.","color":"red"}]
+                            tag @s add ErrorShowed
+                        }
+                    }
 
                     # Check if the player has the rotten flesh in hand
-                    execute as @a[limit=1,sort=nearest,nbt={SelectedItem:{id:"minecraft:rotten_flesh",components:{"minecraft:custom_data":{dried_rotten_flesh:true}}}}] run block check_amount{
+                    execute as @a[limit=1,sort=nearest,nbt={SelectedItem:{id:"minecraft:poisonous_potato",components:{"minecraft:custom_data":{dried_rotten_flesh:true}}}}] run block check_amount{
                         # Store the amount of rotten flesh in hand
                         execute as @s run execute store result score @s Nightrunner_CauldronCraftableAmountInHand run data get entity @s SelectedItem.count
                         # if the amount is more then 16 we can continue
                         execute if score @s Nightrunner_CauldronCraftableAmountInHand matches 16.. run block amount_exceeded{
                             tag @s add AmountExceeded
                             # TODO: Save the removed amount and if its somehow wrong give it back
-                            clear @s rotten_flesh[custom_data={dried_rotten_flesh:true}] 16
+                            clear @s poisonous_potato[custom_data={dried_rotten_flesh:true}] 16
+                        }
+                        execute if score @s Nightrunner_CauldronCraftableAmountInHand matches ..15 run block{
+                            tellraw @s [{"text":"You need at least 16 dried rotten flesh to craft with the cauldron.","color":"red"}]
+                            tag @s add ErrorShowed
                         }
                     }
 
                     # Check if craft can continue
-                    execute at @s run execute unless entity @a[distance=..8,limit=1,tag=AmountExceeded] run return 1
+                    execute at @s run execute unless entity @a[distance=..8,limit=1,tag=AmountExceeded] run return run block{
+                        execute as @s run tellraw @s [{"text":"This item is not a valid recipe for the cauldron.","color":"red"}]
+                    }
 
                     # Set item display to show rotten flesh
-                    data merge entity @e[type=item_display,limit=1,sort=nearest,tag=cauldroncraft] {CustomNameVisible:0b,start_interpolation:0,interpolation_duration:100,transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,-1f,0f],scale:[0.8f,0.8f,0.8f]},item:{id:"minecraft:rotten_flesh",count:1,components:{"minecraft:custom_model_data":1121}}}
+                    data merge entity @e[type=item_display,limit=1,sort=nearest,tag=forge_core] {CustomNameVisible:0b,start_interpolation:0,interpolation_duration:100,transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,-1f,0f],scale:[0.8f,0.8f,0.8f]},item:{id:"minecraft:poisonous_potato",count:1,components:{"minecraft:custom_model_data":1121}}}
                     execute as @s run scoreboard players set @s Nightrunner_CauldronCraftingTimer 100
                 }
 
@@ -212,26 +210,12 @@ dir crafting{
                 # remove tag
                 tag @s remove interaction
             }
+
+            execute as @s[tag=!AmountExceeded] run execute as @s[tag=!ErrorShowed] run tellraw @s [{"text":"This item is not a valid recipe for the cauldron.","color":"red"}]
+
+            tag @s remove ErrorShowed
             tag @s remove interaction_player
             tag @s remove AmountExceeded
-        }
-        function finish_craft{
-            # Check if lava cauldron still exists
-            execute as @s at @s run execute unless block ~ ~-1 ~ lava_cauldron run block{
-                # Cancel the craft if the cauldron is missing
-                execute as @s run function ./cancel_craft
-            }
-            execute as @s at @s run execute if block ~ ~-1 ~ lava_cauldron run block{
-                # Convert to empty cauldron
-                execute as @s run setblock ~ ~-1 ~ minecraft:cauldron
-                # Summon the soulstone
-                execute at @s run function ../soulstone/summon_soulstone
-            }
-
-            # Kill item display
-            execute at @s run kill @e[type=item_display,limit=1,sort=nearest,tag=cauldroncraft]
-            # Kill interactable
-            kill @s
         }
         function left_clicked{
             # Reset advancement
@@ -245,13 +229,32 @@ dir crafting{
                 # Clear the player who clicked from item display
                 execute as @s run data remove entity @s attack
 
-                execute as @s run function ./cancel_craft
+                # Summon the original item
+                execute as @s run function *items/forge_core/summon
 
                 # kill the item display
                 execute at @s run kill @e[type=item_display,nbt={Tags:["forge_core"]},sort=nearest,limit=1]
                 # kill the interactable
                 kill @s
             }
+        }
+        function finish_craft{
+            # Check if lava cauldron still exists
+            execute as @s at @s run execute unless block ~ ~-1 ~ lava_cauldron run block{
+                # Cancel the craft if the cauldron is missing
+                execute as @s run function *items/forge_core/summon
+            }
+            execute as @s at @s run execute if block ~ ~-1 ~ lava_cauldron run block{
+                # Convert to empty cauldron
+                execute as @s run setblock ~ ~-1 ~ minecraft:cauldron
+                # Summon the soulstone
+                execute at @s run function *items/soulstone/summon
+            }
+
+            # Kill item display
+            execute at @s run kill @e[type=item_display,limit=1,sort=nearest,tag=forge_core]
+            # Kill interactable
+            kill @s
         }
         function destroy_cauldron_crafts{
             # Kill item frames (Item placer)
@@ -264,35 +267,121 @@ dir crafting{
     }
 }
 #=================================================
-# MARK: Crafting Recipes
-recipe forge_core{
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " i ",
-        " i ",
-        "iSi"
-    ],
-    "key": {
-        "i": {
-            "item": "minecraft:iron_ingot"
-        },
-        "S": {
-            "item": "minecraft:stone"
+# MARK: Items
+#=================================================
+dir items{
+    dir forge_core{
+        # Forge Core: A fundamental component essential for all cauldron crafting recipes
+        # Uses music disc mall as a base
+        # Used in cauldon crafting recipes as base component
+        function give{
+            give @p item_frame[entity_data={id:"minecraft:item_frame",Item:{id:"minecraft:music_disc_mall"},Tags:["forge_core"]},custom_model_data=1124,item_name='{"text":"Forge Core","italic":false}',lore=['{"text":"A fundamental component essential for all cauldron crafting recipes."}','{"text":"Nightrunner","color":"aqua"}']] 1
         }
-    },
-    "result": {
-        "id": "minecraft:item_frame",
-        "count": 1,
-        "components":{
-            "item_name":"[{\"text\":\"Forge Core\",\"italic\":false}]",
-            "lore": ["{\"text\":\"A fundamental component essential for all cauldron crafting recipes.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-            "custom_model_data": 1124,
-            "entity_data": {
-                "id": "minecraft:item_frame",
-                "Item": {
-                    "id": "minecraft:music_disc_mall"
+        function summon{
+            summon item ~ ~ ~ {Item:{id:"minecraft:item_frame",count:1,components:{"minecraft:entity_data":{id:"minecraft:item_frame",Item:{id:"minecraft:music_disc_mall"},Tags:["forge_core"]},"minecraft:custom_model_data":1124,"minecraft:item_name":'{"text":"Forge Core","italic":false}',"minecraft:lore":['"A fundamental component essential for all cauldron crafting recipes."','{"color":"aqua","text":"Nightrunner"}']}}}
+        }
+        recipe forge_core{
+            "type": "minecraft:crafting_shaped",
+            "pattern": [
+                " i ",
+                " i ",
+                "iSi"
+            ],
+            "key": {
+                "i": {
+                    "item": "minecraft:iron_ingot"
                 },
-                "Tags": ["forge_core"]
+                "S": {
+                    "item": "minecraft:stone"
+                }
+            },
+            "result": {
+                "id": "minecraft:item_frame",
+                "count": 1,
+                "components":{
+                    "item_name":"[{\"text\":\"Forge Core\",\"italic\":false}]",
+                    "lore": ["{\"text\":\"A fundamental component essential for all cauldron crafting recipes.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                    "custom_model_data": 1124,
+                    "entity_data": {
+                        "id": "minecraft:item_frame",
+                        "Item": {
+                            "id": "minecraft:music_disc_mall"
+                        },
+                        "Tags": ["forge_core"]
+                    }
+                }
+            }
+        }
+    }
+    dir soulstone{
+        # Soulstone: artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living
+        # Uses music disc 11 as a base
+        # Used to revive from grave
+        function give{
+            give @p minecraft:music_disc_11[custom_data={soulstone:true},item_name='{"text":"Soulstone","italic":false}',lore=['{"text":"Artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1125,!minecraft:jukebox_playable] 1
+        }
+        function summon{
+            summon item ~ ~ ~ {Item:{id:"minecraft:music_disc_11",count:1,components:{"!minecraft:jukebox_playable":{},"minecraft:item_name":'"Soulstone"',"minecraft:lore":['"Artifact capable of reviving a fallen player from their grave, bringing them back to the realm of the living."','{"color":"aqua","text":"Nightrunner"}'],"minecraft:custom_model_data":1125,"minecraft:custom_data":{soulstone:true}}}}
+        }
+    }
+    dir dried_rotten_flesh{
+        # Dried Rotten Flesh: (4 nutrition, 0.8 saturation, 1.5 eat seconds)
+        # Uses rotten flesh as a base.
+        function give_dried_rotten_flesh{
+            give @s minecraft:poisonous_potato[food={nutrition:4,saturation:0.8,can_always_eat:false,eat_seconds:1.5},item_name='{"text":"Dried Rotten Flesh","italic":false}',lore=['{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1121,custom_data={dried_rotten_flesh:true}] 1
+        }
+        # Smelting rotten flesh to dried rotten flesh
+        recipe smelt_rotten_flesh{
+            "type": "minecraft:smelting",
+            "ingredient": {
+                "item": "minecraft:rotten_flesh"
+            },
+            "result": {
+                "id": "minecraft:poisonous_potato",
+                "components":{
+                    "item_name":"[{\"text\":\"Dried Rotten Flesh\",\"italic\":false}]",
+                    "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                    "food": {
+                        "nutrition": 4,
+                        "saturation": 0.8,
+                        "can_always_eat": false,
+                        "eat_seconds": 1.5
+                    },
+                    "custom_model_data": 1121,
+                    "custom_data": {
+                        "dried_rotten_flesh": true
+                    }
+                }
+            },
+            "experience": 0.05,
+            "cookingtime": 100
+        }
+    }
+    dir consumables{
+        dir heartfruit{
+            # Heartfruit: A common consumable that grants a temporary heart, up to a maximum of two.
+            # Uses sweet berries as a base.
+            function give{
+                give @s minecraft:poisonous_potato[custom_data={heartfruit:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit","italic":false}',lore=['{"text":"A common consumable that grants a temporary heart, up to a maximum of two."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1122] 1
+            }
+            function apply{
+                # reset advancement
+                advancement revoke @s only nightrunner:used_heartfruit
+                # Apply temporary health
+                add_temp_health 2 4
+            }
+        }
+        dir heartfruit_plus{
+            # Heartfruit Plus: A rarer variant that grants a temporary heart, up to a maximum of three.
+            # Uses Glow Berries as a base.
+            function give{
+                give @s minecraft:poisonous_potato[custom_data={heartfruit_plus:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit Plus","italic":false}',lore=['{"text":"A rarer variant that grants a temporary heart and a half, up to a maximum of three."}','{"text":"Nightrunner","color":"aqua"}'],enchantment_glint_override=true,rarity=rare,custom_model_data=1123] 1
+            }
+            function apply{
+                # reset advancement
+                advancement revoke @s only nightrunner:used_heartfruit_plus
+                # Apply temporary health
+                add_temp_health 3 6
             }
         }
     }
@@ -453,69 +542,6 @@ dir health_system{
         function op_revive_all{
             # Execute as dead players
             execute as @a[scores={Nightrunner_CurrentlyDead=1}] run function ./op_revive
-        }
-    }
-    dir items{
-        dir consumables{
-            dir heartfruit{
-                # Heartfruit: A common consumable that grants a temporary heart, up to a maximum of two.
-                # Uses sweet berries as a base.
-                function give_heartfruit{
-                    give @s minecraft:poisonous_potato[custom_data={heartfruit:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit","italic":false}',lore=['{"text":"A common consumable that grants a temporary heart, up to a maximum of two."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1122] 1
-                }
-                function apply_heartfruit{
-                    # reset advancement
-                    advancement revoke @s only nightrunner:used_heartfruit
-                    # Apply temporary health
-                    add_temp_health 2 4
-                }
-            }
-            dir heartfruit_plus{
-                # Heartfruit Plus: A rarer variant that grants a temporary heart, up to a maximum of three.
-                # Uses Glow Berries as a base.
-                function give_heartfruit_plus{
-                    give @s minecraft:poisonous_potato[custom_data={heartfruit_plus:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit Plus","italic":false}',lore=['{"text":"A rarer variant that grants a temporary heart and a half, up to a maximum of three."}','{"text":"Nightrunner","color":"aqua"}'],enchantment_glint_override=true,rarity=rare,custom_model_data=1123] 1
-                }
-                function apply_heartfruit_plus{
-                    # reset advancement
-                    advancement revoke @s only nightrunner:used_heartfruit_plus
-                    # Apply temporary health
-                    add_temp_health 3 6
-                }
-            }
-            dir dried_rotten_flesh{
-                # Dried Rotten Flesh: (4 nutrition, 0.8 saturation, 1.5 eat seconds)
-                # Uses rotten flesh as a base.
-                function give_dried_rotten_flesh{
-                    give @s minecraft:rotten_flesh[food={nutrition:4,saturation:0.8,can_always_eat:false,eat_seconds:1.5},item_name='{"text":"Dried Rotten Flesh","italic":false}',lore=['{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1121,custom_data={dried_rotten_flesh:true}] 1
-                }
-                # Smelting rotten flesh to dried rotten flesh
-                recipe smelt_rotten_flesh{
-                    "type": "minecraft:smelting",
-                    "ingredient": {
-                        "item": "minecraft:rotten_flesh"
-                    },
-                    "result": {
-                        "id": "minecraft:rotten_flesh",
-                        "components":{
-                            "item_name":"[{\"text\":\"Dried Rotten Flesh\",\"italic\":false}]",
-                            "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "food": {
-                                "nutrition": 4,
-                                "saturation": 0.8,
-                                "can_always_eat": false,
-                                "eat_seconds": 1.5
-                            },
-                            "custom_model_data": 1121,
-                            "custom_data": {
-                                "dried_rotten_flesh": true
-                            }
-                        }
-                    },
-                    "experience": 0.05,
-                    "cookingtime": 100
-                }
-            }
         }
     }
 }
@@ -681,7 +707,7 @@ advancement used_heartfruit{
     }
 },
 "rewards": {
-    "function": "nightrunner:health_system/items/consumables/heartfruit/apply_heartfruit"
+    "function": "nightrunner:items/consumables/heartfruit/apply"
 }
 }
 # Heartfruit Plus
@@ -699,7 +725,7 @@ advancement used_heartfruit_plus{
     }
 },
 "rewards": {
-    "function": "nightrunner:health_system/items/consumables/heartfruit_plus/apply_heartfruit_plus"
+    "function": "nightrunner:items/consumables/heartfruit_plus/apply"
 }
 }
 #=================================================

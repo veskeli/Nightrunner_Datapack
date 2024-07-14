@@ -1,1 +1,1 @@
-{"criteria":{"use_item":{"trigger": "minecraft:consume_item","conditions":{"item":{"predicates":{"minecraft:custom_data": {"heartfruit_plus":true}}}}}},"rewards":{"function": "nightrunner:health_system/items/consumables/heartfruit_plus/apply_heartfruit_plus"}}
+{"criteria":{"use_item":{"trigger": "minecraft:consume_item","conditions":{"item":{"predicates":{"minecraft:custom_data": {"heartfruit_plus":true}}}}}},"rewards":{"function": "nightrunner:items/consumables/heartfruit_plus/apply"}}

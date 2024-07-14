@@ -8,5 +8,7 @@ execute at @s as @n[type=minecraft:interaction,predicate=nightrunner:interaction
 tag @s add interaction_player
 # Check wich interaction was clicked
 execute as @e[tag=interaction] run function nightrunner:crafting/cauldroncraft/right_clicked/handle_interaction
+execute as @s[tag=!AmountExceeded] run execute as @s[tag=!ErrorShowed] run tellraw @s [{"text":"This item is not a valid recipe for the cauldron.","color":"red"}]
+tag @s remove ErrorShowed
 tag @s remove interaction_player
 tag @s remove AmountExceeded

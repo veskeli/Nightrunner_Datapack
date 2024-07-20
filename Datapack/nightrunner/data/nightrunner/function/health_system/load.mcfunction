@@ -27,6 +27,8 @@ scoreboard objectives add Nightrunner_Absorption dummy
 scoreboard objectives add Nightrunner_CheckCurrentAbsorptionAmount dummy
 # Grave id
 scoreboard objectives add Nightrunner_GraveID dummy
+# Attempt revive
+scoreboard objectives add Nightrunner_AttemptRevive dummy
 #=================================================
 # Load the health system
 #=================================================

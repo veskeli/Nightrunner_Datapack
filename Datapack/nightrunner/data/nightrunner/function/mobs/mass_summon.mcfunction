@@ -1,0 +1,32 @@
+# Generated with MC-Build
+
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~
+$summon $(type) ~ ~ ~

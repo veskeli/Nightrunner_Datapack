@@ -1,0 +1,1 @@
+{"criteria":{"use_item":{"trigger": "minecraft:consume_item","conditions":{"item":{"predicates":{"minecraft:custom_data": {"bottle_of_experience_10":true}}}}}},"rewards":{"function": "nightrunner:items/consumables/bottle_of_experience_10/apply"}}

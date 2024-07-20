@@ -1,0 +1,3 @@
+# Generated with MC-Build
+
+give @s minecraft:poisonous_potato[custom_data={bottle_of_experience_30:true},item_name='{"text":"Bottle of experience III","italic":false}',lore=['{"text":"A consumable item that gives levels when consumed."}','{"text":"Level amount: 30","color":"green"}','{"text":"(1395 points)","color":"dark_green"}','{"text":"Nightrunner","color":"aqua"}'],food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:2},enchantment_glint_override=true,custom_model_data=1126,max_stack_size=16] 1

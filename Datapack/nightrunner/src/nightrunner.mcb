@@ -35,6 +35,11 @@ function on_load minecraft:load{
     gamerule doInsomnia false
 
     #=================================================
+    # Items
+    #=================================================
+    scoreboard objectives add Nightrunner_Used_Magic_tool minecraft.used:minecraft.warped_fungus_on_a_stick
+
+    #=================================================
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
@@ -475,6 +480,220 @@ dir items{
             }
         }
     }
+    dir tools{
+        function tick minecraft:tick{
+            # Check if the player used the default warp fungus on a stick and ignore it
+            execute as @a if score @s Nightrunner_Used_Magic_tool matches 2.. run scoreboard players reset @s Nightrunner_Used_Magic_tool
+        }
+        dir wands{
+            dir wooden{
+                # Wooden Wand: A basic wand that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={wooden_wand:true},item_name='{"text":"Wooden Wand","italic":false}',lore=['{"text":"A basic wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1121] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wooden_wand:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used wooden wand
+                }
+            }
+            dir stone{
+                # Stone Wand: A stronger wand that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={stone_wand:true},item_name='{"text":"Stone Wand","italic":false}',lore=['{"text":"A stronger wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1122] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{stone_wand:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used stone wand
+                }
+            }
+            dir iron{
+                # Iron Wand: A powerful wand that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={iron_wand:true},item_name='{"text":"Iron Wand","italic":false}',lore=['{"text":"A powerful wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1123] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{iron_wand:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used iron wand
+                }
+            }
+            dir golden{
+                # Golden Wand: A rare wand that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={golden_wand:true},item_name='{"text":"Golden Wand","italic":false}',lore=['{"text":"A rare wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1124] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{golden_wand:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used golden wand
+                }
+            }
+            dir diamond{
+                # Diamond Wand: A legendary wand that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_wand:true},item_name='{"text":"Diamond Wand","italic":false}',lore=['{"text":"A legendary wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1125] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{diamond_wand:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used diamond wand
+                }
+            }
+            function give_all{
+                function ./wooden/give
+                function ./stone/give
+                function ./iron/give
+                function ./golden/give
+                function ./diamond/give
+            }
+        }
+        dir staffs{
+            dir wooden{
+                # Wooden Staff: A basic staff that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[max_damage=61,custom_data={wooden_staff:true},item_name='{"text":"Wooden Staff","italic":false}',lore=['{"text":"A basic staff that can be used to cast spells."}','{"color":"aqua","text":"Nightrunner"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 3 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:1,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1126] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wooden_staff:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used wooden staff
+                }
+            }
+            dir stone{
+                # Stone Staff: A stronger staff that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={stone_staff:true},item_name='{"text":"Stone Staff","italic":false}',lore=['{"text":"A stronger staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 4 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:2,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1127] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{stone_staff:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used stone staff
+                }
+            }
+            dir iron{
+                # Iron Staff: A powerful staff that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={iron_staff:true},item_name='{"text":"Iron Staff","italic":false}',lore=['{"text":"A powerful staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 5 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:3,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1128] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{iron_staff:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used iron staff
+                }
+            }
+            dir golden{
+                # Golden Staff: A rare staff that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={golden_staff:true},item_name='{"text":"Golden Staff","italic":false}',lore=['{"text":"A rare staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 3 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:1,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1129] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{golden_staff:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used golden staff
+                }
+            }
+            dir diamond{
+                # Diamond Staff: A legendary staff that can be used to cast spells.
+                # Uses warped fungus on a stick as a base.
+                function give{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_staff:true},item_name='{"text":"Diamond Staff","italic":false}',lore=['{"text":"A legendary staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 6 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:4,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=11210] 1
+                }
+                function tick minecraft:tick{
+                    # Check if the player used magic tool
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{diamond_staff:true}}}}] run function ./use
+                    }
+                }
+                function use{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used diamond staff
+                }
+            }
+            function give_all{
+                function ./wooden/give
+                function ./stone/give
+                function ./iron/give
+                function ./golden/give
+                function ./diamond/give
+            }
+        }
+    }
 }
 #=================================================
 # MARK: Health system
@@ -889,5 +1108,54 @@ predicate 10change{
   "condition": "minecraft:random_chance",
   "chance": 0.1
 }
-
+#=================================================
+# MARK: Enchantments
+#=================================================
+enchantment damage_item_on_attack{
+  "description": "damage_item_on_attack",
+  "supported_items": "minecraft:warped_fungus_on_a_stick",
+  "weight": 1,
+  "max_level": 1,
+  "min_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "anvil_cost": 0,
+  "slots": [],
+  "effects": {
+    "minecraft:post_attack": [
+      {
+        "enchanted": "attacker",
+        "affected": "attacker",
+        "effect": {
+          "type": "minecraft:damage_item",
+          "amount": 1
+        }
+      },
+      {
+        "enchanted": "attacker",
+        "affected": "attacker",
+        "effect": {
+          "type": "minecraft:summon_entity",
+          "entity": "minecraft:boat"
+        }
+      }
+    ]
+  }
+}
+#=================================================
+# MARK: Item modifiers
+#=================================================
+item_modifier damage_item {
+[
+  {
+    "function": "minecraft:set_damage",
+    "damage": 1
+  }
+]
+}
 # Iron Golem has the following entity data: {Brain: {memories: {}}, HurtByTimestamp: 27715, Invulnerable: 0b, FallFlying: 0b, PortalCooldown: 0, AbsorptionAmount: 0.0f, FallDistance: 0.0f, DeathTime: 0s, WorldUUIDMost: -7580720819105740754L, HandDropChances: [0.085f, 0.085f], Bukkit.Aware: 1b, PersistenceRequired: 0b, Spigot.ticksLived: 612698, UUID: [I; 39879517, 2084847774, -1694864611, -2059684637], AngerTime: 0, Motion: [-0.062486890252097436d, -0.0784000015258789d, 0.026071353097120456d], Health: 100.0f, Bukkit.updateLevel: 2, PlayerCreated: 0b, LeftHanded: 0b, Air: 300s, OnGround: 1b, Rotation: [10.75795f, 0.0f], HandItems: [{}, {}], ArmorDropChances: [0.085f, 0.085f, 0.085f, 0.085f], Pos: [-7877.799999989569d, 69.0d, 2543.8081930395288d], Fire: -1s, ArmorItems: [{}, {}, {}, {}], CanPickUpLoot: 0b, attributes: [{id: "minecraft:generic.max_health", base: 100.0d}, {id: "minecraft:generic.follow_range", modifiers: [{amount: 0.04404645443414565d, id: "minecraft:random_spawn_bonus", operation: "add_multiplied_base"}], base: 16.0d}, {id: "minecraft:generic.movement_speed", base: 0.25d}], HurtTime: 0s, WorldUUIDLeast: -5180699469935483630L}

@@ -21,6 +21,10 @@ gamerule commandBlockOutput false
 gamerule playersSleepingPercentage 50
 gamerule doInsomnia false
 #=================================================
+# Items
+#=================================================
+scoreboard objectives add Nightrunner_Used_Magic_tool minecraft.used:minecraft.warped_fungus_on_a_stick
+#=================================================
 # Show the welcome message
 #=================================================
 # Show the welcome message (Takes build number [int] and update message [raw])

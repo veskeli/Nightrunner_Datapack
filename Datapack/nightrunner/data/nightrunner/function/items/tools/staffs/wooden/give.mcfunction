@@ -1,0 +1,3 @@
+# Generated with MC-Build
+
+give @s minecraft:warped_fungus_on_a_stick[max_damage=61,custom_data={wooden_staff:true},item_name='{"text":"Wooden Staff","italic":false}',lore=['{"text":"A basic staff that can be used to cast spells."}','{"color":"aqua","text":"Nightrunner"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 3 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:1,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1126] 1

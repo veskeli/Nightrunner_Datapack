@@ -14,7 +14,12 @@ template settings_page{
                     // Add toggle for Revive system with diffrent colors based on the state
                     emit('execute if score $Nightrunner Nightrunner_UseReviveSystem matches 1 run tellraw @s ["",{"text":"Revive system: "},{"text":"Click to toggle","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner:settings/toggles/toggle_revive_system"}},{"text":" » "},{"text":"ON","color":"green","bold":true}]')
                     emit('execute if score $Nightrunner Nightrunner_UseReviveSystem matches 0 run tellraw @s ["",{"text":"Revive system: "},{"text":"Click to toggle","color":"red","clickEvent":{"action":"run_command","value":"/function nightrunner:settings/toggles/toggle_revive_system"}},{"text":" » "},{"text":"OFF","color":"red","bold":true}]')
-                    for (let i = 0; i < 16; i++)
+
+                    // add toggle for custom mobs with diffrent colors based on the state
+                    emit('execute if score $Nightrunner Nightrunner_CustomMobsEnabled matches 1 run tellraw @s ["",{"text":"Custom mobs: "},{"text":"Click to toggle","color":"green","clickEvent":{"action":"run_command","value":"/function nightrunner:settings/toggles/toggle_custom_mobs"}},{"text":" » "},{"text":"ON","color":"green","bold":true}]')
+                    emit('execute if score $Nightrunner Nightrunner_CustomMobsEnabled matches 0 run tellraw @s ["",{"text":"Custom mobs: "},{"text":"Click to toggle","color":"red","clickEvent":{"action":"run_command","value":"/function nightrunner:settings/toggles/toggle_custom_mobs"}},{"text":" » "},{"text":"OFF","color":"red","bold":true}]')
+
+                    for (let i = 0; i < 15; i++)
                     {
                         emit('tellraw @s [{"text": " "}]')
                     }

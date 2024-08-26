@@ -16,39 +16,50 @@ function on_load minecraft:load{
     #================= internal scoreboard
     scoreboard objectives add nightrunner.internal dummy
 
-    #================= Settings
-    scoreboard objectives add Nightrunner_BlockMobs dummy
-    # Operators
-    scoreboard objectives add Nightrunner_Op dummy
-    # open settings trigger
-    scoreboard objectives add Open_Nightrunner_Settings trigger
-
-    #================= Join
-    scoreboard objectives add Nightrunner_Joined dummy
-    scoreboard objectives add Nightrunner_ID dummy
-
     #=================================================
     # Gamerules
     #=================================================
     gamerule commandBlockOutput false
-    gamerule playersSleepingPercentage 50
+    # gamerule playersSleepingPercentage 50
     gamerule doInsomnia false
-
-    #=================================================
-    # Items
-    #=================================================
-    scoreboard objectives add Nightrunner_Used_Magic_tool minecraft.used:minecraft.warped_fungus_on_a_stick
 
     #=================================================
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 4 Cauldron Crafting!
+    welcome 4 Cauldron crafting!
 }
 #=================================================
 # MARK: Settings
 #=================================================
 dir settings{
+    function load minecraft:load{
+        scoreboard objectives add Nightrunner_BlockMobs dummy
+        # Operators
+        scoreboard objectives add Nightrunner_Op dummy
+        # open settings trigger
+        scoreboard objectives add Open_Nightrunner_Settings trigger
+
+        #================= Join
+        scoreboard objectives add Nightrunner_Joined dummy
+        scoreboard objectives add Nightrunner_ID dummy
+
+        # First time load
+        scoreboard objectives add Nightrunner_FirstTime dummy
+        # Check if first time
+        execute unless score $Nightrunner Nightrunner_FirstTime matches 1 run function ./first_time
+    }
+    function first_time{
+        # Set the player as first time
+        scoreboard players set $Nightrunner Nightrunner_FirstTime 1
+
+        # Disable all systems
+        scoreboard players set $Nightrunner Nightrunner_UseReviveSystem 0
+        scoreboard players set $Nightrunner Nightrunner_UseHealthSystem 0
+        scoreboard players set $Nightrunner Nightrunner_CustomMobsEnabled 0
+
+        say First time
+    }
     function settings{
         settings_page 1
     }
@@ -105,6 +116,18 @@ dir settings{
                 function ../settings
             }
         }
+        function toggle_custom_mobs{
+            # Toggle the custom mobs
+            execute if score $Nightrunner Nightrunner_CustomMobsEnabled matches 1 run {
+                scoreboard players set $Nightrunner Nightrunner_CustomMobsEnabled 0
+                # open settings again
+                function ../settings
+            } else run {
+                scoreboard players set $Nightrunner Nightrunner_CustomMobsEnabled 1
+                # open settings again
+                function ../settings
+            }
+        }
     }
 }
 #=================================================
@@ -115,6 +138,7 @@ dir crafting{
         # Click check
         scoreboard objectives add Nightrunner_ClickedBool dummy
     }
+    # MARK: Cauldron Crafting
     dir cauldroncraft{
         function load minecraft:load{
             # Click check
@@ -275,6 +299,10 @@ dir crafting{
 # MARK: Items
 #=================================================
 dir items{
+    function load minecraft:load{
+        # Magic tool usage
+        scoreboard objectives add Nightrunner_Used_Magic_tool minecraft.used:minecraft.warped_fungus_on_a_stick
+    }
     dir forge_core{
         # Forge Core: A fundamental component essential for all cauldron crafting recipes
         # Uses music disc mall as a base
@@ -365,7 +393,7 @@ dir items{
     dir consumables{
         dir heartfruit{
             # Heartfruit: A common consumable that grants a temporary heart, up to a maximum of two.
-            # Uses sweet berries as a base.
+            # Uses poisonous_potato as a base.
             function give{
                 give @s minecraft:poisonous_potato[custom_data={heartfruit:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit","italic":false}',lore=['{"text":"A common consumable that grants a temporary heart, up to a maximum of two."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1122] 1
             }
@@ -378,7 +406,7 @@ dir items{
         }
         dir heartfruit_plus{
             # Heartfruit Plus: A rarer variant that grants a temporary heart, up to a maximum of three.
-            # Uses Glow Berries as a base.
+            # Uses poisonous_potato as a base.
             function give{
                 give @s minecraft:poisonous_potato[custom_data={heartfruit_plus:true},food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:1},item_name='{"text":"Heartfruit Plus","italic":false}',lore=['{"text":"A rarer variant that grants a temporary heart and a half, up to a maximum of three."}','{"text":"Nightrunner","color":"aqua"}'],enchantment_glint_override=true,rarity=rare,custom_model_data=1123] 1
             }
@@ -480,6 +508,7 @@ dir items{
             }
         }
     }
+    # MARK: Tools
     dir tools{
         function tick minecraft:tick{
             # Check if the player used the default warp fungus on a stick and ignore it
@@ -901,9 +930,25 @@ dir health_system{
 #=================================================
 dir mobs{
     function load minecraft:load{
+        scoreboard objectives add Nightrunner_CustomMobsEnabled dummy
         scoreboard objectives add Nightrunner_MobDefiner dummy
-        
+
     }
+
+    function tick minecraft:tick{
+        # Check if the custom mobs are enabled
+        execute if score $Nightrunner Nightrunner_CustomMobsEnabled matches 0 run return 1
+        # call all mob functions
+        function ./monsters/zombie
+        function ./monsters/drowned
+        function ./monsters/husk
+        function ./monsters/zombie_villager
+        function ./monsters/skeleton
+        function ./monsters/stray
+        function ./monsters/bogged
+        function ./monsters/creeper
+    }
+
     function mass_summon{
         REPEAT (1,30) {
             $summon $(type) ~ ~ ~
@@ -914,7 +959,7 @@ dir mobs{
     dir monsters{
         #=================================================
         # Zombie
-        function zombie minecraft:tick{
+        function zombie{
             execute if predicate nightrunner:10change run execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
 
             execute as @e[type=zombie,tag=!Nightrunner,limit=1] run data merge entity @s {CustomName:'"test"',CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
@@ -926,26 +971,26 @@ dir mobs{
             # data_damage_speed zombie 9 0.31
             # execute as @e[type=<%entity_type%>,tag=!Nightrunner,limit=1] run data merge entity @s {Attributes:[{Base:<%attack_damage%>,Name:"generic.attack_damage"},{Base:<%move_speed%>,Name:"generic.movement_speed"}], CanPickUpLoot:1b,Tags:["nightmare"], CustomName:'{"text":"<%entity_name%>"}',CustomNameVisible:0b}
         }
-        function drowned minecraft:tick{
+        function drowned{
             set_random_score drowned 1 100
 
             undead_base_values drowned Nightrunner_MobDefiner 100 20 10 0.31 1 1 HurtTime:0s
 
         }
-        function husk minecraft:tick{
+        function husk{
             execute as @e[type=husk,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
 
 
         }
-        function zombie_villager minecraft:tick{
+        function zombie_villager{
             execute as @e[type=zombie_villager,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
 
 
         }
-        function skeleton minecraft:tick{
+        function skeleton{
             # execute as @e[type=husk,tag=!Nightrunner,limit=1] run data merge entity @s {CanBreakDoors:1b,Tags:["Nightrunner"],attributes:[{id:"minecraft:generic.attack_damage",base:10},,{id:"minecraft:generic.movement_speed",base:0.31},{id:"minecraft:zombie.spawn_reinforcements",base:0.125}]}
         }
-        function stray minecraft:tick{
+        function stray{
 
             # Store a random value
             # execute store result score @s Nightrunner_MobDefiner run random value 1..100
@@ -961,14 +1006,14 @@ dir mobs{
             # }
 
         }
-        function bogged minecraft:tick{
+        function bogged{
             # execute store result score @s Nightrunner_MobDefiner run random value 1..100
             set_random_score bogged 1 100
             
             undead_base_values bogged Nightrunner_MobDefiner 100 20 10 0.31 1 1 HurtTime:0s
 
         }
-        function creeper minecraft:tick{
+        function creeper{
             execute as @e[type=creeper,tag=!Nightrunner,limit=1] run block data/creeper{
                 # Store a random value
                 execute store result score @s nightrunner.internal run random value 1..100

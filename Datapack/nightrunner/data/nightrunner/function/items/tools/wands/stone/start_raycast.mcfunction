@@ -13,7 +13,7 @@ scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown
 execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
 # Raycast
 tag @s add raycasting
-execute anchored eyes positioned ^ ^ ^ store result score @s Nightrunner_Item_Ray_Return run function nightrunner:items/tools/wands/wooden/raycast
+execute anchored eyes positioned ^ ^ ^ store result score @s Nightrunner_Item_Ray_Return run function nightrunner:items/tools/wands/stone/raycast
 tag @s remove raycasting
 # Returns score to "@s" "Nightrunner_Item_Ray_Return" base on hit: 1 entity, 2 block, 3 no hit
 # scoreboard players set @s Nm_testing_wand_active 1

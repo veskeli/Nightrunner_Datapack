@@ -3,18 +3,13 @@
 # Returns score to "@s" "Nightrunner_Item_Ray_Return" base on hit: 1 entity, 2 block, 3 no hit
 # function_name: function name for the wand
 template wand_setup {
-    with particle:word cooldown:int function_name:word data:js{
-        <%%
-            var name = data.name;
-            var rarity = data.rarity;
-            var custom_model_data = data.custom_model_data;
-        %%>
+    with data:js{
         # damage @s <%damage%> minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest,nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",tag:{Nightrunner_TestWand:1b}}}]
         block start_raycast{
             # check if cooldown is active
             execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1
             # add cooldown
-            scoreboard players set @s Nightrunner_SpellCooldown <%cooldown%>
+            scoreboard players set @s Nightrunner_SpellCooldown <%data.Cooldown%>
             # Reset scoreboards
             scoreboard players reset @s Nightrunner_Item_Ray_steps
             scoreboard players reset $Nightrunner Nightrunner_Item_Ray_steps
@@ -38,8 +33,12 @@ template wand_setup {
             <%%
                 let hit_entity_or_block = 1;
                 let check = hit_entity_or_block;
-                if (check == 1) {
-                    emit('execute as @e[dx=0,type=!#nightrunner:not_mob,tag=!raycasting,limit=1] positioned ~-0.9 ~-0.9 ~-0.9 if entity @s[dx=0] positioned ~0.9 ~0.9 ~0.9 run function ' + function_name)
+                if(data.MainSpell == "Damage")
+                {
+                    emit('execute as @e[dx=0,type=!#nightrunner:not_mob,tag=!raycasting,limit=1] positioned ~-0.9 ~-0.9 ~-0.9 if entity @s[dx=0] positioned ~0.9 ~0.9 ~0.9 run function nightrunner:items/tools/wands/' + data.FunctionName + '/spell_damage');
+                }
+                else {
+                    emit('execute as @e[dx=0,type=!#nightrunner:not_mob,tag=!raycasting,limit=1] positioned ~-0.9 ~-0.9 ~-0.9 if entity @s[dx=0] positioned ~0.9 ~0.9 ~0.9 run function nightrunner:items/tools/wands/' + data.FunctionName + '/hit_entity');
                 }
             %%>
 
@@ -61,7 +60,7 @@ template wand_setup {
                 # cooldown
                 execute if score $NightrunnerCooldown Nightrunner_EffectCooldown matches 1.. run scoreboard players remove $NightrunnerCooldown Nightrunner_EffectCooldown 1
                 execute if score $NightrunnerCooldown Nightrunner_EffectCooldown matches 1.. run return 1
-                particle minecraft:<%particle%> ~ ~ ~ 0 0 0 0.02 1 force
+                particle <%data.Particle%> ~ ~ ~ 0 0 0 0.02 1 force
                 scoreboard players add $NightrunnerCooldown Nightrunner_EffectCooldown 8
             }
 
@@ -71,8 +70,59 @@ template wand_setup {
             execute positioned ^ ^ ^0.25 rotated ~ ~ run function ./raycast
         }
         block give{
-            give @s minecraft:warped_fungus_on_a_stick[custom_data={<%data.Namespace%>:true,wand:true},item_name='{"text":"<% data.Name %>","italic":false}',lore=['{"text":"<%data.Description%>"}','{"text":"Nightrunner","color":"aqua"}'],rarity=<%data.Rarity%>,custom_model_data=<%data.CustomModelData%>] 1
+            give @s minecraft:warped_fungus_on_a_stick[custom_data={<%data.Namespace%>:true,wand:true},item_name='{"text":"<% data.Name %>","italic":false,"color":"<%data.Color%>"}',lore=['{"text":"<%data.Description%>"}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=<%data.CustomModelData%>] 1
+        }
+        block check{
+            execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
+                # Selected item
+                <%%
+                    let MainFunctionName = 'function nightrunner:items/tools/wands/' + data.FunctionName + '/use';
+                    if(data.MainSpell == "Damage")
+                    {
+                        MainFunctionName = "execute at @s run function nightrunner:items/tools/wands/" + data.FunctionName + "/start_raycast";
+                    }
+                    else if(data.MainSpell == "Heal")
+                    {
+                        MainFunctionName = 'function nightrunner:items/tools/wands/' + data.FunctionName + '/spell_heal';
+                    }
+                    emit('execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}}] run ' + MainFunctionName);
+
+                    emit('# Offhand item');
+                    let OffhandFunctionName = 'function nightrunner:items/tools/wands/' + data.FunctionName + '/use_secondary';
+                    if(data.SecondarySpell == "Damage")
+                    {
+                        OffhandFunctionName = "execute at @s run function nightrunner:items/tools/wands/" + data.FunctionName + "/start_raycast";
+                    }
+                    else if(data.SecondarySpell == "Heal")
+                    {
+                        OffhandFunctionName = 'function nightrunner:items/tools/wands/' + data.FunctionName + '/spell_heal';
+                    }
+                    emit('execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}]}] run ' + OffhandFunctionName);
+                %%>
+                # Reset
+                execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}}] run scoreboard players reset @s Nightrunner_Used_Magic_tool
+                # Offhand item
+                # execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}]}] run function nightrunner:items/tools/wands/<%data.FunctionName%>/use_secondary
+                # Reset
+                execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}]}] run scoreboard players reset @s Nightrunner_Used_Magic_tool
+            }
+        }
+        block spell_damage{
+            # Apply damage if the player has the wand in their hand
+            execute if entity @a[limit=1,tag=raycasting,sort=nearest] run block apply_spell_damage{
+                # check if entitiy is iron golem
+                execute if entity @s[type=minecraft:iron_golem] run return run block{
+                    damage @a[limit=1,tag=raycasting,sort=nearest] 2 minecraft:magic by @s
+                    playsound minecraft:item.trident.riptide_2 player @a ~ ~ ~ 0.4 0.4
+                }
+
+                damage @s <%data.SpellDamage%> minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]
+                playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.4
+                effect give @s slowness 1 1 true
+            }
+        }
+        block spell_heal{
+            effect give veskeli minecraft:instant_health 1 <%data.HealAmount%>
         }
     }
-    
 }

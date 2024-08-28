@@ -5,3 +5,6 @@ function nightrunner:items/tools/wands/wooden/start_raycast
 return 0
 function nightrunner:items/tools/wands/wooden/raycast
 function nightrunner:items/tools/wands/wooden/give
+function nightrunner:items/tools/wands/wooden/check
+function nightrunner:items/tools/wands/wooden/spell_damage
+function nightrunner:items/tools/wands/wooden/spell_heal

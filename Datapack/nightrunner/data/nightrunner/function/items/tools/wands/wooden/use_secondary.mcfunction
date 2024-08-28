@@ -2,4 +2,4 @@
 
 # Reset score
 scoreboard players reset @s Nightrunner_Used_Magic_tool
-execute at @s run function nightrunner:items/tools/wands/wooden/setup
+say @s used wooden wand secondary

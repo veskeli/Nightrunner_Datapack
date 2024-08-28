@@ -6,3 +6,4 @@ scoreboard players set @s Nightrunner_Joined 1
 scoreboard players add $Nightrunner_Internal_ID Nightrunner_ID 1
 # Set the player id
 scoreboard players operation @s Nightrunner_ID = $Nightrunner_Internal_ID Nightrunner_ID
+execute as @s run function #nightrunner:on_join

@@ -2,3 +2,8 @@
 
 # Magic tool usage
 scoreboard objectives add Nightrunner_Used_Magic_tool minecraft.used:minecraft.warped_fungus_on_a_stick
+scoreboard objectives add Nightrunner_EffectCooldown dummy
+scoreboard objectives add Nightrunner_Item_Ray_steps dummy
+scoreboard objectives add Nightrunner_Item_Ray_Return dummy
+scoreboard objectives add Nightrunner_RangedSpellRange dummy
+scoreboard objectives add Nightrunner_SpellCooldown dummy

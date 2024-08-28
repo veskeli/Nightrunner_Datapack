@@ -20,6 +20,6 @@ tellraw @a [{"text": " "}]
 tellraw @a {"text":"Nightrunner loaded!","bold":true,"color":"gold"}
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
-tellraw @a ["",{"text":"Cauldron crafting!","color":"aqua"},{"text":" update"}]
-tellraw @a ["",{"text":"(Build "},{"text":"4","underlined":true,"color":"yellow"},{"text":")"}]
+tellraw @a ["",{"text":"Wands!","color":"aqua"},{"text":" update"}]
+tellraw @a ["",{"text":"(Build "},{"text":"5","underlined":true,"color":"yellow"},{"text":")"}]
 tellraw @a [{"text": " "}]

@@ -1,3 +1,4 @@
+# import all templates
 import ./templates/messages.mcbt
 import ./templates/scoreboard/settings_scoreboard.mcbt
 import ./templates/settings/settings_page.mcbt
@@ -7,6 +8,10 @@ import ./templates/health/set_temp_health.mcbt
 import ./templates/health/add_temp_health.mcbt
 import ./templates/mobs/undead_base_values.mcbt
 import ./templates/mobs/set_random_score.mcbt
+import ./templates/tools/wand_setup.mcbt
+# import all javascript files
+import ./javascripts/wands.js
+
 # Nightrunner
 function on_load minecraft:load{
     #=================================================
@@ -27,7 +32,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 4 Cauldron crafting!
+    welcome 5 Wands!
 }
 #=================================================
 # MARK: Settings
@@ -58,6 +63,8 @@ dir settings{
         scoreboard players set $Nightrunner Nightrunner_UseHealthSystem 0
         scoreboard players set $Nightrunner Nightrunner_CustomMobsEnabled 0
 
+        function #nightrunner:first_time
+
         say First time
     }
     function settings{
@@ -72,6 +79,8 @@ dir settings{
             scoreboard players add $Nightrunner_Internal_ID Nightrunner_ID 1
             # Set the player id
             scoreboard players operation @s Nightrunner_ID = $Nightrunner_Internal_ID Nightrunner_ID
+
+            execute as @s run function #nightrunner:on_join
         }
     }
     function reset_join{
@@ -108,6 +117,9 @@ dir settings{
             # Toggle the health system
             execute if score $Nightrunner Nightrunner_UseHealthSystem matches 1 run {
                 scoreboard players set $Nightrunner Nightrunner_UseHealthSystem 0
+                # Reset health to 20
+                execute as @a run attribute @s minecraft:generic.max_health base set 20
+
                 # open settings again
                 function ../settings
             } else run {
@@ -302,6 +314,12 @@ dir items{
     function load minecraft:load{
         # Magic tool usage
         scoreboard objectives add Nightrunner_Used_Magic_tool minecraft.used:minecraft.warped_fungus_on_a_stick
+
+        scoreboard objectives add Nightrunner_EffectCooldown dummy
+        scoreboard objectives add Nightrunner_Item_Ray_steps dummy
+        scoreboard objectives add Nightrunner_Item_Ray_Return dummy
+        scoreboard objectives add Nightrunner_RangedSpellRange dummy
+        scoreboard objectives add Nightrunner_SpellCooldown dummy
     }
     dir forge_core{
         # Forge Core: A fundamental component essential for all cauldron crafting recipes
@@ -390,6 +408,7 @@ dir items{
             "cookingtime": 100
         }
     }
+    # MARK: Consumables
     dir consumables{
         dir heartfruit{
             # Heartfruit: A common consumable that grants a temporary heart, up to a maximum of two.
@@ -510,40 +529,101 @@ dir items{
     }
     # MARK: Tools
     dir tools{
+        function on_join nightrunner:on_join{
+            scoreboard players set @s Nightrunner_RangedSpellRange 50
+        }
+        clock spell_cooldown 0.1s{
+            # Cool down the Nightrunner_SpellCooldown
+            execute as @a[scores={Nightrunner_SpellCooldown=1..}] run scoreboard players remove @s Nightrunner_SpellCooldown 1
+            # if the cooldown is 0 then play sound
+            execute as @a[scores={Nightrunner_SpellCooldown=1}] at @s run playsound minecraft:item.book.put master @s ~ ~ ~ 1 1
+        }
         function tick minecraft:tick{
             # Check if the player used the default warp fungus on a stick and ignore it
             execute as @a if score @s Nightrunner_Used_Magic_tool matches 2.. run scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+            # show mana bar if wnat is in the player's main hand
+            execute as @a[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true}}}}] run function ./show_cooldown_bar
+            # show mana bar if wnat is in the player's off hand
+            execute as @a[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{wand:1b}}}]}] run function ./show_cooldown_bar
+        }
+        function show_cooldown_bar{
+            execute as @s[scores={Nightrunner_SpellCooldown=0}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Ready","color":"green"},{"text":" |====","color":"gold"}]
+            execute as @s[scores={Nightrunner_SpellCooldown=1..}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Cooldown: ","color":"aqua"},{"score":{"name":"@s","objective":"Nightrunner_SpellCooldown"}},{"text":" |====","color":"gold"}]
         }
         dir wands{
             dir wooden{
-                # Wooden Wand: A basic wand that can be used to cast spells.
+                # Wooden Wand: A basic wand with ranged damage spell.
                 # Uses warped fungus on a stick as a base.
-                function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={wooden_wand:true},item_name='{"text":"Wooden Wand","italic":false}',lore=['{"text":"A basic wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1121] 1
+                function setup{
+                    wand_setup crit 8 nightrunner:items/tools/wands/wooden/hit <%data = wooden_wand%>
+                }
+                function hit{
+                    execute as @s run effect give @s glowing 1 0 true
+                    # Apply damage if the player has the wand in their hand
+                    execute if entity @a[limit=1,tag=raycasting,sort=nearest] run block {
+                        damage @s 4 minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]
+                        playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.4
+                        effect give @s slowness 1 1 true
+                    }
                 }
                 function tick minecraft:tick{
+                    return 0
                     # Check if the player used magic tool
                     execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wooden_wand:true}}}}] run function ./use
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{<%wooden_wand.Namespace%>:true,wand:true}}}}] run function ./use
                     }
+                    # Reset the score if still 1
+                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run scoreboard players reset @s Nightrunner_Used_Magic_tool
                 }
                 function use{
                     # Reset score
                     scoreboard players reset @s Nightrunner_Used_Magic_tool
 
-                    say @s used wooden wand
+                    execute at @s run function ./setup
+                }
+                function use_secondary{
+                    # Reset score
+                    scoreboard players reset @s Nightrunner_Used_Magic_tool
+
+                    say @s used wooden wand secondary
+                }
+                recipe wooden_wand{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        " i",
+                        "i "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:stick"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"<%wooden_wand.Name%>\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"<%wooden_wand.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": <%wooden_wand.CustomModelData%>,
+                            "custom_data": {
+                                "<%wooden_wand.Namespace%>": true,
+                                "wand": true
+                            }
+                        }
+                    }
                 }
             }
             dir stone{
                 # Stone Wand: A stronger wand that can be used to cast spells.
                 # Uses warped fungus on a stick as a base.
                 function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={stone_wand:true},item_name='{"text":"Stone Wand","italic":false}',lore=['{"text":"A stronger wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1122] 1
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={stone_wand:true,wand:true},item_name='{"text":"Stone Wand","italic":false}',lore=['{"text":"A stronger wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1122] 1
                 }
                 function tick minecraft:tick{
                     # Check if the player used magic tool
                     execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{stone_wand:true}}}}] run function ./use
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{stone_wand:true,wand:true}}}}] run function ./use
                     }
                 }
                 function use{
@@ -552,17 +632,45 @@ dir items{
 
                     say @s used stone wand
                 }
+                recipe stone_wand{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        " i",
+                        "u "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:cobblestone"
+                        },
+                        "u": {
+                            "item": "minecraft:stick"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Stone Wand\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"A stronger wand that can be used to cast spells.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": 1122,
+                            "custom_data": {
+                                "stone_wand": true,
+                                "wand": true
+                            }
+                        }
+                    }
+                }
             }
             dir iron{
                 # Iron Wand: A powerful wand that can be used to cast spells.
                 # Uses warped fungus on a stick as a base.
                 function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={iron_wand:true},item_name='{"text":"Iron Wand","italic":false}',lore=['{"text":"A powerful wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1123] 1
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={iron_wand:true,wand:true},item_name='{"text":"Iron Wand","italic":false}',lore=['{"text":"A powerful wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1123] 1
                 }
                 function tick minecraft:tick{
                     # Check if the player used magic tool
                     execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{iron_wand:true}}}}] run function ./use
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{iron_wand:true,wand:true}}}}] run function ./use
                     }
                 }
                 function use{
@@ -571,17 +679,45 @@ dir items{
 
                     say @s used iron wand
                 }
+                recipe iron_wand{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        " i",
+                        "u "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:iron_ingot"
+                        },
+                        "u": {
+                            "item": "minecraft:stick"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Iron Wand\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"A powerful wand that can be used to cast spells.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": 1123,
+                            "custom_data": {
+                                "iron_wand": true,
+                                "wand": true
+                            }
+                        }
+                    }
+                }
             }
             dir golden{
                 # Golden Wand: A rare wand that can be used to cast spells.
                 # Uses warped fungus on a stick as a base.
                 function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={golden_wand:true},item_name='{"text":"Golden Wand","italic":false}',lore=['{"text":"A rare wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1124] 1
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={golden_wand:true,wand:true},item_name='{"text":"Golden Wand","italic":false}',lore=['{"text":"A rare wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1124] 1
                 }
                 function tick minecraft:tick{
                     # Check if the player used magic tool
                     execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{golden_wand:true}}}}] run function ./use
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{golden_wand:true,wand:true}}}}] run function ./use
                     }
                 }
                 function use{
@@ -590,17 +726,45 @@ dir items{
 
                     say @s used golden wand
                 }
+                recipe golden_wand{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        " i",
+                        "u "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:gold_ingot"
+                        },
+                        "u": {
+                            "item": "minecraft:stick"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Golden Wand\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"A rare wand that can be used to cast spells.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": 1124,
+                            "custom_data": {
+                                "golden_wand": true,
+                                "wand": true
+                            }
+                        }
+                    }
+                }
             }
             dir diamond{
                 # Diamond Wand: A legendary wand that can be used to cast spells.
                 # Uses warped fungus on a stick as a base.
                 function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_wand:true},item_name='{"text":"Diamond Wand","italic":false}',lore=['{"text":"A legendary wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1125] 1
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_wand:true,wand:true},item_name='{"text":"Diamond Wand","italic":false}',lore=['{"text":"A legendary wand that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}'],custom_model_data=1125] 1
                 }
                 function tick minecraft:tick{
                     # Check if the player used magic tool
                     execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{diamond_wand:true}}}}] run function ./use
+                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{diamond_wand:true,wand:true}}}}] run function ./use
                     }
                 }
                 function use{
@@ -608,6 +772,34 @@ dir items{
                     scoreboard players reset @s Nightrunner_Used_Magic_tool
 
                     say @s used diamond wand
+                }
+                recipe diamond_wand{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        " i",
+                        "u "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:diamond"
+                        },
+                        "u": {
+                            "item": "minecraft:stick"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Diamond Wand\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"A legendary wand that can be used to cast spells.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": 1125,
+                            "custom_data": {
+                                "diamond_wand": true,
+                                "wand": true
+                            }
+                        }
+                    }
                 }
             }
             function give_all{
@@ -1203,4 +1395,168 @@ item_modifier damage_item {
   }
 ]
 }
+#=================================================
+# MARK: Tags
+#=================================================
+tag entity_type not_mob{
+    minecraft:item
+    minecraft:item_frame
+    minecraft:glow_item_frame
+    minecraft:area_effect_cloud
+    minecraft:armor_stand
+    minecraft:arrow
+    minecraft:boat
+    minecraft:dragon_fireball
+    minecraft:egg
+    minecraft:evoker_fangs
+    minecraft:falling_block
+    minecraft:fireball
+    minecraft:firework_rocket
+    minecraft:lightning_bolt
+    minecraft:ender_pearl
+    minecraft:small_fireball
+    minecraft:eye_of_ender
+    minecraft:potion
+    minecraft:firework_rocket
+    minecraft:leash_knot
+    minecraft:llama_spit
+    minecraft:painting
+    minecraft:shulker_bullet
+    minecraft:snowball
+    minecraft:spectral_arrow
+    minecraft:trident
+    minecraft:tnt
+    minecraft:falling_block
+    minecraft:minecart
+    minecraft:command_block_minecart
+    minecraft:furnace_minecart
+    minecraft:spawner_minecart
+    minecraft:hopper_minecart
+    minecraft:chest_minecart
+    minecraft:tnt_minecart
+    minecraft:wither_skull
+    minecraft:experience_orb
+    minecraft:marker
+    minecraft:experience_bottle
+    create:carriage_contraption
+    create:contraption
+    create:potato_projectile
+    create:crafting_blueprint
+    create:gantry_contraption
+    create:seat
+    create:super_glue
+}
+tag block raycast_pass{
+    minecraft:air
+    minecraft:void_air
+    minecraft:cave_air
+    minecraft:water
+    minecraft:lava
+    minecraft:short_grass
+    minecraft:dead_bush
+    minecraft:brown_mushroom
+    minecraft:red_mushroom
+    minecraft:lily_pad
+    minecraft:pointed_dripstone
+    minecraft:snow
+    #minecraft:small_flowers
+    #minecraft:tall_flowers
+    #minecraft:small_dripleaf_placeable
+    minecraft:fern
+    minecraft:fire
+    minecraft:tall_grass
+    minecraft:large_fern
+    minecraft:vine
+    minecraft:twisting_vines
+    minecraft:twisting_vines_plant
+    minecraft:weeping_vines
+    minecraft:weeping_vines_plant
+    #minecraft:crops
+    #minecraft:saplings
+    #minecraft:signs
+    minecraft:attached_melon_stem
+    minecraft:attached_pumpkin_stem
+    minecraft:nether_wart
+    minecraft:sweet_berry_bush
+    minecraft:cocoa
+    minecraft:sugar_cane
+    minecraft:seagrass
+    minecraft:tall_seagrass
+    minecraft:redstone_wire
+    minecraft:rail
+    minecraft:powered_rail
+    minecraft:activator_rail
+    minecraft:detector_rail
+    minecraft:torch
+    minecraft:soul_torch
+    minecraft:redstone_torch
+    minecraft:glow_lichen
+}
+tag block air{
+    minecraft:air
+    minecraft:void_air
+    minecraft:cave_air
+    minecraft:water
+    minecraft:lava
+    #minecraft:buttons
+    #minecraft:candles
+    #minecraft:cave_vines
+    minecraft:short_grass
+    minecraft:dead_bush
+    minecraft:brown_mushroom
+    minecraft:red_mushroom
+    minecraft:lily_pad
+    minecraft:pointed_dripstone
+    minecraft:snow
+    #minecraft:small_flowers
+    #minecraft:tall_flowers
+    #minecraft:small_dripleaf_placeable
+    minecraft:fern
+    minecraft:fire
+    minecraft:tall_grass
+    minecraft:large_fern
+    minecraft:vine
+    minecraft:twisting_vines
+    minecraft:twisting_vines_plant
+    minecraft:weeping_vines
+    minecraft:weeping_vines_plant
+    #minecraft:crops
+    #minecraft:fire
+    #minecraft:flowers
+    #minecraft:pressure_plates
+    #minecraft:rails
+    #minecraft:saplings
+    #minecraft:signs
+    minecraft:attached_melon_stem
+    minecraft:attached_pumpkin_stem
+    minecraft:nether_wart
+    minecraft:sweet_berry_bush
+    minecraft:cocoa
+    minecraft:sugar_cane
+    minecraft:seagrass
+    minecraft:tall_seagrass
+    minecraft:redstone_wire
+    minecraft:rail
+    minecraft:powered_rail
+    minecraft:activator_rail
+    minecraft:detector_rail
+    minecraft:torch
+    minecraft:soul_torch
+    minecraft:redstone_torch
+    minecraft:glow_lichen
+    minecraft:comparator
+    minecraft:repeater
+    minecraft:lever
+    minecraft:tripwire
+    minecraft:tripwire_hook
+    #minecraft:wall_signs
+    #minecraft:banners
+    #minecraft:corals
+    minecraft:end_rod
+    minecraft:scaffolding
+    minecraft:campfire
+    minecraft:soul_campfire
+    minecraft:bamboo
+}
+
 # Iron Golem has the following entity data: {Brain: {memories: {}}, HurtByTimestamp: 27715, Invulnerable: 0b, FallFlying: 0b, PortalCooldown: 0, AbsorptionAmount: 0.0f, FallDistance: 0.0f, DeathTime: 0s, WorldUUIDMost: -7580720819105740754L, HandDropChances: [0.085f, 0.085f], Bukkit.Aware: 1b, PersistenceRequired: 0b, Spigot.ticksLived: 612698, UUID: [I; 39879517, 2084847774, -1694864611, -2059684637], AngerTime: 0, Motion: [-0.062486890252097436d, -0.0784000015258789d, 0.026071353097120456d], Health: 100.0f, Bukkit.updateLevel: 2, PlayerCreated: 0b, LeftHanded: 0b, Air: 300s, OnGround: 1b, Rotation: [10.75795f, 0.0f], HandItems: [{}, {}], ArmorDropChances: [0.085f, 0.085f, 0.085f, 0.085f], Pos: [-7877.799999989569d, 69.0d, 2543.8081930395288d], Fire: -1s, ArmorItems: [{}, {}, {}, {}], CanPickUpLoot: 0b, attributes: [{id: "minecraft:generic.max_health", base: 100.0d}, {id: "minecraft:generic.follow_range", modifiers: [{amount: 0.04404645443414565d, id: "minecraft:random_spawn_bonus", operation: "add_multiplied_base"}], base: 16.0d}, {id: "minecraft:generic.movement_speed", base: 0.25d}], HurtTime: 0s, WorldUUIDLeast: -5180699469935483630L}

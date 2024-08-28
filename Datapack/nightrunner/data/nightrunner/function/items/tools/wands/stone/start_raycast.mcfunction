@@ -3,7 +3,7 @@
 # check if cooldown is active
 execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1
 # add cooldown
-scoreboard players set @s Nightrunner_SpellCooldown 6
+scoreboard players set @s Nightrunner_SpellCooldown 8
 # Reset scoreboards
 scoreboard players reset @s Nightrunner_Item_Ray_steps
 scoreboard players reset $Nightrunner Nightrunner_Item_Ray_steps

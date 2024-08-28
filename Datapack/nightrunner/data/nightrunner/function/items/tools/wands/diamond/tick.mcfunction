@@ -1,4 +1,4 @@
 # Generated with MC-Build
 
-# Check if the player used magic tool
-execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run function nightrunner:items/tools/wands/diamond/check_wand
+# Need to check if the player used the magic tool
+function nightrunner:items/tools/wands/diamond/check

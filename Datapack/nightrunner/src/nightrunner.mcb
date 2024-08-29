@@ -11,6 +11,7 @@ import ./templates/mobs/set_random_score.mcbt
 import ./templates/tools/wand_setup.mcbt
 # import all javascript files
 import ./javascripts/wands.js
+import ./javascripts/staffs.js
 
 # Nightrunner
 function on_load minecraft:load{
@@ -32,7 +33,22 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 5 Wands!
+    welcome 6 Wands!
+}
+function test{
+    scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 30
+    execute positioned as @s run block testaction{
+        # set blocks at all sides to air
+        fill ~-4 ~-1 ~-4 ~4 ~-1 ~4 air replace
+
+        # print item ray steps
+        tellraw @s [{"text":"Item ray steps: ","color":"green"},{"score":{"name":"$Nightrunner","objective":"Nightrunner_Item_Ray_steps"}}]
+
+        # Reduce the item ray steps
+        scoreboard players remove $Nightrunner Nightrunner_Item_Ray_steps 1
+        # Check the item ray steps
+        execute if score $Nightrunner Nightrunner_Item_Ray_steps matches 1.. run execute positioned ~ ~-1 ~ run function ./testaction
+    }
 }
 #=================================================
 # MARK: Settings
@@ -553,12 +569,8 @@ dir items{
         }
         dir wands{
             dir wooden{
-                function setup{
+                function setup minecraft:tick{
                     wand_setup <%data = wooden_wand%>
-                }
-                function tick minecraft:tick{
-                    # Need to check if the player used the magic tool
-                    function ./check
                 }
                 recipe wooden_wand{
                     "type": "minecraft:crafting_shaped",
@@ -587,12 +599,8 @@ dir items{
                 }
             }
             dir stone{
-                function setup{
+                function setup minecraft:tick{
                     wand_setup <%data = stone_wand%>
-                }
-                function tick minecraft:tick{
-                    # Need to check if the player used the magic tool
-                    function ./check
                 }
                 recipe stone_wand{
                     "type": "minecraft:crafting_shaped",
@@ -624,12 +632,8 @@ dir items{
                 }
             }
             dir iron{
-                function setup{
+                function setup minecraft:tick{
                     wand_setup <%data = iron_wand%>
-                }
-                function tick minecraft:tick{
-                    # Need to check if the player used the magic tool
-                    function ./check
                 }
                 recipe iron_wand{
                     "type": "minecraft:crafting_shaped",
@@ -661,12 +665,8 @@ dir items{
                 }
             }
             dir golden{
-                function setup{
+                function setup minecraft:tick{
                     wand_setup <%data = golden_wand%>
-                }
-                function tick minecraft:tick{
-                    # Need to check if the player used the magic tool
-                    function ./check
                 }
                 recipe golden_wand{
                     "type": "minecraft:crafting_shaped",
@@ -698,12 +698,8 @@ dir items{
                 }
             }
             dir diamond{
-                function setup{
+                function setup minecraft:tick{
                     wand_setup <%data = diamond_wand%>
-                }
-                function tick minecraft:tick{
-                    # Need to check if the player used the magic tool
-                    function ./check
                 }
                 recipe diamond_wand{
                     "type": "minecraft:crafting_shaped",
@@ -743,23 +739,58 @@ dir items{
             }
         }
         dir staffs{
+            function load minecraft:load{
+                scoreboard objectives add Nightrunner_SentryID minecraft.used:minecraft.warped_fungus_on_a_stick
+            }
             dir wooden{
-                # Wooden Staff: A basic staff that can be used to cast spells.
-                # Uses warped fungus on a stick as a base.
-                function give{
-                    give @s minecraft:warped_fungus_on_a_stick[max_damage=61,custom_data={wooden_staff:true},item_name='{"text":"Wooden Staff","italic":false}',lore=['{"text":"A basic staff that can be used to cast spells."}','{"color":"aqua","text":"Nightrunner"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 3 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:1,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1126] 1
+                function setup minecraft:tick{
+                    wand_setup <%data = wooden_staff%>
                 }
-                function tick minecraft:tick{
-                    # Check if the player used magic tool
-                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wooden_staff:true}}}}] run function ./use
+                function hit_block{
+                    summon block_display ~ ~1 ~ {Tags:["sentry","just_spawned"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.7f,0.7f,0.7f]},block_state:{Name:"minecraft:calibrated_sculk_sensor"}}
+                    # find just spawned sentry
+                    execute as @e[type=block_display,tag=sentry,tag=just_spawned] run block{
+                        tag @s remove just_spawned
+                        execute store result score @s Nightrunner_SentryID run scoreboard players get @p Nightrunner_ID
                     }
                 }
-                function use{
-                    # Reset score
-                    scoreboard players reset @s Nightrunner_Used_Magic_tool
-
-                    say @s used wooden staff
+                clock check_sentry 20t{
+                    execute as @e[type=block_display,tag=sentry] run block{
+                        # TODO: Check all mobs in range. | While testing use player
+                        execute at @s run execute as @e[distance=..10,type=zombie] run block apply_sentry_damage{
+                            execute at @s run summon evoker_fangs ~ ~ ~
+                            # execute at @s run summon evoker_fangs ~-1 ~ ~
+                            # execute at @s run summon evoker_fangs ~1 ~ ~
+                            # execute at @s run summon evoker_fangs ~ ~ ~-1
+                            # execute at @s run summon evoker_fangs ~ ~ ~1
+                        }
+                    }
+                }
+                recipe wooden_staff{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        "  i",
+                        " i ",
+                        "i  "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:stick"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"<%wooden_staff.Name%>\",\"italic\":false,\"color\":\"<%wooden_staff.Color%>\"}]",
+                            "lore": ["{\"text\":\"<%wooden_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": <%wooden_staff.CustomModelData%>,
+                            "custom_data": {
+                                "<%wooden_staff.Namespace%>": true,
+                                "wand": true
+                            }
+                        }
+                    }
                 }
             }
             dir stone{

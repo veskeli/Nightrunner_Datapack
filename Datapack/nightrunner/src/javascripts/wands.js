@@ -3,6 +3,7 @@ module.exports = {
     wooden_wand : {
         Name: "Wooden Wand",
         Color: "white",
+        Folder: "wands",
         Description: "Damage: 4 | Cooldown: 8",
         Cooldown: 8,
         Particle: "minecraft:crit",
@@ -13,10 +14,12 @@ module.exports = {
         SecondarySpell: "Damage",
         SpellDamage: 4,
         HealAmount: 0,
+        HitType: 1,
     },
     stone_wand: {
         Name: "Stone Wand",
         Color: "white",
+        Folder: "wands",
         Description: "Damage: 5 | Cooldown: 8",
         Cooldown: 8,
         Particle: "minecraft:crit",
@@ -27,10 +30,12 @@ module.exports = {
         SecondarySpell: "Damage",
         SpellDamage: 5,
         HealAmount: 0,
+        HitType: 1,
     },
     iron_wand: {
         Name: "Iron Wand",
         Color: "white",
+        Folder: "wands",
         Description: "Damage: 6 | Cooldown: 8",
         Cooldown: 8,
         Particle: "minecraft:crit",
@@ -41,10 +46,12 @@ module.exports = {
         SecondarySpell: "Damage",
         SpellDamage: 6,
         HealAmount: 0,
+        HitType: 1,
     },
     golden_wand: {
         Name: "Golden Wand",
         Color: "white",
+        Folder: "wands",
         Description: "Damage: 11 | Cooldown: 16",
         Cooldown: 16,
         Particle: "minecraft:crit",
@@ -55,10 +62,12 @@ module.exports = {
         SecondarySpell: "Damage",
         SpellDamage: 11,
         HealAmount: 0,
+        HitType: 1,
     },
     diamond_wand: {
         Name: "Diamond Wand",
         Color: "white",
+        Folder: "wands",
         Description: "Damage: 7 | Cooldown: 8",
         Cooldown: 8,
         Particle: "minecraft:crit",
@@ -69,5 +78,6 @@ module.exports = {
         SecondarySpell: "Damage",
         SpellDamage: 7,
         HealAmount: 0,
-    },
+        HitType: 1,
+    }
 }

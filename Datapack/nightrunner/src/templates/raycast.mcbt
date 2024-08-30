@@ -1,0 +1,19 @@
+template raycast{
+    with type:int{
+        return 0
+        block start_raycast{
+            scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 35
+            tag @s add raycasting
+            execute anchored eyes positioned ^ ^ ^ store result score @s Nightrunner_Item_Ray_Return run function ./raycast
+            tag @s remove raycasting
+        }
+        block raycast{
+            execute unless block ~ ~ ~ #nightrunner:air run return run function ./hit_block
+            # Update steps
+            scoreboard players remove $Nightrunner Nightrunner_Item_Ray_steps 1
+            execute if score $Nightrunner Nightrunner_Item_Ray_steps matches ..0 run return 3
+            # Loop
+            execute positioned ^ ^ ^0.25 rotated ~ ~ run function ./raycast
+        }
+    }
+}

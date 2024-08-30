@@ -161,4 +161,55 @@ module.exports = {
             ...spells.Raycast,
         },
     },
+    iron_staff: {
+        Name: "Iron Staff",
+        Color: "white",
+        Folder: "staffs",
+        Description: "Summon damage sentry",
+        Cooldown: 8,
+        Particle: "minecraft:crit",
+        CustomModelData: 1128,
+        Namespace: "iron_staff",
+        FunctionName: "iron",
+        MainSpell: {
+            ...spells.Raycast,
+        },
+        SecondarySpell: {
+            ...spells.Raycast,
+        },
+    },
+    golden_staff: {
+        Name: "Golden Staff",
+        Color: "white",
+        Folder: "staffs",
+        Description: "Summon heal sentry",
+        Cooldown: 16,
+        Particle: "minecraft:crit",
+        CustomModelData: 1129,
+        Namespace: "golden_staff",
+        FunctionName: "golden",
+        MainSpell: {
+            ...spells.Raycast,
+        },
+        SecondarySpell: {
+            ...spells.Raycast,
+        },
+    },
+    diamond_staff: {
+        Name: "Diamond Staff",
+        Color: "white",
+        Folder: "staffs",
+        Description: "Summon damage sentry",
+        Cooldown: 8,
+        Particle: "minecraft:crit",
+        CustomModelData: 1130,
+        Namespace: "diamond_staff",
+        FunctionName: "diamond",
+        MainSpell: {
+            ...spells.Raycast,
+        },
+        SecondarySpell: {
+            ...spells.Raycast,
+        },
+    },
 };

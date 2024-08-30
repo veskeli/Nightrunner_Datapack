@@ -35,7 +35,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 6 Wands!
+    welcome 6 Staffs and Wands!
 }
 function test{
     scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 30
@@ -748,7 +748,7 @@ dir items{
                     wand_setup <%data = wooden_staff%>
                 }
                 function load_setup minecraft:load{
-                    sentry_setup <%data = damage_sentry%>
+                    sentry_setup <%data = wooden_sentry%>
                 }
                 function sentry_action{
                     execute at @s run summon evoker_fangs ~ ~ ~
@@ -785,10 +785,10 @@ dir items{
                     wand_setup <%data = stone_staff%>
                 }
                 function load_setup minecraft:load{
-                    sentry_setup <%data = heal_sentry%>
+                    sentry_setup <%data = stone_sentry%>
                 }
                 function sentry_action{
-                    effect give @s minecraft:regeneration 2 0 true
+                    execute at @s run summon evoker_fangs ~ ~ ~
                 }
                 recipe stone_staff{
                     "type": "minecraft:crafting_shaped",
@@ -821,60 +821,126 @@ dir items{
                 }
             }
             dir iron{
-                # Iron Staff: A powerful staff that can be used to cast spells.
-                # Uses warped fungus on a stick as a base.
-                function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={iron_staff:true},item_name='{"text":"Iron Staff","italic":false}',lore=['{"text":"A powerful staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 5 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:3,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1128] 1
+                function setup minecraft:tick{
+                    wand_setup <%data = iron_staff%>
                 }
-                function tick minecraft:tick{
-                    # Check if the player used magic tool
-                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{iron_staff:true}}}}] run function ./use
+                function load_setup minecraft:load{
+                    sentry_setup <%data = iron_sentry%>
+                }
+                function sentry_action{
+                    execute at @s run summon evoker_fangs ~ ~ ~
+                }
+                recipe iron_staff{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        "  y",
+                        " i ",
+                        "i  "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:stick"
+                        },
+                        "y": {
+                            "item": "minecraft:iron_ingot"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"<%iron_staff.Name%>\",\"italic\":false,\"color\":\"<%iron_staff.Color%>\"}]",
+                            "lore": ["{\"text\":\"<%iron_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": <%iron_staff.CustomModelData%>,
+                            "custom_data": {
+                                "<%iron_staff.Namespace%>": true,
+                                "wand": true
+                            }
+                        }
                     }
-                }
-                function use{
-                    # Reset score
-                    scoreboard players reset @s Nightrunner_Used_Magic_tool
-
-                    say @s used iron staff
                 }
             }
             dir golden{
-                # Golden Staff: A rare staff that can be used to cast spells.
-                # Uses warped fungus on a stick as a base.
-                function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={golden_staff:true},item_name='{"text":"Golden Staff","italic":false}',lore=['{"text":"A rare staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 3 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:1,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=1129] 1
+                function setup minecraft:tick{
+                    wand_setup <%data = golden_staff%>
                 }
-                function tick minecraft:tick{
-                    # Check if the player used magic tool
-                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{golden_staff:true}}}}] run function ./use
+                function load_setup minecraft:load{
+                    sentry_setup <%data = golden_sentry%>
+                }
+                function sentry_action{
+                    execute at @s run summon evoker_fangs ~ ~ ~
+                }
+                recipe golden_staff{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        "  y",
+                        " i ",
+                        "i  "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:stick"
+                        },
+                        "y": {
+                            "item": "minecraft:gold_ingot"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"<%golden_staff.Name%>\",\"italic\":false,\"color\":\"<%golden_staff.Color%>\"}]",
+                            "lore": ["{\"text\":\"<%golden_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": <%golden_staff.CustomModelData%>,
+                            "custom_data": {
+                                "<%golden_staff.Namespace%>": true,
+                                "wand": true
+                            }
+                        }
                     }
-                }
-                function use{
-                    # Reset score
-                    scoreboard players reset @s Nightrunner_Used_Magic_tool
-
-                    say @s used golden staff
                 }
             }
             dir diamond{
-                # Diamond Staff: A legendary staff that can be used to cast spells.
-                # Uses warped fungus on a stick as a base.
-                function give{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_staff:true},item_name='{"text":"Diamond Staff","italic":false}',lore=['{"text":"A legendary staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 6 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:4,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=11210] 1
+                function setup minecraft:tick{
+                    wand_setup <%data = diamond_staff%>
                 }
-                function tick minecraft:tick{
-                    # Check if the player used magic tool
-                    execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
-                        execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{diamond_staff:true}}}}] run function ./use
+                function load_setup minecraft:load{
+                    sentry_setup <%data = diamond_sentry%>
+                }
+                function sentry_action{
+                    execute at @s run summon evoker_fangs ~ ~ ~
+                }
+                recipe diamond_staff{
+                    "type": "minecraft:crafting_shaped",
+                    "pattern": [
+                        "  y",
+                        " i ",
+                        "i  "
+                    ],
+                    "key": {
+                        "i": {
+                            "item": "minecraft:stick"
+                        },
+                        "y": {
+                            "item": "minecraft:diamond"
+                        }
+                    },
+                    "result": {
+                        "id": "minecraft:warped_fungus_on_a_stick",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"<%diamond_staff.Name%>\",\"italic\":false,\"color\":\"<%diamond_staff.Color%>\"}]",
+                            "lore": ["{\"text\":\"<%diamond_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "custom_model_data": <%diamond_staff.CustomModelData%>,
+                            "custom_data": {
+                                "<%diamond_staff.Namespace%>": true,
+                                "wand": true
+                            }
+                        }
                     }
                 }
-                function use{
-                    # Reset score
-                    scoreboard players reset @s Nightrunner_Used_Magic_tool
-
-                    say @s used diamond staff
+                function give_old{
+                    give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_staff:true},item_name='{"text":"Diamond Staff","italic":false}',lore=['{"text":"A legendary staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 6 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:4,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=11210] 1
                 }
             }
             function give_all{

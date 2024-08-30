@@ -1,10 +1,4 @@
 # Generated with MC-Build
 
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^6 ^ ^ 0 0 0 0 1 normal
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^4.24 ^ ^4.24 0 0 0 0 1 normal
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^0 ^ ^6 0 0 0 0 1 normal
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^-4.24 ^ ^4.24 0 0 0 0 1 normal
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^-6 ^ ^ 0 0 0 0 1 normal
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^-4.24 ^ ^-4.24 0 0 0 0 1 normal
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^0 ^ ^-6 0 0 0 0 1 normal
-execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^4.24 ^ ^-4.24 0 0 0 0 1 normal
+scoreboard players remove @s Nightrunner_SentryLifetime 1
+execute if score @s Nightrunner_SentryLifetime matches 0 run function nightrunner:sentry/generated/2

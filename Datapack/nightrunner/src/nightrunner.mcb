@@ -9,9 +9,11 @@ import ./templates/health/add_temp_health.mcbt
 import ./templates/mobs/undead_base_values.mcbt
 import ./templates/mobs/set_random_score.mcbt
 import ./templates/tools/wand_setup.mcbt
+import ./templates/tools/sentry_setup.mcbt
 import ./templates/raycast.mcbt
 # import all javascript files
 import ./javascripts/wands.js
+import ./javascripts/sentry.js
 
 # Nightrunner
 function on_load minecraft:load{
@@ -749,28 +751,11 @@ dir items{
                 function setup minecraft:tick{
                     wand_setup <%data = wooden_staff%>
                 }
-                function hit_block{
-
-                    # Kill other sentries with the same ID
-                    execute as @e[type=block_display,tag=sentry] if score @s Nightrunner_SentryID = @a[limit=1,sort=nearest,tag=raycasting] Nightrunner_ID run kill @s
-
-                    # summon sentry
-                    summon block_display ~-0.35 ~1 ~-0.35 {Tags:["sentry","just_spawned","damage"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.7f,0.7f,0.7f]},block_state:{Name:"minecraft:calibrated_sculk_sensor"}}
-                    # find just spawned sentry
-                    execute as @e[type=block_display,tag=sentry,tag=just_spawned] run block{
-                        tag @s remove just_spawned
-                        execute store result score @s Nightrunner_SentryID run scoreboard players get @a[limit=1,sort=nearest,tag=raycasting] Nightrunner_ID
-                        scoreboard players set @s Nightrunner_SentryLifetime 15
-                        execute at @s run playsound minecraft:item.chorus_fruit.teleport master @a ~ ~ ~ 0.7 0.2
-                    }
+                function load_setup minecraft:load{
+                    sentry_setup <%data = damage_sentry%>
                 }
-                clock check_sentry 20t{
-                    execute as @e[type=block_display,tag=sentry,tag=damage] run block{
-                        # TODO: Check all mobs in range. | While testing use player
-                        execute at @s run execute as @e[distance=..6,type=#nightrunner:enemy] run block apply_sentry_damage{
-                            execute at @s run summon evoker_fangs ~ ~ ~
-                        }
-                    }
+                function sentry_action{
+                    execute at @s run summon evoker_fangs ~ ~ ~
                 }
                 recipe wooden_staff{
                     "type": "minecraft:crafting_shaped",
@@ -803,29 +788,11 @@ dir items{
                 function setup minecraft:tick{
                     wand_setup <%data = stone_staff%>
                 }
-                function hit_block{
-
-                    # TODO: Check the player ID against the sentry ID
-                    # Kill other sentries with the same ID
-                    execute as @e[type=block_display,tag=sentry,scores={Nightrunner_SentryID=1..}] run kill @s
-
-                    # summon sentry
-                    summon block_display ~-0.35 ~1 ~-0.35 {Tags:["sentry","just_spawned","heal"],transformation:{left_rotation:[0f,0f,0f,1f],right_rotation:[0f,0f,0f,1f],translation:[0f,0f,0f],scale:[0.7f,0.7f,0.7f]},block_state:{Name:"minecraft:beacon"}}
-                    # find just spawned sentry
-                    execute as @e[type=block_display,tag=sentry,tag=just_spawned] run block{
-                        tag @s remove just_spawned
-                        execute store result score @s Nightrunner_SentryID run scoreboard players get @p Nightrunner_ID
-                        scoreboard players set @s Nightrunner_SentryLifetime 5
-                        execute at @s run playsound minecraft:item.chorus_fruit.teleport master @a ~ ~ ~ 0.7 0.2
-                    }
+                function load_setup minecraft:load{
+                    sentry_setup <%data = heal_sentry%>
                 }
-                clock check_sentry 20t{
-                    execute as @e[type=block_display,tag=sentry,tag=heal] run block{
-                        # TODO: Check all mobs in range. | While testing use player
-                        execute at @s run execute as @e[distance=..6,type=player] run block apply_sentry_damage{
-                            effect give @s minecraft:regeneration 2 0 true
-                        }
-                    }
+                function sentry_action{
+                    effect give @s minecraft:regeneration 2 0 true
                 }
                 recipe stone_staff{
                     "type": "minecraft:crafting_shaped",
@@ -928,30 +895,6 @@ dir items{
 # MARK: Sentry
 #=================================================
 dir sentry{
-    clock check_sentry_effects 10t{
-        # If heal sentry
-        execute as @e[type=block_display,tag=sentry,tag=heal] run block{
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^6 ^ ^ 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^4.24 ^ ^4.24 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^0 ^ ^6 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^-4.24 ^ ^4.24 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^-6 ^ ^ 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^-4.24 ^ ^-4.24 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^0 ^ ^-6 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[0.0,1.0,0.0],scale:2} ^4.24 ^ ^-4.24 0 0 0 0 1 normal
-        }
-        # if damage sentry
-        execute as @e[type=block_display,tag=sentry,tag=damage] run block{
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^6 ^ ^ 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^4.24 ^ ^4.24 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^0 ^ ^6 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^-4.24 ^ ^4.24 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^-6 ^ ^ 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^-4.24 ^ ^-4.24 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^0 ^ ^-6 0 0 0 0 1 normal
-            execute as @s at @s run particle dust{color:[1.0,0.0,0.0],scale:2} ^4.24 ^ ^-4.24 0 0 0 0 1 normal
-        }
-    }
     clock check_sentry_lifetime 1s{
         execute as @e[type=block_display,tag=sentry] run block{
             scoreboard players remove @s Nightrunner_SentryLifetime 1

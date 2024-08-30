@@ -1,6 +1,5 @@
 # Generated with MC-Build
 
-# If hit block
 execute unless block ~ ~ ~ #nightrunner:air run function nightrunner:items/tools/staffs/wooden/hit_block
 execute unless block ~ ~ ~ #nightrunner:air run return 2
 #

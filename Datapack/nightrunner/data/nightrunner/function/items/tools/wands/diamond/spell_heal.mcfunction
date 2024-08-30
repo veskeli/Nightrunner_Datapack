@@ -1,3 +1,3 @@
 # Generated with MC-Build
 
-effect give @s minecraft:instant_health 1 0
+effect give @s minecraft:instant_health 1 

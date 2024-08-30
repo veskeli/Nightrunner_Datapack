@@ -35,32 +35,30 @@ template wand_setup {
                 let ExecuteAsRaycast = 'execute as @e[dx=0,type=!#nightrunner:not_mob,tag=!raycasting,limit=1] positioned ~-';
                 let RunNightrunnerWandFunction = ' run function nightrunner:items/tools/' + data.Folder + '/';
                 // If hit entity
-                if(data.HitType == 1)
+                if(data.MainSpell.HitType == 1)
                 {
-                    emit("# If hit entity");
                     // Add coordinates
                     ExecuteAsRaycast = ExecuteAsRaycast + CheckQuality +' ~-' + CheckQuality +' ~-' + CheckQuality +' if entity @s[dx=0] positioned ~' + CheckQuality +' ~' + CheckQuality +' ~' + CheckQuality;
-                    if(data.MainSpell == "Damage")
+                    switch(data.MainSpell.Name)
                     {
-                        emit(ExecuteAsRaycast + RunNightrunnerWandFunction + data.FunctionName + '/spell_damage');
-                    }
-                    else {
-                        emit(ExecuteAsRaycast + RunNightrunnerWandFunction + data.FunctionName + '/hit_entity');
+                        case "Damage":
+                            emit(ExecuteAsRaycast + RunNightrunnerWandFunction + data.FunctionName + '/spell_damage');
+                            break;
+                        default:
+                            emit(ExecuteAsRaycast + RunNightrunnerWandFunction + data.FunctionName + '/hit_entity');
+                            break;
                     }
                     // Return if hit entity
                     emit(ExecuteAsRaycast +' run return 1');
-                }
-                // If hit block
-                emit("# If hit block");
-                if(data.HitType == 1)
-                {
-                    // Cloud particle
+
+                    // If hit enetity but hit block
                     emit('execute unless block ~ ~ ~ #nightrunner:air run particle minecraft:cloud ~ ~ ~ 0 0 0 0.02 1 force');
                 }
-                else
+                else // If hit block
                 {
-                   emit('execute unless block ~ ~ ~ #nightrunner:air' + RunNightrunnerWandFunction + data.FunctionName + '/hit_block');
+                    emit('execute unless block ~ ~ ~ #nightrunner:air' + RunNightrunnerWandFunction + data.FunctionName + '/hit_block');
                 }
+                // If no hit
                 emit('execute unless block ~ ~ ~ #nightrunner:air run return 2');
             %%>
             #
@@ -91,34 +89,36 @@ template wand_setup {
                 # Selected item
                 <%%
                     let MainFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/use';
-                    if(data.MainSpell == "Damage")
+                    switch(data.MainSpell.Name)
                     {
-                        MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
+                        case "Damage":
+                            MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
+                            break;
+                        case "Heal":
+                            MainFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
+                            break;
+                        case "Raycast":
+                            MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
+                            break;
                     }
-                    else if(data.MainSpell == "Heal")
-                    {
-                        MainFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
-                    }
-                    else if(data.MainSpell == "Raycast")
-                    {
-                        MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
-                    }
+                    // Emit function
                     emit('execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}}] run ' + MainFunctionName);
 
                     emit('# Offhand item');
                     let OffhandFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/use_secondary';
-                    if(data.SecondarySpell == "Damage")
+                    switch(data.SecondarySpell)
                     {
-                        OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
+                        case "Damage":
+                            OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
+                            break;
+                        case "Heal":
+                            OffhandFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
+                            break;
+                        case "Raycast":
+                            OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
+                            break;
                     }
-                    else if(data.SecondarySpell == "Heal")
-                    {
-                        OffhandFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
-                    }
-                    else if(data.SecondarySpell == "Raycast")
-                    {
-                        OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
-                    }
+                    // Emit function
                     emit('execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}]}] run ' + OffhandFunctionName);
                 %%>
                 # Reset
@@ -136,7 +136,7 @@ template wand_setup {
                     playsound minecraft:item.trident.riptide_2 player @a ~ ~ ~ 0.4 0.4
                 }
 
-                damage @s <%data.SpellDamage%> minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]
+                damage @s <%data.MainSpell.SpellDamage%> minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]
                 playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.4
                 effect give @s slowness 1 1 true
             }

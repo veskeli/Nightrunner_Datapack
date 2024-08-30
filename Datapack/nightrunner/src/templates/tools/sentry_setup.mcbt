@@ -19,8 +19,9 @@ template sentry_setup{
         }
         block check_sentry{
             execute as @e[type=block_display,tag=sentry,tag=<%data.Namespace%>] run block check_current_sentry{
-                execute at @s run execute as @e[distance=..<%data.Distance%>,type=<%data.Target%>] run function ./sentry_action
+                execute at @s run execute as @e[distance=..<%data.Distance%>,type=<%data.Target%>,limit=<%data.ConcurrentAttacks%>,sort=nearest] run function ./sentry_action
             }
+            execute as @e[type=block_display,tag=sentry,tag=<%data.Namespace%>] run scoreboard players reset @s Nightrunner_CurrentConcurrentAttacks
             # Loop
             schedule function ./check_sentry 20t
         }

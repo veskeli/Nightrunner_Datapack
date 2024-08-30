@@ -6,6 +6,7 @@ module.exports = {
         Distance: 6,
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
+        ConcurrentAttacks: 3,
     },
     heal_sentry:{
         Namespace: "Heal",
@@ -14,5 +15,6 @@ module.exports = {
         Distance: 6,
         DustColor: "0.0,1.0,0.0",
         DisplayBlock: "minecraft:beacon",
+        ConcurrentAttacks: 3,
     }
 }

@@ -743,10 +743,6 @@ dir items{
         }
         # MARK: Staffs
         dir staffs{
-            function load minecraft:load{
-                scoreboard objectives add Nightrunner_SentryID minecraft.used:minecraft.warped_fungus_on_a_stick
-                scoreboard objectives add Nightrunner_SentryLifetime dummy
-            }
             dir wooden{
                 function setup minecraft:tick{
                     wand_setup <%data = wooden_staff%>
@@ -895,6 +891,10 @@ dir items{
 # MARK: Sentry
 #=================================================
 dir sentry{
+    function load minecraft:load{
+        scoreboard objectives add Nightrunner_SentryID minecraft.used:minecraft.warped_fungus_on_a_stick
+        scoreboard objectives add Nightrunner_SentryLifetime dummy
+    }
     clock check_sentry_lifetime 1s{
         execute as @e[type=block_display,tag=sentry] run block{
             scoreboard players remove @s Nightrunner_SentryLifetime 1

@@ -130,7 +130,6 @@ data/nightrunner/function/items/tools/wands/diamond/spell_heal.mcfunction:5ffc3b
 data/nightrunner/function/items/tools/wands/diamond/setup.mcfunction:e3fcacb8bdd25358c3912d1301504abea83d0c0b
 data/nightrunner/recipe/items/tools/wands/diamond/diamond_wand.json:fa175d4f73d3ef97d8373b5d64cd6983f9d13441
 data/nightrunner/function/items/tools/wands/give_all.mcfunction:91ea5bf37567bd35ae92185396242c61e1459ef8
-data/nightrunner/function/items/tools/staffs/load.mcfunction:b6acf4288db2a5b71646b366a5dda9569cdf16d9
 data/nightrunner/function/items/tools/staffs/wooden/start_raycast.mcfunction:82efe706e470b4b118b97e09ae67d5f6863d5346
 data/nightrunner/function/items/tools/staffs/wooden/raycast/generated/0.mcfunction:6e7ce85b6600f919fb0e2c714a25469a96b9f1df
 data/nightrunner/function/items/tools/staffs/wooden/raycast/effect.mcfunction:5e40cc69f865f191be21e07b703ff4400a160c18
@@ -145,8 +144,8 @@ data/nightrunner/function/items/tools/staffs/wooden/spell_heal.mcfunction:5ffc3b
 data/nightrunner/function/items/tools/staffs/wooden/setup.mcfunction:1df59b8ac9f762c80cd334f3802d6ee8f00e0454
 data/nightrunner/function/items/tools/staffs/wooden/hit_block/generated/2.mcfunction:8aa323db9a0c2df7faedd436052ce9359abb804a
 data/nightrunner/function/items/tools/staffs/wooden/hit_block.mcfunction:493adc0c836f76017ed037f369194237f0a750ce
-data/nightrunner/function/items/tools/staffs/wooden/check_sentry/check_current_sentry.mcfunction:926bd6b5f05827e14517fc3b414ef320cd7e98f1
-data/nightrunner/function/items/tools/staffs/wooden/check_sentry.mcfunction:5582d35889f42b240eba92e031ea11ab15c0ed19
+data/nightrunner/function/items/tools/staffs/wooden/check_sentry/check_current_sentry.mcfunction:607b38c5cfc1a3feaa854a99da228312886b12d9
+data/nightrunner/function/items/tools/staffs/wooden/check_sentry.mcfunction:07da304c350754b349c473c66f247eb1ea9c02cc
 data/nightrunner/function/items/tools/staffs/wooden/sentry_effects/generated/3.mcfunction:40000d4dcbd8bca50766c1dbea31004bb893ba40
 data/nightrunner/function/items/tools/staffs/wooden/sentry_effects.mcfunction:42d0e984eceaf816ba240ea78ee570d12fb6537b
 data/nightrunner/function/items/tools/staffs/wooden/load_setup.mcfunction:ecb08c26b4f769101a7dd097ecbc2c90b72ee85b
@@ -166,8 +165,8 @@ data/nightrunner/function/items/tools/staffs/stone/spell_heal.mcfunction:5ffc3b2
 data/nightrunner/function/items/tools/staffs/stone/setup.mcfunction:779b03c90a25efe6321d659217908546ac403512
 data/nightrunner/function/items/tools/staffs/stone/hit_block/generated/2.mcfunction:c2095dbbb84a730f293fda43199a4b26e84dc87b
 data/nightrunner/function/items/tools/staffs/stone/hit_block.mcfunction:220418c2dfe646fcc6951a41c9587750e8065675
-data/nightrunner/function/items/tools/staffs/stone/check_sentry/check_current_sentry.mcfunction:312ffad3f7420f1b41639794c6ed5d06fe1df49e
-data/nightrunner/function/items/tools/staffs/stone/check_sentry.mcfunction:3a7462f805c8c6d1399e58f6e93183c5926d2f65
+data/nightrunner/function/items/tools/staffs/stone/check_sentry/check_current_sentry.mcfunction:c3f7aa97590a0bebbb519a33cf3309601d1bc402
+data/nightrunner/function/items/tools/staffs/stone/check_sentry.mcfunction:315ecc6febf26e28c1044213d5539bbca85dd142
 data/nightrunner/function/items/tools/staffs/stone/sentry_effects/generated/3.mcfunction:7a9df5ad913bbd0e6a7f1b1a1e86fa40c0244475
 data/nightrunner/function/items/tools/staffs/stone/sentry_effects.mcfunction:a52c95c8a113c144ba339989606a63153435a7de
 data/nightrunner/function/items/tools/staffs/stone/load_setup.mcfunction:dfea22bb62fe062446db5c2b37e2b158e2bce97f
@@ -186,6 +185,7 @@ data/nightrunner/function/items/tools/staffs/diamond/check_wand.mcfunction:cc2c3
 data/nightrunner/function/items/tools/staffs/diamond/tick.mcfunction:6f7a1633065a7aef563104512bf3f1d399f37b95
 data/nightrunner/function/items/tools/staffs/diamond/use.mcfunction:4403d34b5e46ea41863d925aca902b28b135359d
 data/nightrunner/function/items/tools/staffs/give_all.mcfunction:1996999d616d2ce2aa38a739538699dde69ec99a
+data/nightrunner/function/sentry/load.mcfunction:b6acf4288db2a5b71646b366a5dda9569cdf16d9
 data/nightrunner/function/sentry/generated/2.mcfunction:7fdb09647ec4a5133d70621201377410ab872409
 data/nightrunner/function/sentry/generated/1.mcfunction:1b0d0b0de67a8fa74f857cf024349a4dfb886118
 data/nightrunner/function/sentry/check_sentry_lifetime.mcfunction:518f79713950ad93e08e37a3aec712e3a3b1953b
@@ -295,6 +295,6 @@ data/nightrunner_dev_tools/predicate/is_sneaking.json:80d2f2119d07b9ddf946d4f389
 data/nightrunner_dev_tools/function/give_heal.mcfunction:c10a67eb2d65a0265e37af7f243ddf8ff22f4464
 data/nightrunner_dev_tools/function/apply_heal.mcfunction:f102fb1314cd179ae34cc09c8126ca11cf5b7f06
 data/nightrunner_dev_tools/advancement/used_heal.json:a2535bc027ba3eea325d4bc714f83e62a3503a9c
-data/minecraft/tags/function/load.json:04247c34235aa5e2d92419feb641ee344533d39e
+data/minecraft/tags/function/load.json:c0f7df468695aeed25bc4cd2a39ddf232c0364ec
 data/minecraft/tags/function/tick.json:de4fe48e4a90bd093c71c4435287ed835ff85abc
 data/nightrunner/tags/function/on_join.json:43216c8ae8f18c386c22f42b9b2df8f39409cc55

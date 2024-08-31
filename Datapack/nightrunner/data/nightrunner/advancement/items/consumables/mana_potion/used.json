@@ -1,0 +1,1 @@
+{"criteria":{"use_item":{"trigger": "minecraft:consume_item","conditions":{"item":{"predicates":{"minecraft:custom_data": {"mana_potion":true}}}}}},"rewards":{"function": "nightrunner:items/consumables/mana_potion/apply"}}

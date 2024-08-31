@@ -1,0 +1,3 @@
+# Generated with MC-Build
+
+give @s minecraft:poisonous_potato[custom_data={mana_potion_3:true},item_name='{"text":"Mana Potion III","italic":false}',lore=['{"text":"A consumable item that gives mana when consumed."}','{"text":"Mana amount: 15","color":"green"}','{"text":"Nightrunner","color":"aqua"}'],food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:4},enchantment_glint_override=true,rarity="rare",custom_model_data=1128,max_stack_size=6] 1

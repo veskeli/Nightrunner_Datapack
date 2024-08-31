@@ -35,7 +35,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 7 Staffs and Wands!
+    welcome 8 Mana And Item Descriptions!
 }
 function test{
     scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 30
@@ -336,19 +336,27 @@ dir items{
         scoreboard objectives add Nightrunner_Mana dummy
         scoreboard objectives add Nightrunner_ManaMax dummy
         scoreboard objectives add Nightrunner_ManaXP xp
+        scoreboard objectives add Nightrunner_ManaTemp dummy
 
         scoreboard objectives add Nightrunner_EffectCooldown dummy
         scoreboard objectives add Nightrunner_Item_Ray_steps dummy
         scoreboard objectives add Nightrunner_Item_Ray_Return dummy
         scoreboard objectives add Nightrunner_RangedSpellRange dummy
         scoreboard objectives add Nightrunner_SpellCooldown dummy
+        scoreboard objectives add Nightrunner_Weak_Use dummy
     }
     function magic_tick minecraft:tick{
         # check if player has xp mana
         execute as @a[scores={Nightrunner_ManaXP=1..}] run block{
             # reset mana xp
-            scoreboard players operation @s Nightrunner_Mana += @s Nightrunner_ManaXP
+            scoreboard players operation @s Nightrunner_ManaTemp += @s Nightrunner_ManaXP
             scoreboard players reset @s Nightrunner_ManaXP
+
+            execute if score @s Nightrunner_ManaTemp matches 100.. run block{
+                scoreboard players remove @s Nightrunner_ManaTemp 100
+                scoreboard players add @s Nightrunner_Mana 1
+            }
+
             # clamp mana
             execute if score @s Nightrunner_Mana > @s Nightrunner_ManaMax run scoreboard players operation @s Nightrunner_Mana = @s Nightrunner_ManaMax
         }
@@ -563,8 +571,8 @@ dir items{
     dir tools{
         function on_join nightrunner:on_join{
             scoreboard players set @s Nightrunner_RangedSpellRange 50
-            scoreboard players set @s Nightrunner_Mana 10000
-            scoreboard players set @s Nightrunner_ManaMax 10000
+            scoreboard players set @s Nightrunner_Mana 20
+            scoreboard players set @s Nightrunner_ManaMax 20
         }
         clock spell_cooldown 0.1s{
             # Cool down the Nightrunner_SpellCooldown
@@ -582,8 +590,8 @@ dir items{
             execute as @a[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{wand:1b}}}]}] run function ./show_cooldown_bar
         }
         function show_cooldown_bar{
-            execute as @s[scores={Nightrunner_SpellCooldown=0}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Ready","color":"green"},{"text":" |====","color":"gold"}]
-            execute as @s[scores={Nightrunner_SpellCooldown=1..}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Cooldown: ","color":"aqua"},{"score":{"name":"@s","objective":"Nightrunner_SpellCooldown"}},{"text":" |====","color":"gold"}]
+            execute as @s[scores={Nightrunner_SpellCooldown=0}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"}},{"text":" |====","color":"gold"}]
+            execute as @s[scores={Nightrunner_SpellCooldown=1..}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"}},{"text":" | ","color":"gold"},{"text":"Cooldown: ","color":"aqua"},{"score":{"name":"@s","objective":"Nightrunner_SpellCooldown"}},{"text":" |====","color":"gold"}]
         }
         # MARK: Wands
         dir wands{
@@ -607,7 +615,7 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%wooden_wand.Name%>\",\"italic\":false,\"color\":\"<%wooden_wand.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%wooden_wand.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%wooden_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%wooden_wand.CustomModelData%>,
                             "custom_data": {
                                 "<%wooden_wand.Namespace%>": true,
@@ -640,7 +648,7 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%stone_wand.Name%>\",\"italic\":false,\"color\":\"<%stone_wand.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%stone_wand.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%stone_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%stone_wand.CustomModelData%>,
                             "custom_data": {
                                 "<%stone_wand.Namespace%>": true,
@@ -673,7 +681,7 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%iron_wand.Name%>\",\"italic\":false,\"color\":\"<%iron_wand.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%iron_wand.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%iron_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%iron_wand.CustomModelData%>,
                             "custom_data": {
                                 "<%iron_wand.Namespace%>": true,
@@ -706,7 +714,7 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%golden_wand.Name%>\",\"italic\":false,\"color\":\"<%golden_wand.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%golden_wand.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%golden_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%golden_wand.CustomModelData%>,
                             "custom_data": {
                                 "<%golden_wand.Namespace%>": true,
@@ -739,7 +747,7 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%diamond_wand.Name%>\",\"italic\":false,\"color\":\"<%diamond_wand.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%diamond_wand.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%diamond_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%diamond_wand.CustomModelData%>,
                             "custom_data": {
                                 "<%diamond_wand.Namespace%>": true,
@@ -786,12 +794,12 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%wooden_staff.Name%>\",\"italic\":false,\"color\":\"<%wooden_staff.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%wooden_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%wooden_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%wooden_staff.CustomModelData%>,
                             "custom_data": {
                                 "<%wooden_staff.Namespace%>": true,
                                 "wand": true
-                            }
+                            }<%wooden_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -826,12 +834,12 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%stone_staff.Name%>\",\"italic\":false,\"color\":\"<%stone_staff.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%stone_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%stone_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%stone_staff.CustomModelData%>,
                             "custom_data": {
                                 "<%stone_staff.Namespace%>": true,
                                 "wand": true
-                            }
+                            }<%stone_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -866,12 +874,12 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%iron_staff.Name%>\",\"italic\":false,\"color\":\"<%iron_staff.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%iron_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%iron_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%iron_staff.CustomModelData%>,
                             "custom_data": {
                                 "<%iron_staff.Namespace%>": true,
                                 "wand": true
-                            }
+                            }<%iron_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -906,12 +914,12 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%golden_staff.Name%>\",\"italic\":false,\"color\":\"<%golden_staff.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%golden_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%golden_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%golden_staff.CustomModelData%>,
                             "custom_data": {
                                 "<%golden_staff.Namespace%>": true,
                                 "wand": true
-                            }
+                            }<%golden_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -946,12 +954,12 @@ dir items{
                         "count": 1,
                         "components":{
                             "item_name":"[{\"text\":\"<%diamond_staff.Name%>\",\"italic\":false,\"color\":\"<%diamond_staff.Color%>\"}]",
-                            "lore": ["{\"text\":\"<%diamond_staff.Description%>\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "lore": [<%diamond_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
                             "custom_model_data": <%diamond_staff.CustomModelData%>,
                             "custom_data": {
                                 "<%diamond_staff.Namespace%>": true,
                                 "wand": true
-                            }
+                            }<%diamond_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }

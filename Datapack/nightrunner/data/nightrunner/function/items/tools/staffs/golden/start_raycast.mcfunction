@@ -1,11 +1,18 @@
 # Generated with MC-Build
 
+# Reset Nightrunner Mana
+scoreboard players reset $Nightrunner Nightrunner_Mana
 # check if cooldown is active
 execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1
 # check if player has enough mana
-execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..4999 run return run function nightrunner:items/tools/staffs/golden/start_raycast/generated/0
+# execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..<%data.ManaCost - 1%> run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]
+execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..14 run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]
+# play sound
+execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
+execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
 # Reduce mana (not in creative mode)
-scoreboard players remove @s[gamemode=!creative] Nightrunner_Mana 5000
+# execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana <%data.ManaCost%>
+scoreboard players set $Nightrunner Nightrunner_Mana 15
 # add cooldown
 scoreboard players set @s Nightrunner_SpellCooldown 16
 # Reset scoreboards
@@ -21,11 +28,10 @@ execute as @s if entity @s[nbt={Inventory:[{Slot:100b,id:"minecraft:leather_boot
 # tell spell range
 tellraw @s [{"text":"Spell range: ","color":"aqua"},{"score":{"name":"$Nightrunner","objective":"Nightrunner_RangedSpellRange"}}]
 scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown
-# play sound
-execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
 # Raycast
 tag @s add raycasting
 execute anchored eyes positioned ^ ^ ^ store result score @s Nightrunner_Item_Ray_Return run function nightrunner:items/tools/staffs/golden/raycast
 tag @s remove raycasting
+scoreboard players reset $Nightrunner Nightrunner_Weak_Use
 # Returns score to "@s" "Nightrunner_Item_Ray_Return" base on hit: 1 entity, 2 block, 3 no hit
 # scoreboard players set @s Nm_testing_wand_active 1

@@ -1,6 +1,4 @@
 data/nightrunner/function/on_load.mcfunction:0b2cf33339f7da448d1ba190fc88cae958e0a91f
-data/nightrunner/function/testaction.mcfunction:c8e6727647cc492d7bb4541bfce063ac86be64d0
-data/nightrunner/function/test.mcfunction:bab6887d6a8f4e9990b3486b43ecf879d53210fe
 data/nightrunner/function/settings/load.mcfunction:22e576b546dce0370e3f7bd0ac2f45a7bfacaa8a
 data/nightrunner/function/settings/first_time.mcfunction:798207ef5ed17a36d138689a63c4daf90292ab12
 data/nightrunner/function/settings/settings.mcfunction:d9bdc1aab03555067276fa5f423a2bcdac1c174a

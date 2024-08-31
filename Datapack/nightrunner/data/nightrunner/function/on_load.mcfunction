@@ -21,5 +21,5 @@ tellraw @a {"text":"Nightrunner loaded!","bold":true,"color":"gold"}
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
 tellraw @a ["",{"text":"Staffs and Wands!","color":"aqua"},{"text":" update"}]
-tellraw @a ["",{"text":"(Build "},{"text":"6","underlined":true,"color":"yellow"},{"text":")"}]
+tellraw @a ["",{"text":"(Build "},{"text":"7","underlined":true,"color":"yellow"},{"text":")"}]
 tellraw @a [{"text": " "}]

@@ -1,3 +1,3 @@
 # Generated with MC-Build
 
-execute at @s run summon evoker_fangs ~ ~ ~
+execute as @s run function nightrunner:items/tools/staffs/summon_fangs

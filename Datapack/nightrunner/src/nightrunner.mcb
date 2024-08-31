@@ -35,7 +35,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 6 Staffs and Wands!
+    welcome 7 Staffs and Wands!
 }
 function test{
     scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 30
@@ -333,11 +333,25 @@ dir items{
         # Magic tool usage
         scoreboard objectives add Nightrunner_Used_Magic_tool minecraft.used:minecraft.warped_fungus_on_a_stick
 
+        scoreboard objectives add Nightrunner_Mana dummy
+        scoreboard objectives add Nightrunner_ManaMax dummy
+        scoreboard objectives add Nightrunner_ManaXP xp
+
         scoreboard objectives add Nightrunner_EffectCooldown dummy
         scoreboard objectives add Nightrunner_Item_Ray_steps dummy
         scoreboard objectives add Nightrunner_Item_Ray_Return dummy
         scoreboard objectives add Nightrunner_RangedSpellRange dummy
         scoreboard objectives add Nightrunner_SpellCooldown dummy
+    }
+    function magic_tick minecraft:tick{
+        # check if player has xp mana
+        execute as @a[scores={Nightrunner_ManaXP=1..}] run block{
+            # reset mana xp
+            scoreboard players operation @s Nightrunner_Mana += @s Nightrunner_ManaXP
+            scoreboard players reset @s Nightrunner_ManaXP
+            # clamp mana
+            execute if score @s Nightrunner_Mana > @s Nightrunner_ManaMax run scoreboard players operation @s Nightrunner_Mana = @s Nightrunner_ManaMax
+        }
     }
     dir forge_core{
         # Forge Core: A fundamental component essential for all cauldron crafting recipes
@@ -549,6 +563,8 @@ dir items{
     dir tools{
         function on_join nightrunner:on_join{
             scoreboard players set @s Nightrunner_RangedSpellRange 50
+            scoreboard players set @s Nightrunner_Mana 10000
+            scoreboard players set @s Nightrunner_ManaMax 10000
         }
         clock spell_cooldown 0.1s{
             # Cool down the Nightrunner_SpellCooldown
@@ -751,7 +767,7 @@ dir items{
                     sentry_setup <%data = wooden_sentry%>
                 }
                 function sentry_action{
-                    execute at @s run summon evoker_fangs ~ ~ ~
+                    execute as @s run function ../summon_fangs
                 }
                 recipe wooden_staff{
                     "type": "minecraft:crafting_shaped",
@@ -788,7 +804,7 @@ dir items{
                     sentry_setup <%data = stone_sentry%>
                 }
                 function sentry_action{
-                    execute at @s run summon evoker_fangs ~ ~ ~
+                    execute as @s run function ../summon_fangs
                 }
                 recipe stone_staff{
                     "type": "minecraft:crafting_shaped",
@@ -828,7 +844,7 @@ dir items{
                     sentry_setup <%data = iron_sentry%>
                 }
                 function sentry_action{
-                    execute at @s run summon evoker_fangs ~ ~ ~
+                    execute as @s run function ../summon_fangs
                 }
                 recipe iron_staff{
                     "type": "minecraft:crafting_shaped",
@@ -868,7 +884,7 @@ dir items{
                     sentry_setup <%data = golden_sentry%>
                 }
                 function sentry_action{
-                    execute at @s run summon evoker_fangs ~ ~ ~
+                    execute as @s run function ../summon_fangs
                 }
                 recipe golden_staff{
                     "type": "minecraft:crafting_shaped",
@@ -908,7 +924,7 @@ dir items{
                     sentry_setup <%data = diamond_sentry%>
                 }
                 function sentry_action{
-                    execute at @s run summon evoker_fangs ~ ~ ~
+                    execute as @s run function ../summon_fangs
                 }
                 recipe diamond_staff{
                     "type": "minecraft:crafting_shaped",
@@ -949,6 +965,12 @@ dir items{
                 function ./iron/give
                 function ./golden/give
                 function ./diamond/give
+            }
+            function summon_fangs{
+                execute at @s run summon evoker_fangs ~ ~ ~ {Warmup:0}
+                # execute at @s run execute as @a run execute if score @s Nightrunner_ID = @e[tag=sentry,sort=nearest,limit=1] Nightrunner_SentryID run data modify entity @e[tag=sentry,sort=nearest,limit=1] Owner set from entity @s UUID
+                # TODO: set owner to be correct player (Currently its closest player)
+                execute as @e[type=evoker_fangs,sort=nearest,limit=1] run data modify entity @s Owner set from entity @p UUID
             }
         }
     }

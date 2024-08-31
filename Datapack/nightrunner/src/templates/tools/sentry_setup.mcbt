@@ -21,20 +21,19 @@ template sentry_setup{
             execute as @e[type=block_display,tag=sentry,tag=<%data.Namespace%>] run block check_current_sentry{
                 execute at @s run execute as @e[distance=..<%data.Distance%>,type=<%data.Target%>,limit=<%data.ConcurrentAttacks%>,sort=nearest] run function ./sentry_action
             }
-            execute as @e[type=block_display,tag=sentry,tag=<%data.Namespace%>] run scoreboard players reset @s Nightrunner_CurrentConcurrentAttacks
             # Loop
             schedule function ./check_sentry 20t
         }
         block sentry_effects{
             execute as @e[type=block_display,tag=sentry,tag=<%data.Namespace%>] run block{
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^6 ^ ^ 0 0 0 0 1 normal
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^4.24 ^ ^4.24 0 0 0 0 1 normal
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^0 ^ ^6 0 0 0 0 1 normal
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^-4.24 ^ ^4.24 0 0 0 0 1 normal
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^-6 ^ ^ 0 0 0 0 1 normal
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^-4.24 ^ ^-4.24 0 0 0 0 1 normal
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^0 ^ ^-6 0 0 0 0 1 normal
-                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^4.24 ^ ^-4.24 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^<%data.Distance%> ^ ^0 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^<%data.Distance * 0.707%> ^ ^<%data.Distance * 0.707%> 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^0 ^ ^<%data.Distance%> 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^-<%data.Distance * 0.707%> ^ ^<%data.Distance * 0.707%> 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^-<%data.Distance%> ^ ^0 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^-<%data.Distance * 0.707%> ^ ^-<%data.Distance * 0.707%> 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^0 ^ ^-<%data.Distance%> 0 0 0 0 1 normal
+                execute as @s at @s run particle dust{color:[<%data.DustColor%>],scale:2} ^<%data.Distance * 0.707%> ^ ^-<%data.Distance * 0.707%> 0 0 0 0 1 normal
             }
             schedule function ./sentry_effects 10t
         }

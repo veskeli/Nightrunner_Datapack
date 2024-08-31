@@ -41,6 +41,7 @@ module.exports = {
         CustomModelData: 1121,
         Namespace: "wooden_wand",
         FunctionName: "wooden",
+        ManaCost: 4,
         MainSpell: {
             ...spells.Damage,
             SpellDamage: 4,
@@ -60,6 +61,7 @@ module.exports = {
         CustomModelData: 1122,
         Namespace: "stone_wand",
         FunctionName: "stone",
+        ManaCost: 4,
         MainSpell: {
             ...spells.Damage,
             SpellDamage: 5,
@@ -79,6 +81,7 @@ module.exports = {
         CustomModelData: 1123,
         Namespace: "iron_wand",
         FunctionName: "iron",
+        ManaCost: 4,
         MainSpell: {
             ...spells.Damage,
             SpellDamage: 6,
@@ -98,6 +101,7 @@ module.exports = {
         CustomModelData: 1124,
         Namespace: "golden_wand",
         FunctionName: "golden",
+        ManaCost: 4,
         MainSpell: {
             ...spells.Damage,
             SpellDamage: 11,
@@ -117,6 +121,7 @@ module.exports = {
         CustomModelData: 1125,
         Namespace: "diamond_wand",
         FunctionName: "diamond",
+        ManaCost: 4,
         MainSpell: {
             ...spells.Damage,
             SpellDamage: 7,
@@ -137,6 +142,7 @@ module.exports = {
         CustomModelData: 1126,
         Namespace: "wooden_staff",
         FunctionName: "wooden",
+        ManaCost: 5000,
         MainSpell: {
             ...spells.Raycast,
         },
@@ -154,6 +160,7 @@ module.exports = {
         CustomModelData: 1127,
         Namespace: "stone_staff",
         FunctionName: "stone",
+        ManaCost: 5000,
         MainSpell: {
             ...spells.Raycast,
         },
@@ -171,6 +178,7 @@ module.exports = {
         CustomModelData: 1128,
         Namespace: "iron_staff",
         FunctionName: "iron",
+        ManaCost: 5000,
         MainSpell: {
             ...spells.Raycast,
         },
@@ -188,6 +196,7 @@ module.exports = {
         CustomModelData: 1129,
         Namespace: "golden_staff",
         FunctionName: "golden",
+        ManaCost: 5000,
         MainSpell: {
             ...spells.Raycast,
         },
@@ -202,9 +211,10 @@ module.exports = {
         Description: "Summon damage sentry",
         Cooldown: 8,
         Particle: "minecraft:crit",
-        CustomModelData: 1130,
+        CustomModelData: 11210,
         Namespace: "diamond_staff",
         FunctionName: "diamond",
+        ManaCost: 5000,
         MainSpell: {
             ...spells.Raycast,
         },

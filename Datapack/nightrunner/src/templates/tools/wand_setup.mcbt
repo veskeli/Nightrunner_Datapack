@@ -30,7 +30,7 @@ template wand_setup {
             %%>
 
             # play sound
-            execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
+            # execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
             <%%
                 // Play sound
                 let value = data.ManaCost - 1;
@@ -45,13 +45,62 @@ template wand_setup {
                 }
             %%>
 
-            # Reduce mana (not in creative mode)
-            # execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana <%data.ManaCost%>
+            # Add damage to item
+            <%%
+                let start = `execute if entity `;
+                let mainhand1 = start + `@s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true}`;
+                let mainhand2 = `}}}]`;
+                let offhand1 = start + `@s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true}`;
+                let offhand2 = `}}]}]`;
+                let mainhandEnd = `item modify entity @s weapon.mainhand nightrunner:damage_item`;
+                let offhandEnd = `item modify entity @s weapon.offhand nightrunner:damage_item`;
+                let blockArray = [];
+                blockArray.push(`# Add damage to item`);
 
+                // Unbreaking 1
+                blockArray.push(`execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true},"minecraft:enchantments":{levels:{"minecraft:unbreaking":1}}}}}] run execute if predicate nightrunner:50change run return 1`);
+                blockArray.push(`execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true},"minecraft:enchantments":{levels:{"minecraft:unbreaking":1}}}}]}] run execute if predicate nightrunner:50change run return 1`);
+
+                // Unbreaking 2
+                blockArray.push(`execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true},"minecraft:enchantments":{levels:{"minecraft:unbreaking":2}}}}}] run execute if predicate nightrunner:66change run return 1`);
+                blockArray.push(`execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true},"minecraft:enchantments":{levels:{"minecraft:unbreaking":2}}}}]}] run execute if predicate nightrunner:66change run return 1`);
+
+                // Unbreaking 3
+                blockArray.push(`execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true},"minecraft:enchantments":{levels:{"minecraft:unbreaking":3}}}}}] run execute if predicate nightrunner:75change run return 1`);
+                blockArray.push(`execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true},"minecraft:enchantments":{levels:{"minecraft:unbreaking":3}}}}]}] run execute if predicate nightrunner:75change run return 1`);
+
+                // Default
+                blockArray.push(`execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true}}}}] run item modify entity @s weapon.mainhand nightrunner:damage_item`);
+                blockArray.push(`execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true}}}]}] run item modify entity @s weapon.offhand nightrunner:damage_item`);
+
+                emit("execute as @s[gamemode=!creative] run function " + emit.block(blockArray));
+            %%>
+            # execute as @s[gamemode=!creative] run execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}}] run item modify entity @s weapon.mainhand nightrunner:damage_item
+            # execute as @s[gamemode=!creative] run execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}]}] run item modify entity @s weapon.offhand nightrunner:damage_item
+
+            # Reduce mana (not in creative mode)
             <%%
                 if(data.ConsumeManaOnCast)
                 {
-                    emit('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana ' + data.ManaCost)
+                    let halfMana = data.ManaCost / 2;
+                    if(halfMana < 1) halfMana = 0;
+                    let TakeHalfMana = `scoreboard players remove @s Nightrunner_Mana ` + halfMana;
+                    let blockArray = [];
+                    blockArray.push(`# Reduce mana (not in creative mode)`);
+
+                    // Mana efficiency 1
+                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":1}}}}}] run execute if predicate nightrunner:` + `10change` + ` run return run ` + TakeHalfMana);
+
+                    // Mana efficiency 2
+                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":2}}}}}] run execute if predicate nightrunner:` + `35change` + ` run return run ` + TakeHalfMana);
+
+                    // Mana efficiency 3
+                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":3}}}}}] run execute if predicate nightrunner:` + `50change` + ` run return run ` + TakeHalfMana);
+
+                    // Default
+                    blockArray.push('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana ' + data.ManaCost)
+
+                    emit.block(blockArray);
                 }
                 else
                 {
@@ -141,44 +190,50 @@ template wand_setup {
             execute positioned ^ ^ ^0.25 rotated ~ ~ run function ./raycast
         }
         block give{
-            give @s minecraft:warped_fungus_on_a_stick[custom_data={<%data.Namespace%>:true,wand:true},item_name='{"text":"<% data.Name %>","italic":false,"color":"<%data.Color%>"}',lore=[<%data.Description%>,'{"text":"Nightrunner","color":"aqua"}']<%data.Attributes.GiveLiteral%>,custom_model_data=<%data.CustomModelData%>] 1
+            give @s minecraft:warped_fungus_on_a_stick[custom_data={<%data.Namespace%>:true,wand:true},item_name='{"text":"<% data.Name %>","italic":false,"color":"<%data.Color%>"}',lore=[<%data.Description%>,'{"text":"Nightrunner","color":"aqua"}']<%data.Attributes.GiveLiteral%>,custom_model_data=<%data.CustomModelData%>,max_damage=<%data.Durability%>,damage=0.5] 1
         }
         block check{
             execute as @a if score @s Nightrunner_Used_Magic_tool matches 1 run block check_wand{
                 # Selected item
                 <%%
-                    let MainFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/use';
-                    switch(data.MainSpell.Name)
+                    if(data.MainSpell && data.MainSpell.Name !== undefined) // Main item
                     {
-                        case "Damage":
-                            MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
-                            break;
-                        case "Heal":
-                            MainFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
-                            break;
-                        case "Raycast":
-                            MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
-                            break;
+                        let MainFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/use';
+                        switch(data.MainSpell.Name)
+                        {
+                            case "Damage":
+                                MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
+                                break;
+                            case "Heal":
+                                MainFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
+                                break;
+                            case "Raycast":
+                                MainFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
+                                break;
+                        }
+                        // Emit function
+                        emit('execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}}] run ' + MainFunctionName);
                     }
-                    // Emit function
-                    emit('execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}}] run ' + MainFunctionName);
 
-                    emit('# Offhand item');
-                    let OffhandFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/use_secondary';
-                    switch(data.SecondarySpell)
+                    if(data.SecondarySpell && data.SecondarySpell.Name !== undefined) // Offhand item
                     {
-                        case "Damage":
-                            OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
-                            break;
-                        case "Heal":
-                            OffhandFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
-                            break;
-                        case "Raycast":
-                            OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
-                            break;
+                        emit('# Offhand item');
+                        let OffhandFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/use_secondary';
+                        switch(data.SecondarySpell.Name)
+                        {
+                            case "Damage":
+                                OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + "/start_raycast";
+                                break;
+                            case "Heal":
+                                OffhandFunctionName = 'function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/spell_heal';
+                                break;
+                            case "Raycast":
+                                OffhandFunctionName = 'execute at @s run function nightrunner:items/tools/' + data.Folder + '/' + data.FunctionName + '/start_raycast';
+                                break;
+                        }
+                        // Emit function
+                        emit('execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}]}] run ' + OffhandFunctionName);
                     }
-                    // Emit function
-                    emit('execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{' + data.Namespace + ':true,wand:true}}}]}] run ' + OffhandFunctionName);
                 %%>
                 # Reset
                 execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}}] run scoreboard players reset @s Nightrunner_Used_Magic_tool

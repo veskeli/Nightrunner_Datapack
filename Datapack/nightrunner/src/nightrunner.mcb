@@ -35,7 +35,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 9 Mana potions!
+    welcome 10 Wand Durability!
 }
 #=================================================
 # MARK: Settings
@@ -551,9 +551,13 @@ dir items{
             }
             }
         }
+        function show_mana_state{
+            # Show mana state
+            title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"}},{"text":" | ","color":"gold"},{"text":"Cooldown: ","color":"aqua"},{"score":{"name":"@s","objective":"Nightrunner_SpellCooldown"}},{"text":" |====","color":"gold"}]
+        }
         dir mana_potion{
             function give{
-            give @s minecraft:poisonous_potato[custom_data={mana_potion:true},item_name='{"text":"Mana Potion I","italic":false}',lore=['{"text":"A consumable item that gives mana when consumed."}','{"text":"Mana amount: 3","color":"green"}','{"text":"Nightrunner","color":"aqua"}'],food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:4},enchantment_glint_override=false,custom_model_data=1128,max_stack_size=6] 1
+            give @s minecraft:poisonous_potato[custom_data={mana_potion:true},item_name='{"text":"Mana Potion I","italic":false}',lore=['{"text":"A consumable item that gives mana when consumed."}','{"text":"Mana amount: 3","color":"green"}','{"text":"Nightrunner","color":"aqua"}'],food={nutrition:0,saturation:0,can_always_eat:true,eat_seconds:4},enchantment_glint_override=false,custom_model_data=1128,max_stack_size=6,enchantments={levels:{"nightrunner:mana_state":1},show_in_tooltip:false}] 1
             }
             function apply{
                 scoreboard players add @s Nightrunner_Mana 3
@@ -767,7 +771,8 @@ dir items{
                             "custom_data": {
                                 "<%wooden_wand.Namespace%>": true,
                                 "wand": true
-                            }
+                            },
+                            "max_damage": <%wooden_wand.Durability%>
                         }
                     }
                 }
@@ -800,7 +805,8 @@ dir items{
                             "custom_data": {
                                 "<%stone_wand.Namespace%>": true,
                                 "wand": true
-                            }
+                            },
+                            "max_damage": <%stone_wand.Durability%>
                         }
                     }
                 }
@@ -833,7 +839,8 @@ dir items{
                             "custom_data": {
                                 "<%iron_wand.Namespace%>": true,
                                 "wand": true
-                            }
+                            },
+                            "max_damage": <%iron_wand.Durability%>
                         }
                     }
                 }
@@ -866,7 +873,8 @@ dir items{
                             "custom_data": {
                                 "<%golden_wand.Namespace%>": true,
                                 "wand": true
-                            }
+                            },
+                            "max_damage": <%golden_wand.Durability%>
                         }
                     }
                 }
@@ -899,7 +907,8 @@ dir items{
                             "custom_data": {
                                 "<%diamond_wand.Namespace%>": true,
                                 "wand": true
-                            }
+                            },
+                            "max_damage": <%diamond_wand.Durability%>
                         }
                     }
                 }
@@ -946,7 +955,8 @@ dir items{
                             "custom_data": {
                                 "<%wooden_staff.Namespace%>": true,
                                 "wand": true
-                            }<%wooden_staff.Attributes.RecipeLiteral%>
+                            },
+                            "max_damage": <%wooden_staff.Durability%><%wooden_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -986,7 +996,8 @@ dir items{
                             "custom_data": {
                                 "<%stone_staff.Namespace%>": true,
                                 "wand": true
-                            }<%stone_staff.Attributes.RecipeLiteral%>
+                            },
+                            "max_damage": <%stone_staff.Durability%><%stone_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -1026,7 +1037,8 @@ dir items{
                             "custom_data": {
                                 "<%iron_staff.Namespace%>": true,
                                 "wand": true
-                            }<%iron_staff.Attributes.RecipeLiteral%>
+                            },
+                            "max_damage": <%iron_staff.Durability%><%iron_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -1066,7 +1078,8 @@ dir items{
                             "custom_data": {
                                 "<%golden_staff.Namespace%>": true,
                                 "wand": true
-                            }<%golden_staff.Attributes.RecipeLiteral%>
+                            },
+                            "max_damage": <%golden_staff.Durability%><%golden_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -1106,7 +1119,8 @@ dir items{
                             "custom_data": {
                                 "<%diamond_staff.Namespace%>": true,
                                 "wand": true
-                            }<%diamond_staff.Attributes.RecipeLiteral%>
+                            },
+                            "max_damage": <%diamond_staff.Durability%><%diamond_staff.Attributes.RecipeLiteral%>
                         }
                     }
                 }
@@ -1633,6 +1647,26 @@ predicate 10change{
   "condition": "minecraft:random_chance",
   "chance": 0.1
 }
+# 35% chance
+predicate 35change{
+  "condition": "minecraft:random_chance",
+  "chance": 0.35
+}
+# 50% chance
+predicate 50change{
+  "condition": "minecraft:random_chance",
+  "chance": 0.5
+}
+# 66% chance
+predicate 66change{
+  "condition": "minecraft:random_chance",
+  "chance": 0.66
+}
+# 75% chance
+predicate 75change{
+  "condition": "minecraft:random_chance",
+  "chance": 0.75
+}
 #=================================================
 # MARK: Enchantments
 #=================================================
@@ -1675,13 +1709,10 @@ enchantment damage_item_on_attack{
 #=================================================
 # MARK: Item modifiers
 #=================================================
-item_modifier damage_item {
-[
-  {
+item_modifier damage_item{
     "function": "minecraft:set_damage",
-    "damage": 1
-  }
-]
+    "damage": -0.01,
+    "add": true
 }
 #=================================================
 # MARK: Tags
@@ -1830,4 +1861,55 @@ tag block air{
     minecraft:campfire
     minecraft:soul_campfire
     minecraft:bamboo
+}
+#=================================================
+# MARK: Enchantments
+#=================================================
+enchantment mana_state{
+  "description": "Nightrunner info",
+  "supported_items": [
+    "minecraft:poisonous_potato",
+    "minecraft:warped_fungus_on_a_stick"
+  ],
+  "weight": 1,
+  "max_level": 1,
+  "min_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "anvil_cost": 0,
+  "slots": [
+    "mainhand",
+    "offhand"
+  ],
+  "effects": {
+    "minecraft:tick": [
+      {
+        "effect": {
+          "type": "minecraft:run_function",
+          "function": "nightrunner:items/consumables/show_mana_state"
+        }
+      }
+    ]
+  }
+}
+enchantment mana_efficiency{
+  "description": "Mana Efficiency (Half-Cost Chance)",
+  "supported_items": "minecraft:warped_fungus_on_a_stick",
+  "weight": 1,
+  "max_level": 3,
+  "min_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "anvil_cost": 2,
+  "slots": []
 }

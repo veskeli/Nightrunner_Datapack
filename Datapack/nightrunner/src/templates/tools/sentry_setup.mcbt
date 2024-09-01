@@ -15,7 +15,28 @@ template sentry_setup{
                 tag @s remove just_spawned
 
                 execute store result score @s Nightrunner_SentryID run scoreboard players get @a[limit=1,sort=nearest,tag=raycasting] Nightrunner_ID
-                execute as @a[limit=1,sort=nearest,tag=raycasting,gamemode=!creative] run scoreboard players operation @s Nightrunner_Mana -= $Nightrunner Nightrunner_Mana
+
+                <%%
+                    let halfMana = Math.floor(data.ManaCost / 2);
+                    if(halfMana < 1) halfMana = 0; // Prevent negative mana cost
+                    let TakeHalfMana = `scoreboard players remove @s Nightrunner_Mana ` + halfMana;
+                    let blockArray = [];
+                    blockArray.push(`# Reduce mana (not in creative mode)`);
+
+                    // Mana efficiency 1
+                    blockArray.push(`execute as @a[limit=1,sort=nearest,tag=raycasting,gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":1}}}}}] run execute if predicate nightrunner:` + `10change` + ` run return run ` + TakeHalfMana);
+
+                    // Mana efficiency 2
+                    blockArray.push(`execute as @a[limit=1,sort=nearest,tag=raycasting,gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":2}}}}}] run execute if predicate nightrunner:` + `35change` + ` run return run ` + TakeHalfMana);
+
+                    // Mana efficiency 3
+                    blockArray.push(`execute as @a[limit=1,sort=nearest,tag=raycasting,gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":3}}}}}] run execute if predicate nightrunner:` + `50change` + ` run return run ` + TakeHalfMana);
+
+                    // Default
+                    blockArray.push('execute as @a[limit=1,sort=nearest,tag=raycasting,gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana ' + data.ManaCost);
+
+                    emit.block(blockArray);
+                %%>
 
                 # Reset Nightrunner Mana
                 scoreboard players reset $Nightrunner Nightrunner_Mana

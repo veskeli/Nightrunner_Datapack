@@ -20,6 +20,6 @@ tellraw @a [{"text": " "}]
 tellraw @a {"text":"Nightrunner loaded!","bold":true,"color":"gold"}
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
-tellraw @a ["",{"text":"Mana potions!","color":"aqua"},{"text":" update"}]
-tellraw @a ["",{"text":"(Build "},{"text":"9","underlined":true,"color":"yellow"},{"text":")"}]
+tellraw @a ["",{"text":"Wand Durability!","color":"aqua"},{"text":" update"}]
+tellraw @a ["",{"text":"(Build "},{"text":"10","underlined":true,"color":"yellow"},{"text":")"}]
 tellraw @a [{"text": " "}]

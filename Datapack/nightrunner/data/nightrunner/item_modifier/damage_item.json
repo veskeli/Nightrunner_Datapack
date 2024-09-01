@@ -1,1 +1,1 @@
-{[{"function": "minecraft:set_damage","damage": 1}]}
+{"function": "minecraft:set_damage","damage": -0.01,"add": true}

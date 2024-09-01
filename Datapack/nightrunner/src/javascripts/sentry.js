@@ -1,3 +1,4 @@
+let DefaultSentryCost = 15;
 module.exports = {
     damage_sentry:{
         Namespace: "Damage",
@@ -7,6 +8,7 @@ module.exports = {
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 3,
+        ManaCost: DefaultSentryCost,
     },
     heal_sentry:{
         Namespace: "Heal",
@@ -16,6 +18,7 @@ module.exports = {
         DustColor: "0.0,1.0,0.0",
         DisplayBlock: "minecraft:beacon",
         ConcurrentAttacks: 3,
+        ManaCost: 15,
     },
     wooden_sentry:{
         Namespace: "Wooden",
@@ -25,6 +28,7 @@ module.exports = {
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 1,
+        ManaCost: DefaultSentryCost,
     },
     stone_sentry:{
         Namespace: "Stone",
@@ -34,6 +38,7 @@ module.exports = {
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 2,
+        ManaCost: DefaultSentryCost,
     },
     iron_sentry:{
         Namespace: "Iron",
@@ -43,6 +48,7 @@ module.exports = {
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 3,
+        ManaCost: DefaultSentryCost,
     },
     golden_sentry:{
         Namespace: "Golden",
@@ -52,6 +58,7 @@ module.exports = {
         DustColor: "0.973,1.000,0.212",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 5,
+        ManaCost: DefaultSentryCost,
     },
     diamond_sentry:{
         Namespace: "Diamond",
@@ -61,5 +68,6 @@ module.exports = {
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 4,
+        ManaCost: DefaultSentryCost,
     },
 }

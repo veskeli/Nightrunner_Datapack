@@ -8,10 +8,14 @@ execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1
 # execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..<%data.ManaCost - 1%> run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]
 execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..14 run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]
 # play sound
+# execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
 execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
-execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
+# Add damage to item
+function nightrunner:items/tools/staffs/diamond/start_raycast/generated/0
+execute as @s[gamemode=!creative] run function nightrunner:items/tools/staffs/diamond/start_raycast/generated/0
+# execute as @s[gamemode=!creative] run execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}}] run item modify entity @s weapon.mainhand nightrunner:damage_item
+# execute as @s[gamemode=!creative] run execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}]}] run item modify entity @s weapon.offhand nightrunner:damage_item
 # Reduce mana (not in creative mode)
-# execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana <%data.ManaCost%>
 scoreboard players set $Nightrunner Nightrunner_Mana 15
 # add cooldown
 scoreboard players set @s Nightrunner_SpellCooldown 8

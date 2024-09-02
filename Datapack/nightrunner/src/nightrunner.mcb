@@ -13,6 +13,7 @@ import ./templates/tools/sentry_setup.mcbt
 import ./templates/raycast.mcbt
 # import all javascript files
 import ./javascripts/wands.js
+import ./javascripts/wandsnew.js
 import ./javascripts/sentry.js
 
 # Nightrunner
@@ -1410,6 +1411,48 @@ dir testing{
             tag @s add notdamaged
         }
     }
+    <%%
+        //emit.mcb(`function test2{\nsay hi\n}`);
+        //emit.mcb(`predicate 88change{\n"condition": "minecraft:random_chance",\n"chance": 0.88\n}`);
+        let functionArray = [];
+        data = diamond_staff;
+        functionArray.push(`recipe ` + data.Namespace + `{\n`);
+        functionArray.push(`"type": "minecraft:crafting_shaped",\n`);
+        functionArray.push(`"pattern": [\n`);
+        functionArray.push(`"  y",\n`);
+        functionArray.push(`" i ",\n`);
+        functionArray.push(`"i  "\n`);
+        functionArray.push(`],\n`);
+        functionArray.push(`"key": {\n`);
+        functionArray.push(`"i": {\n`);
+        functionArray.push(`"item": "minecraft:stick"\n`);
+        functionArray.push(`},\n`);
+        functionArray.push(`"y": {\n`);
+        functionArray.push(`"item": "minecraft:diamond"\n`);
+        functionArray.push(`}\n`);
+        functionArray.push(`},\n`);
+        functionArray.push(`"result": {\n`);
+        functionArray.push(`"id": "minecraft:warped_fungus_on_a_stick",\n`);
+        functionArray.push(`"count": 1,\n`);
+        functionArray.push(`"components":{\n`);
+        functionArray.push(`"item_name":"[{\\"text\\":\\"` + data.Name + `\\",\\"italic\\":false,\\"color\\":\\"` + data.Color + `\\"}]",\n`);
+        functionArray.push(`"lore": [ ` + data.Description.replace(/"/g, '\\"').replace(/'/g, '"') + `,"{\\"text\\":\\"Nightrunner\\",\\"color\\":\\"aqua\\"}"],\n`);
+        functionArray.push(`"custom_model_data": ` + data.CustomModelData + `,\n`);
+        functionArray.push(`"custom_data": {\n`);
+        functionArray.push(`"` + data.Namespace + `": true,\n`);
+        functionArray.push(`"wand": true\n`);
+        functionArray.push(`},\n`);
+        functionArray.push(`"max_damage": ` + data.Durability + `\n`);
+        functionArray.push(`}\n`);
+        functionArray.push(`}\n`);
+        functionArray.push(`}\n`);
+        emit.mcb(functionArray.join(''));
+
+        for(let i = 0; i < WandsArray.length; i++){
+            emit.mcb(WandsArray[i].compiledData);
+        }
+    %%>
+
     function summon_home{
         summon cow ~ ~ ~ {Tags:["home"],CustomName:'{"text":"Home","color":"green"}',CustomNameVisible:1b,NoGravity:1b,NoAI:1b,Silent:1b}
     }

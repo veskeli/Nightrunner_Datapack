@@ -8,54 +8,95 @@ template wand_setup {
         function ./check
         return 0
         block start_raycast{
-            # Reset Nightrunner Mana
-            scoreboard players reset $Nightrunner Nightrunner_Mana
-            # check if cooldown is active
-            execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1
-            # check if player has enough mana
-            # execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..<%data.ManaCost - 1%> run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]
-
             <%%
+                StartRaycastContent = [];
+                // Reset Nightrunner Mana
+                StartRaycastContent.push('scoreboard players reset $Nightrunner Nightrunner_Mana')
+
+                // Check if cooldown is active
+                StartRaycastContent.push('execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1')
+
+                let value = data.ManaCost - 1;
+
                 // Check if the spell can be casted without mana
-                let start = 'execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..';
-                let value = data.ManaCost - 1;
+                let ManaStart = 'execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..';
                 if(data.MainSpell.Name == "Damage") // Damage spell can be casted without mana but with damage loss
                 {
-                    emit(start + value + ' run scoreboard players set $Nightrunner Nightrunner_Weak_Use 1')
+                    StartRaycastContent.push(ManaStart + value + ' run scoreboard players set $Nightrunner Nightrunner_Weak_Use 1')
                 }
                 else
                 {
-                    emit(start + value + ' run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]')
+                    StartRaycastContent.push(ManaStart + value + ' run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]')
                 }
-            %%>
-
-            # play sound
-            # execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
-            <%%
                 // Play sound
-                let value = data.ManaCost - 1;
                 if(data.MainSpell.Name == "Damage") // Damage spell can be casted without mana but with damage loss
                 {
-                    emit('execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..' + value + ' run execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 1.5')
-                    emit('execute unless score @s[gamemode=!creative] Nightrunner_Mana matches ..' + value + ' run execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2')
+                    StartRaycastContent.push('execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..' + value + ' run execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 1.5')
+                    StartRaycastContent.push('execute if score @s[gamemode=!creative] Nightrunner_Mana matches ' + data.ManaCost + '.. run execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2')
+                    StartRaycastContent.push('execute as @s[gamemode=creative] run execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2')
                 }
                 else
                 {
-                    emit('execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2')
+                    StartRaycastContent.push('execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2')
                 }
-            %%>
 
-            # Add damage to item
-            <%%
-                let start = `execute if entity `;
-                let mainhand1 = start + `@s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true}`;
-                let mainhand2 = `}}}]`;
-                let offhand1 = start + `@s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true}`;
-                let offhand2 = `}}]}]`;
-                let mainhandEnd = `item modify entity @s weapon.mainhand nightrunner:damage_item`;
-                let offhandEnd = `item modify entity @s weapon.offhand nightrunner:damage_item`;
+                // Add Cooldown
+                StartRaycastContent.push('scoreboard players set @s Nightrunner_SpellCooldown ' + data.Cooldown)
+                // Reset scoreboards
+                StartRaycastContent.push('scoreboard players reset @s Nightrunner_Item_Ray_steps')
+                StartRaycastContent.push('scoreboard players reset $Nightrunner Nightrunner_Item_Ray_steps')
+
+                // Set spell range
+                StartRaycastContent.push(`execute as @s run scoreboard players operation $Nightrunner Nightrunner_RangedSpellRange = @s Nightrunner_RangedSpellRange`);
+                let LeatherArmor = ['leather_boots', 'leather_leggings', 'leather_chestplate', 'leather_helmet'];
+                let RangeAddAmount = 15;
+                for(let i = 0; i < LeatherArmor.length; i++)
+                {
+                    StartRaycastContent.push('execute as @s if entity @s[nbt={Inventory:[{Slot:' + (100 + i) + 'b,id:"minecraft:' + LeatherArmor[i] + '"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange ' + RangeAddAmount);
+                }
+                // tell spell range
+                StartRaycastContent.push(`tellraw @s [{"text":"Spell range: ","color":"aqua"},{"score":{"name":"$Nightrunner","objective":"Nightrunner_RangedSpellRange"}}]`);
+
+                // Reset effect cooldown
+                StartRaycastContent.push(`scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown`);
+
+                // Raycast
+                StartRaycastContent.push(`tag @s add raycasting`);
+                StartRaycastContent.push(`execute anchored eyes positioned ^ ^ ^ store result score @s Nightrunner_Item_Ray_Return run function ./raycast`);
+                StartRaycastContent.push(`tag @s remove raycasting`);
+
+                // Reset weak use
+                StartRaycastContent.push(`scoreboard players reset $Nightrunner Nightrunner_Weak_Use`);
+                emit.mcb(StartRaycastContent.join('\n'));
+
+                // Reduce mana (not in creative mode)
+                if(data.ConsumeManaOnCast)
+                {
+                    let halfMana = data.ManaCost / 2;
+                    if(halfMana < 1) halfMana = 0;
+                    let TakeHalfMana = `scoreboard players remove @s Nightrunner_Mana ` + halfMana;
+                    let blockArray = [];
+
+                    // Mana efficiency 1
+                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":1}}}}}] run execute if predicate nightrunner:` + `10change` + ` run return run ` + TakeHalfMana);
+
+                    // Mana efficiency 2
+                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":2}}}}}] run execute if predicate nightrunner:` + `35change` + ` run return run ` + TakeHalfMana);
+
+                    // Mana efficiency 3
+                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":3}}}}}] run execute if predicate nightrunner:` + `50change` + ` run return run ` + TakeHalfMana);
+
+                    // Default
+                    blockArray.push('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana ' + data.ManaCost)
+
+                    emit.block(blockArray);
+                }
+                else
+                {
+                    StartRaycastContent.push('scoreboard players set $Nightrunner Nightrunner_Mana ' + data.ManaCost)
+                }
+                // Item damage
                 let blockArray = [];
-                blockArray.push(`# Add damage to item`);
 
                 // Unbreaking 1
                 blockArray.push(`execute if entity @s[gamemode=!creative,nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{` + data.Namespace + `:true,wand:true},"minecraft:enchantments":{levels:{"minecraft:unbreaking":1}}}}}] run execute if predicate nightrunner:50change run return 1`);
@@ -75,67 +116,6 @@ template wand_setup {
 
                 emit.block(blockArray);
             %%>
-            # execute as @s[gamemode=!creative] run execute if entity @s[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}}] run item modify entity @s weapon.mainhand nightrunner:damage_item
-            # execute as @s[gamemode=!creative] run execute if entity @s[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{<%data.Namespace%>:true,wand:true}}}]}] run item modify entity @s weapon.offhand nightrunner:damage_item
-
-            # Reduce mana (not in creative mode)
-            <%%
-                if(data.ConsumeManaOnCast)
-                {
-                    let halfMana = data.ManaCost / 2;
-                    if(halfMana < 1) halfMana = 0;
-                    let TakeHalfMana = `scoreboard players remove @s Nightrunner_Mana ` + halfMana;
-                    let blockArray = [];
-                    blockArray.push(`# Reduce mana (not in creative mode)`);
-
-                    // Mana efficiency 1
-                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":1}}}}}] run execute if predicate nightrunner:` + `10change` + ` run return run ` + TakeHalfMana);
-
-                    // Mana efficiency 2
-                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":2}}}}}] run execute if predicate nightrunner:` + `35change` + ` run return run ` + TakeHalfMana);
-
-                    // Mana efficiency 3
-                    blockArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":3}}}}}] run execute if predicate nightrunner:` + `50change` + ` run return run ` + TakeHalfMana);
-
-                    // Default
-                    blockArray.push('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana ' + data.ManaCost)
-
-                    emit.block(blockArray);
-                }
-                else
-                {
-                    emit('scoreboard players set $Nightrunner Nightrunner_Mana ' + data.ManaCost)
-                }
-            %%>
-
-            # add cooldown
-            scoreboard players set @s Nightrunner_SpellCooldown <%data.Cooldown%>
-            # Reset scoreboards
-            scoreboard players reset @s Nightrunner_Item_Ray_steps
-            scoreboard players reset $Nightrunner Nightrunner_Item_Ray_steps
-
-            # Ranged spell range
-            execute as @s run scoreboard players operation $Nightrunner Nightrunner_RangedSpellRange = @s Nightrunner_RangedSpellRange
-            # if player wears lether armor add 5 to the range
-            execute as @s if entity @s[nbt={Inventory:[{Slot:103b,id:"minecraft:leather_helmet"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange 15
-            execute as @s if entity @s[nbt={Inventory:[{Slot:102b,id:"minecraft:leather_chestplate"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange 15
-            execute as @s if entity @s[nbt={Inventory:[{Slot:101b,id:"minecraft:leather_leggings"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange 15
-            execute as @s if entity @s[nbt={Inventory:[{Slot:100b,id:"minecraft:leather_boots"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange 15
-
-            # tell spell range
-            tellraw @s [{"text":"Spell range: ","color":"aqua"},{"score":{"name":"$Nightrunner","objective":"Nightrunner_RangedSpellRange"}}]
-
-            scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown
-
-            # Raycast
-            tag @s add raycasting
-            execute anchored eyes positioned ^ ^ ^ store result score @s Nightrunner_Item_Ray_Return run function ./raycast
-            tag @s remove raycasting
-
-            scoreboard players reset $Nightrunner Nightrunner_Weak_Use
-
-            # Returns score to "@s" "Nightrunner_Item_Ray_Return" base on hit: 1 entity, 2 block, 3 no hit
-            # scoreboard players set @s Nm_testing_wand_active 1
         }
         block raycast{
             <%%

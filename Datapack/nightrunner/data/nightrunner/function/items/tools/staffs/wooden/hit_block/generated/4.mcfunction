@@ -6,5 +6,5 @@ execute store result score @s Nightrunner_SentryID run scoreboard players get @a
 function nightrunner:items/tools/staffs/wooden/hit_block/generated/5
 # Reset Nightrunner Mana
 scoreboard players reset $Nightrunner Nightrunner_Mana
-scoreboard players set @s Nightrunner_SentryLifetime 15
+scoreboard players set @s Nightrunner_SentryLifetime 13
 execute at @s run playsound minecraft:item.chorus_fruit.teleport master @a ~ ~ ~ 0.7 0.2

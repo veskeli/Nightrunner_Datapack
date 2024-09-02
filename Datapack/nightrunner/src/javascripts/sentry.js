@@ -22,7 +22,7 @@ module.exports = {
     },
     wooden_sentry:{
         Namespace: "Wooden",
-        Lifetime: 15,
+        Lifetime: 13,
         Target: "#nightrunner:enemy",
         Distance: 3,
         DustColor: "1.0,0.0,0.0",
@@ -32,7 +32,7 @@ module.exports = {
     },
     stone_sentry:{
         Namespace: "Stone",
-        Lifetime: 15,
+        Lifetime: 14,
         Target: "#nightrunner:enemy",
         Distance: 3,
         DustColor: "1.0,0.0,0.0",
@@ -42,7 +42,7 @@ module.exports = {
     },
     iron_sentry:{
         Namespace: "Iron",
-        Lifetime: 20,
+        Lifetime: 16,
         Target: "#nightrunner:enemy",
         Distance: 5,
         DustColor: "1.0,0.0,0.0",
@@ -62,7 +62,7 @@ module.exports = {
     },
     diamond_sentry:{
         Namespace: "Diamond",
-        Lifetime: 22,
+        Lifetime: 18,
         Target: "#nightrunner:enemy",
         Distance: 5,
         DustColor: "1.0,0.0,0.0",

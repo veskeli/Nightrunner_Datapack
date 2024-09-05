@@ -1,0 +1,1 @@
+{"function": "minecraft:set_lore","entity": "this","lore": [[[{"text": "Damage: ","color": "dark_green"},{"text": "6","color": "aqua"}],{"text": "Mana Cost:","color": "green"},{"text": "1","color": "aqua"}],{"text": "Cooldown:","color": "green"},{"text": "8","color": "aqua"}],"mode": "append"}

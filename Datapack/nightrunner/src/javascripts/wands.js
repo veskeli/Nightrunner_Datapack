@@ -14,27 +14,165 @@ const HitType = {
 const spells = {
     Damage: {
         Name: "Damage",
-        SpellDamage: 1,  // This will vary depending on the wand
-        HealAmount: 0,
-        HitType: HitType.ENTITY,  // Default hit type is entity
+        Tiers: {
+            Wood: {
+                SpellDamage: 4,
+                ManaCost: 1,
+                Cooldown: 8,
+            },
+            Stone: {
+                SpellDamage: 5,
+                ManaCost: 1,
+                Cooldown: 8,
+            },
+            Iron: {
+                SpellDamage: 6,
+                ManaCost: 1,
+                Cooldown: 8,
+            },
+            Gold: {
+                SpellDamage: 11,
+                ManaCost: 2,
+                Cooldown: 8,
+            },
+            Diamond: {
+                SpellDamage: 7,
+                ManaCost: 1,
+                Cooldown: 8,
+            }
+        },
+        HitType: HitType.ENTITY,
+        Lore: function(tier) {
+            return [
+                [{"text": "Spell: ","color": "light_purple"}, {"text": "Damage","color": "gold"}],
+                [{"text": "Damage: ","color": "dark_green"}, {"text": this.Tiers[tier].SpellDamage.toString(),"color": "dark_aqua"}],
+                [{"text": "Mana cost: ","color": "dark_green"}, {"text": this.Tiers[tier].ManaCost.toString(),"color": "dark_aqua"}],
+                [{"text": "Cooldown: ","color": "dark_green"}, {"text": this.Tiers[tier].Cooldown.toString(),"color": "dark_aqua"}],
+                [{"text": "(Can be cast for half damage if out of mana.)","color": "gray"}]
+            ];
+        },
     },
     Heal: {
         Name: "Heal",
-        SpellDamage: 0,
-        HealAmount: 1,
+        Tiers: {
+            Wood: {
+                HealAmount: 4,
+                ManaCost: 1,
+                Cooldown: 8,
+            },
+            Stone: {
+                HealAmount: 5,
+                ManaCost: 1,
+                Cooldown: 8,
+            },
+            Iron: {
+                HealAmount: 6,
+                ManaCost: 1,
+                Cooldown: 8,
+            },
+            Gold: {
+                HealAmount: 11,
+                ManaCost: 2,
+                Cooldown: 8,
+            },
+            Diamond: {
+                HealAmount: 7,
+                ManaCost: 1,
+                Cooldown: 8,
+            }
+        },
         HitType: HitType.ENTITY,  // Default hit type is entity
+        Lore: function(tier) {
+            return [
+                [{"text": "Spell: ","color": "light_purple"}, {"text": "Heal","color": "gold"}],
+                [{"text": "Heal: ","color": "dark_green"}, {"text": this.Tiers[tier].HealAmount.toString(),"color": "dark_aqua"}],
+                [{"text": "Mana cost: ","color": "dark_green"}, {"text": this.Tiers[tier].ManaCost.toString(),"color": "dark_aqua"}],
+                [{"text": "Cooldown: ","color": "dark_green"}, {"text": this.Tiers[tier].Cooldown.toString(),"color": "dark_aqua"}],
+                [{"text": "(Can be cast for half damage if out of mana.)","color": "gray"}]
+            ];
+        },
     },
     Raycast: {
         Name: "Raycast",
-        SpellDamage: 0,
-        HealAmount: 0,
         HitType: HitType.ALL,
+        Lore: [
+            [{"text": "Spell: ","color": "light_purple"}, {"text": "Raycast","color": "gold"}],
+            [{"text": "Damage: ","color": "dark_green"}, {"text": "1","color": "dark_aqua"}],
+            [{"text": "Mana cost: ","color": "dark_green"}, {"text": "1","color": "dark_aqua"}],
+            [{"text": "Cooldown: ","color": "dark_green"}, {"text": "8","color": "dark_aqua"}],
+            [{"text": "(Can be cast for half damage if out of mana.)","color": "gray"}]
+        ],
     },
     SummonSentry: {
         Name: "Summon Sentry",
-        SpellDamage: 0,
-        HealAmount: 0,
+        Tiers: {
+            Wood: {
+                Namespace: "Wooden",
+                Lifetime: 13,
+                Target: "#nightrunner:enemy",
+                Distance: 3,
+                DustColor: "1.0,0.0,0.0",
+                DisplayBlock: "minecraft:calibrated_sculk_sensor",
+                ConcurrentAttacks: 1,
+                ManaCost: 15,
+                Cooldown: 8,
+            },
+            Stone: {
+                Namespace: "Stone",
+                Lifetime: 14,
+                Target: "#nightrunner:enemy",
+                Distance: 3,
+                DustColor: "1.0,0.0,0.0",
+                DisplayBlock: "minecraft:calibrated_sculk_sensor",
+                ConcurrentAttacks: 2,
+                ManaCost: 15,
+                Cooldown: 8,
+            },
+            Iron: {
+                Namespace: "Iron",
+                Lifetime: 16,
+                Target: "#nightrunner:enemy",
+                Distance: 5,
+                DustColor: "1.0,0.0,0.0",
+                DisplayBlock: "minecraft:calibrated_sculk_sensor",
+                ConcurrentAttacks: 3,
+                ManaCost: 15,
+                Cooldown: 8,
+            },
+            Gold: {
+                Namespace: "Golden",
+                Lifetime: 15,
+                Target: "#nightrunner:enemy",
+                Distance: 3,
+                DustColor: "0.973,1.000,0.212",
+                DisplayBlock: "minecraft:calibrated_sculk_sensor",
+                ConcurrentAttacks: 5,
+                ManaCost: 15,
+                Cooldown: 8,
+            },
+            Diamond: {
+                Namespace: "Diamond",
+                Lifetime: 18,
+                Target: "#nightrunner:enemy",
+                Distance: 5,
+                DustColor: "1.0,0.0,0.0",
+                DisplayBlock: "minecraft:calibrated_sculk_sensor",
+                ConcurrentAttacks: 4,
+                ManaCost: 15,
+                Cooldown: 8,
+            }
+        },
         HitType: HitType.BLOCK,
+        Lore: function(tier) {
+            return [
+                [{"text": "Spell: ","color": "light_purple"}, {"text": "Summon Sentry","color": "gold"}],
+                [{"text": "Distance: ","color": "dark_green"}, {"text": this.Tiers[tier].Distance.toString(),"color": "dark_aqua"}],
+                [{"text": "ConcurrentAttacks: ","color": "dark_green"}, {"text": this.Tiers[tier].ConcurrentAttacks.toString(),"color": "dark_aqua"}],
+                [{"text": "Mana cost: ","color": "dark_green"}, {"text": this.Tiers[tier].ManaCost.toString(),"color": "dark_aqua"}],
+                [{"text": "Cooldown: ","color": "dark_green"}, {"text": this.Tiers[tier].Cooldown.toString(),"color": "dark_aqua"}],
+                [{"text": "(Can be cast for half damage if out of mana.)","color": "gray"}]
+            ];
+        },
     },
 };
 //=================================================

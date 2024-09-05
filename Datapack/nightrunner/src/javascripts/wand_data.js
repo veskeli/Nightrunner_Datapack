@@ -1,11 +1,55 @@
 // Get wands from wand.js
 const { NewWandsArray, HitType, spells, Custom_attributes  } = require('./wands');
+let DataArray = [];
+//=================================================
+// MARK: Compile item modifiers
+//=================================================
+for(let i = 0; i < spells.length; i++)
+{
+    let spell = spells[i];
+    DataArray.push(`item_modifier ` + spell.Name + `{\n`);
+
+    DataArray.push(`"function": "minecraft:set_lore","entity": "this","lore": [\n`);
+    DataArray.push(spell.Lore + `"\n`);
+    DataArray.push(`],"mode": "append"\n`);
+
+    DataArray.push(`}\n`);
+}
+
+for (let spellName in spells) {
+    const spell = spells[spellName];
+
+    DataArray.push(`dir ${spell.Name.toLowerCase()}{\n`);
+
+    // Loop over each tier in the spell
+    for (let tierName in spell.Tiers) {
+        const tier = spell.Tiers[tierName];
+
+        // Start the spell modifier with the spell name and tier (e.g., damage_wood)
+        DataArray.push(`item_modifier ${spell.Name.toLowerCase()}_${tierName.toLowerCase()} {\n`);
+
+        // Add the lore function
+        DataArray.push(`"function": "minecraft:set_lore","entity": "this","lore": [\n`);
+
+        // Call the Lore function with the current tier
+        const formattedLore = spell.Lore(tierName).map(line =>
+            JSON.stringify(line)
+        ).join(",\n");
+
+        // Add the formatted lore
+        DataArray.push(formattedLore + `\n`);
+
+        // Close the lore and the modifier
+        DataArray.push(`],"mode": "append"\n`);
+        DataArray.push(`}\n`);
+    }
+    DataArray.push(`}\n`);
+}
 
 //=================================================
 // MARK: Start Compile data
 //=================================================
 for(let i = 0; i < NewWandsArray.length; i++){
-    let DataArray = [];
     WandData = NewWandsArray[i];
     MainOrOffhand = ['mainhand', 'offhand'];
     // Dir

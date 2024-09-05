@@ -166,6 +166,7 @@ dir crafting{
             scoreboard objectives add Nightrunner_CauldronCraftingTimer dummy
         }
         function cauldroncheck minecraft:tick{
+            # TODO: dont use tick but use scoreboard trigger
             execute as @e[type=item_frame,nbt={Tags:["forge_core"],Item:{}}] run block cauldron_check{
                 # Check if its on top of a cauldron
                 execute at @s run execute if block ~ ~-0.5 ~ #minecraft:cauldrons run return run block{

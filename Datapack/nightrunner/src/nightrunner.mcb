@@ -12,8 +12,7 @@ import ./templates/tools/wand_setup.mcbt
 import ./templates/tools/sentry_setup.mcbt
 import ./templates/raycast.mcbt
 # import all javascript files
-import ./javascripts/wands.js
-import ./javascripts/wandsnew.js
+import ./javascripts/wand_data.js
 import ./javascripts/sentry.js
 
 # Nightrunner
@@ -745,404 +744,12 @@ dir items{
             execute as @s[scores={Nightrunner_SpellCooldown=0}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"}},{"text":" |====","color":"gold"}]
             execute as @s[scores={Nightrunner_SpellCooldown=1..}] run title @s actionbar ["",{"text":"====| ","color":"gold"},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"}},{"text":" | ","color":"gold"},{"text":"Cooldown: ","color":"aqua"},{"score":{"name":"@s","objective":"Nightrunner_SpellCooldown"}},{"text":" |====","color":"gold"}]
         }
-        # MARK: Wands
-        dir wands{
-            dir wooden{
-                function setup minecraft:tick{
-                    wand_setup <%data = wooden_wand%>
-                }
-                recipe wooden_wand{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        " i",
-                        "i "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%wooden_wand.Name%>\",\"italic\":false,\"color\":\"<%wooden_wand.Color%>\"}]",
-                            "lore": [<%wooden_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%wooden_wand.CustomModelData%>,
-                            "custom_data": {
-                                "<%wooden_wand.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%wooden_wand.Durability%>
-                        }
-                    }
-                }
+        <%%
+            // MARK: Compile all the wands
+            for(let i = 0; i < WandsArray.length; i++){
+                emit.mcb(WandsArray[i].compiledData);
             }
-            dir stone{
-                function setup minecraft:tick{
-                    wand_setup <%data = stone_wand%>
-                }
-                recipe stone_wand{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        " y",
-                        "i "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:stone"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%stone_wand.Name%>\",\"italic\":false,\"color\":\"<%stone_wand.Color%>\"}]",
-                            "lore": [<%stone_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%stone_wand.CustomModelData%>,
-                            "custom_data": {
-                                "<%stone_wand.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%stone_wand.Durability%>
-                        }
-                    }
-                }
-            }
-            dir iron{
-                function setup minecraft:tick{
-                    wand_setup <%data = iron_wand%>
-                }
-                recipe iron_wand{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        " y",
-                        "i "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:iron_ingot"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%iron_wand.Name%>\",\"italic\":false,\"color\":\"<%iron_wand.Color%>\"}]",
-                            "lore": [<%iron_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%iron_wand.CustomModelData%>,
-                            "custom_data": {
-                                "<%iron_wand.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%iron_wand.Durability%>
-                        }
-                    }
-                }
-            }
-            dir golden{
-                function setup minecraft:tick{
-                    wand_setup <%data = golden_wand%>
-                }
-                recipe golden_wand{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        " y",
-                        "i "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:gold_ingot"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%golden_wand.Name%>\",\"italic\":false,\"color\":\"<%golden_wand.Color%>\"}]",
-                            "lore": [<%golden_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%golden_wand.CustomModelData%>,
-                            "custom_data": {
-                                "<%golden_wand.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%golden_wand.Durability%>
-                        }
-                    }
-                }
-            }
-            dir diamond{
-                function setup minecraft:tick{
-                    wand_setup <%data = diamond_wand%>
-                }
-                recipe diamond_wand{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        " y",
-                        "i "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:diamond"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%diamond_wand.Name%>\",\"italic\":false,\"color\":\"<%diamond_wand.Color%>\"}]",
-                            "lore": [<%diamond_wand.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%diamond_wand.CustomModelData%>,
-                            "custom_data": {
-                                "<%diamond_wand.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%diamond_wand.Durability%>
-                        }
-                    }
-                }
-            }
-            function give_all{
-                function ./wooden/give
-                function ./stone/give
-                function ./iron/give
-                function ./golden/give
-                function ./diamond/give
-            }
-        }
-        # MARK: Staffs
-        dir staffs{
-            dir wooden{
-                function setup minecraft:tick{
-                    wand_setup <%data = wooden_staff%>
-                }
-                function load_setup minecraft:load{
-                    sentry_setup <%data = wooden_sentry%>
-                }
-                function sentry_action{
-                    execute as @s run function ../summon_fangs
-                }
-                recipe wooden_staff{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        "  i",
-                        " i ",
-                        "i  "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%wooden_staff.Name%>\",\"italic\":false,\"color\":\"<%wooden_staff.Color%>\"}]",
-                            "lore": [<%wooden_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%wooden_staff.CustomModelData%>,
-                            "custom_data": {
-                                "<%wooden_staff.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%wooden_staff.Durability%><%wooden_staff.Attributes.RecipeLiteral%>
-                        }
-                    }
-                }
-            }
-            dir stone{
-                function setup minecraft:tick{
-                    wand_setup <%data = stone_staff%>
-                }
-                function load_setup minecraft:load{
-                    sentry_setup <%data = stone_sentry%>
-                }
-                function sentry_action{
-                    execute as @s run function ../summon_fangs
-                }
-                recipe stone_staff{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        "  y",
-                        " i ",
-                        "i  "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:stone"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%stone_staff.Name%>\",\"italic\":false,\"color\":\"<%stone_staff.Color%>\"}]",
-                            "lore": [<%stone_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%stone_staff.CustomModelData%>,
-                            "custom_data": {
-                                "<%stone_staff.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%stone_staff.Durability%><%stone_staff.Attributes.RecipeLiteral%>
-                        }
-                    }
-                }
-            }
-            dir iron{
-                function setup minecraft:tick{
-                    wand_setup <%data = iron_staff%>
-                }
-                function load_setup minecraft:load{
-                    sentry_setup <%data = iron_sentry%>
-                }
-                function sentry_action{
-                    execute as @s run function ../summon_fangs
-                }
-                recipe iron_staff{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        "  y",
-                        " i ",
-                        "i  "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:iron_ingot"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%iron_staff.Name%>\",\"italic\":false,\"color\":\"<%iron_staff.Color%>\"}]",
-                            "lore": [<%iron_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%iron_staff.CustomModelData%>,
-                            "custom_data": {
-                                "<%iron_staff.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%iron_staff.Durability%><%iron_staff.Attributes.RecipeLiteral%>
-                        }
-                    }
-                }
-            }
-            dir golden{
-                function setup minecraft:tick{
-                    wand_setup <%data = golden_staff%>
-                }
-                function load_setup minecraft:load{
-                    sentry_setup <%data = golden_sentry%>
-                }
-                function sentry_action{
-                    execute as @s run function ../summon_fangs
-                }
-                recipe golden_staff{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        "  y",
-                        " i ",
-                        "i  "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:gold_ingot"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%golden_staff.Name%>\",\"italic\":false,\"color\":\"<%golden_staff.Color%>\"}]",
-                            "lore": [<%golden_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%golden_staff.CustomModelData%>,
-                            "custom_data": {
-                                "<%golden_staff.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%golden_staff.Durability%><%golden_staff.Attributes.RecipeLiteral%>
-                        }
-                    }
-                }
-            }
-            dir diamond{
-                function setup minecraft:tick{
-                    wand_setup <%data = diamond_staff%>
-                }
-                function load_setup minecraft:load{
-                    sentry_setup <%data = diamond_sentry%>
-                }
-                function sentry_action{
-                    execute as @s run function ../summon_fangs
-                }
-                recipe diamond_staff{
-                    "type": "minecraft:crafting_shaped",
-                    "pattern": [
-                        "  y",
-                        " i ",
-                        "i  "
-                    ],
-                    "key": {
-                        "i": {
-                            "item": "minecraft:stick"
-                        },
-                        "y": {
-                            "item": "minecraft:diamond"
-                        }
-                    },
-                    "result": {
-                        "id": "minecraft:warped_fungus_on_a_stick",
-                        "count": 1,
-                        "components":{
-                            "item_name":"[{\"text\":\"<%diamond_staff.Name%>\",\"italic\":false,\"color\":\"<%diamond_staff.Color%>\"}]",
-                            "lore": [<%diamond_staff.Description.replace(/"/g, '\\"').replace(/'/g, '"')%>,"{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                            "custom_model_data": <%diamond_staff.CustomModelData%>,
-                            "custom_data": {
-                                "<%diamond_staff.Namespace%>": true,
-                                "wand": true
-                            },
-                            "max_damage": <%diamond_staff.Durability%><%diamond_staff.Attributes.RecipeLiteral%>
-                        }
-                    }
-                }
-                function give_old{
-                    give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_staff:true},item_name='{"text":"Diamond Staff","italic":false}',lore=['{"text":"A legendary staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 6 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:4,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=11210] 1
-                }
-            }
-            function give_all{
-                function ./wooden/give
-                function ./stone/give
-                function ./iron/give
-                function ./golden/give
-                function ./diamond/give
-            }
-            function summon_fangs{
-                execute at @s run summon evoker_fangs ~ ~ ~ {Warmup:0}
-                # execute at @s run execute as @a run execute if score @s Nightrunner_ID = @e[tag=sentry,sort=nearest,limit=1] Nightrunner_SentryID run data modify entity @e[tag=sentry,sort=nearest,limit=1] Owner set from entity @s UUID
-                # TODO: set owner to be correct player (Currently its closest player)
-                execute as @e[type=evoker_fangs,sort=nearest,limit=1] run data modify entity @s Owner set from entity @p UUID
-            }
-        }
+        %%>
     }
 }
 #=================================================
@@ -1156,7 +763,7 @@ dir sentry{
     clock check_sentry_lifetime 1s{
         execute as @e[type=block_display,tag=sentry] run block{
             scoreboard players remove @s Nightrunner_SentryLifetime 1
-            execute if score @s Nightrunner_SentryLifetime matches 0 run block{
+            execute if score @s Nightrunner_SentryLifetime matches ..0 run block{
                 execute at @s run playsound minecraft:block.beacon.deactivate master @a ~ ~ ~ 1 1.5
                 execute at @s run particle minecraft:sonic_boom ~ ~ ~ ~ ~ ~ 1 0 force
                 kill @s
@@ -1411,48 +1018,6 @@ dir testing{
             tag @s add notdamaged
         }
     }
-    <%%
-        //emit.mcb(`function test2{\nsay hi\n}`);
-        //emit.mcb(`predicate 88change{\n"condition": "minecraft:random_chance",\n"chance": 0.88\n}`);
-        let functionArray = [];
-        data = diamond_staff;
-        functionArray.push(`recipe ` + data.Namespace + `{\n`);
-        functionArray.push(`"type": "minecraft:crafting_shaped",\n`);
-        functionArray.push(`"pattern": [\n`);
-        functionArray.push(`"  y",\n`);
-        functionArray.push(`" i ",\n`);
-        functionArray.push(`"i  "\n`);
-        functionArray.push(`],\n`);
-        functionArray.push(`"key": {\n`);
-        functionArray.push(`"i": {\n`);
-        functionArray.push(`"item": "minecraft:stick"\n`);
-        functionArray.push(`},\n`);
-        functionArray.push(`"y": {\n`);
-        functionArray.push(`"item": "minecraft:diamond"\n`);
-        functionArray.push(`}\n`);
-        functionArray.push(`},\n`);
-        functionArray.push(`"result": {\n`);
-        functionArray.push(`"id": "minecraft:warped_fungus_on_a_stick",\n`);
-        functionArray.push(`"count": 1,\n`);
-        functionArray.push(`"components":{\n`);
-        functionArray.push(`"item_name":"[{\\"text\\":\\"` + data.Name + `\\",\\"italic\\":false,\\"color\\":\\"` + data.Color + `\\"}]",\n`);
-        functionArray.push(`"lore": [ ` + data.Description.replace(/"/g, '\\"').replace(/'/g, '"') + `,"{\\"text\\":\\"Nightrunner\\",\\"color\\":\\"aqua\\"}"],\n`);
-        functionArray.push(`"custom_model_data": ` + data.CustomModelData + `,\n`);
-        functionArray.push(`"custom_data": {\n`);
-        functionArray.push(`"` + data.Namespace + `": true,\n`);
-        functionArray.push(`"wand": true\n`);
-        functionArray.push(`},\n`);
-        functionArray.push(`"max_damage": ` + data.Durability + `\n`);
-        functionArray.push(`}\n`);
-        functionArray.push(`}\n`);
-        functionArray.push(`}\n`);
-        emit.mcb(functionArray.join(''));
-
-        // Compile all the wands
-        for(let i = 0; i < WandsArray.length; i++){
-            emit.mcb(WandsArray[i].compiledData);
-        }
-    %%>
 
     function summon_home{
         summon cow ~ ~ ~ {Tags:["home"],CustomName:'{"text":"Home","color":"green"}',CustomNameVisible:1b,NoGravity:1b,NoAI:1b,Silent:1b}
@@ -1533,9 +1098,9 @@ dir mobs{
             # Store a random value
             # execute store result score @s Nightrunner_MobDefiner run random value 1..100
             set_random_score stray 1 100
-            
+
             undead_base_values stray Nightrunner_MobDefiner 100 20 10 0.31 1 1 HurtTime:0s
-            
+
             # execute as @e[type=stray,tag=!Nightrunner,limit=1] run block data/stray{
                 # Store a random value
                 # execute store result score @s nightrunner.internal run random value 1..100
@@ -1547,7 +1112,7 @@ dir mobs{
         function bogged{
             # execute store result score @s Nightrunner_MobDefiner run random value 1..100
             set_random_score bogged 1 100
-            
+
             undead_base_values bogged Nightrunner_MobDefiner 100 20 10 0.31 1 1 HurtTime:0s
 
         }
@@ -1559,11 +1124,11 @@ dir mobs{
                 execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..5 run data merge entity @s {CustomName:'"Nuke"',Tags:["Nightrunner"],ExplosionRadius:15b,Fuse:45,attributes:[{id:"minecraft:generic.movement_speed",base:0.20},{id:"minecraft:generic.max_health", base:30},{id:"minecraft:generic.scale",base:1.25}]}
 
                 execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..15 run data merge entity @s {CustomName:'"Lite"',Tags:["Nightrunner"],ExplosionRadius:2b,Fuse:15,attributes:[{id:"minecraft:generic.movement_speed",base:0.3},{id:"minecraft:generic.max_health", base:10},{id:"minecraft:generic.scale",base:0.75}]}
-                
+
                 execute if score @s[tag=!Nightrunner] nightrunner.internal matches ..100 run data merge entity @s {CustomName:'"Normi"',Tags:["Nightrunner"],ExplosionRadius:5b,Fuse:30,attributes:[{id:"minecraft:generic.movement_speed",base:0.25},{id:"minecraft:generic.max_health", base:20},{id:"minecraft:generic.scale",base:1}]}
-                
+
             }
-            
+
             # Fuse | explosion | movement speed
             # Volatile (nuke)
             # execute if predicate nightmare:10change run data_normal_creeper 35 8 0.2 Volatile Creeper

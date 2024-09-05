@@ -1,3 +1,0 @@
-# Generated with MC-Build
-
-give @s minecraft:warped_fungus_on_a_stick[custom_data={diamond_staff:true},item_name='{"text":"Diamond Staff","italic":false}',lore=['{"text":"A legendary staff that can be used to cast spells."}','{"text":"Nightrunner","color":"aqua"}','" "','{"color":"#A8A8A8","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":" 6 Attack Damage"}','{"color":"dark_green","italic":false,"text":" 1.4 Attack Speed"}'],attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:4,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false},custom_model_data=11210] 1

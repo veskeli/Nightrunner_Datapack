@@ -1448,6 +1448,7 @@ dir testing{
         functionArray.push(`}\n`);
         emit.mcb(functionArray.join(''));
 
+        // Compile all the wands
         for(let i = 0; i < WandsArray.length; i++){
             emit.mcb(WandsArray[i].compiledData);
         }
@@ -1711,45 +1712,6 @@ predicate 75change{
   "chance": 0.75
 }
 #=================================================
-# MARK: Enchantments
-#=================================================
-enchantment damage_item_on_attack{
-  "description": "damage_item_on_attack",
-  "supported_items": "minecraft:warped_fungus_on_a_stick",
-  "weight": 1,
-  "max_level": 1,
-  "min_cost": {
-    "base": 0,
-    "per_level_above_first": 0
-  },
-  "max_cost": {
-    "base": 0,
-    "per_level_above_first": 0
-  },
-  "anvil_cost": 0,
-  "slots": [],
-  "effects": {
-    "minecraft:post_attack": [
-      {
-        "enchanted": "attacker",
-        "affected": "attacker",
-        "effect": {
-          "type": "minecraft:damage_item",
-          "amount": 1
-        }
-      },
-      {
-        "enchanted": "attacker",
-        "affected": "attacker",
-        "effect": {
-          "type": "minecraft:summon_entity",
-          "entity": "minecraft:boat"
-        }
-      }
-    ]
-  }
-}
-#=================================================
 # MARK: Item modifiers
 #=================================================
 item_modifier damage_item{
@@ -1829,6 +1791,7 @@ tag entity_type enemy{
     minecraft:zombified_piglin
     minecraft:creeper
     minecraft:wither_skeleton
+    minecraft:bogged
 }
 tag entity_type not_mob_create_support{
     create:carriage_contraption
@@ -1955,4 +1918,40 @@ enchantment mana_efficiency{
   },
   "anvil_cost": 2,
   "slots": []
+}
+enchantment damage_item_on_attack{
+  "description": "damage_item_on_attack",
+  "supported_items": "minecraft:warped_fungus_on_a_stick",
+  "weight": 1,
+  "max_level": 1,
+  "min_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "anvil_cost": 0,
+  "slots": [],
+  "effects": {
+    "minecraft:post_attack": [
+      {
+        "enchanted": "attacker",
+        "affected": "attacker",
+        "effect": {
+          "type": "minecraft:damage_item",
+          "amount": 1
+        }
+      },
+      {
+        "enchanted": "attacker",
+        "affected": "attacker",
+        "effect": {
+          "type": "minecraft:summon_entity",
+          "entity": "minecraft:boat"
+        }
+      }
+    ]
+  }
 }

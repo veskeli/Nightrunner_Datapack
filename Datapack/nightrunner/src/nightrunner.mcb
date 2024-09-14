@@ -14,6 +14,7 @@ import ./templates/raycast.mcbt
 # import all javascript files
 import ./javascripts/wand_data.js
 import ./javascripts/sentry.js
+import ./javascripts/utils.js
 
 # Nightrunner
 function on_load minecraft:load{
@@ -309,6 +310,60 @@ dir crafting{
             # Kill interactables (Brewing Stand)
             kill @e[type=interaction,nbt={Tags:["CauldronCraftInteractable"]}]
         }
+    }
+    dir enchanting_table_craft{
+        function give{
+            give @p item_frame[entity_data={id:"minecraft:item_frame",Item:{id:"minecraft:music_disc_mall"},Tags:["spellbinder"]},custom_model_data=1124,item_name='{"text":"Spellbinder","italic":false}',lore=['{"text":"Place on top of a lectern"}','{"text":"Nightrunner","color":"aqua"}']] 1
+        }
+        function load minecraft:load{
+            scoreboard objectives add Nightrunner_enchanting_tableUpgradePlaced minecraft.used:minecraft.item_frame
+        }
+        function enchanting_table_check minecraft:tick{
+            # Check if the player placed a lectern
+            execute as @a[scores={Nightrunner_enchanting_tableUpgradePlaced=1..}] run block enchanting_table_check2{
+                scoreboard players reset @s Nightrunner_enchanting_tableUpgradePlaced
+                say placed
+                execute as @e[type=item_frame,nbt={Tags:["spellbinder"],Item:{}}] run block{
+                    # Check if its on top of a lectern
+                    execute at @s run execute if block ~ ~-0.5 ~ minecraft:enchanting_table run return run block{
+                        # Summon interaction
+                        summon interaction ~ ~-0.5 ~ {width:0.75,height:0.75,response:0.75,Tags:["EnchantingTableCraftInteractable"]}
+                        # Summon block display to show its existence
+                        summon block_display ~-0.5 ~-1.25 ~-0.5 {Passengers:[{id:"minecraft:block_display",block_state:{Name:"minecraft:respawn_anchor",Properties:{charges:"0"}},transformation:[0.8750f,0.0000f,0.0000f,0.0625f,0.0000f,0.8750f,0.0000f,0.1250f,0.0000f,0.0000f,0.8750f,0.0625f,0.0000f,0.0000f,0.0000f,1.0000f],Tags:["EnchantingTableCraftInteractable"]}]}
+
+                        say Correct
+
+                        # Kill the item frame
+                        kill @s
+                    }
+                    kill @s
+                }
+            }
+        }
+        <%%
+            let advancementArray = [];
+            let advancement_name = "enchanting_table";
+            let advancement_tag = "EnchantingTableCraftInteractable";
+
+            advancementArray.push(`advancement interacted_with_${advancement_name}_right{\n`);
+            advancementArray.push(`"criteria": {\n`);
+            advancementArray.push(`"requirement": {\n`);
+            advancementArray.push(`"trigger": "minecraft:player_interacted_with_entity",\n`);
+            advancementArray.push(`"conditions": {\n`);
+            advancementArray.push(`"entity": {\n`);
+            advancementArray.push(`"type": "minecraft:interaction",\n`);
+            advancementArray.push(`"nbt": "{Tags:[\\"${advancement_tag}\\"]}"\n`);
+            advancementArray.push(`}\n`); // Close "entity"
+            advancementArray.push(`}\n`); // Close "conditions"
+            advancementArray.push(`}\n`); // Close "requirement"
+            advancementArray.push(`},\n`); // Close "criteria"
+            advancementArray.push(`"rewards": {\n`);
+            advancementArray.push(`"function": "nightrunner:crafting/enchanting_table_craft/right_clicked"\n`);
+            advancementArray.push(`}\n`); // Close "rewards"
+            advancementArray.push(`}\n`); // Close "advancement"
+
+            emit.mcb(advancementArray.join(''));
+        %%>
     }
 }
 #=================================================

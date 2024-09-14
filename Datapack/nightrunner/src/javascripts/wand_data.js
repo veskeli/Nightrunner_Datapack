@@ -2,51 +2,6 @@
 const { NewWandsArray, HitType, spells, Custom_attributes  } = require('./wands');
 let DataArray = [];
 //=================================================
-// MARK: Compile item modifiers
-//=================================================
-for(let i = 0; i < spells.length; i++)
-{
-    let spell = spells[i];
-    DataArray.push(`item_modifier ` + spell.Name + `{\n`);
-
-    DataArray.push(`"function": "minecraft:set_lore","entity": "this","lore": [\n`);
-    DataArray.push(spell.Lore + `"\n`);
-    DataArray.push(`],"mode": "append"\n`);
-
-    DataArray.push(`}\n`);
-}
-
-for (let spellName in spells) {
-    const spell = spells[spellName];
-
-    DataArray.push(`dir ${spell.Name.toLowerCase()}{\n`);
-
-    // Loop over each tier in the spell
-    for (let tierName in spell.Tiers) {
-        const tier = spell.Tiers[tierName];
-
-        // Start the spell modifier with the spell name and tier (e.g., damage_wood)
-        DataArray.push(`item_modifier ${spell.Name.toLowerCase()}_${tierName.toLowerCase()} {\n`);
-
-        // Add the lore function
-        DataArray.push(`"function": "minecraft:set_lore","entity": "this","lore": [\n`);
-
-        // Call the Lore function with the current tier
-        const formattedLore = spell.Lore(tierName).map(line =>
-            JSON.stringify(line)
-        ).join(",\n");
-
-        // Add the formatted lore
-        DataArray.push(formattedLore + `\n`);
-
-        // Close the lore and the modifier
-        DataArray.push(`],"mode": "append"\n`);
-        DataArray.push(`}\n`);
-    }
-    DataArray.push(`}\n`);
-}
-
-//=================================================
 // MARK: Start Compile data
 //=================================================
 for(let i = 0; i < NewWandsArray.length; i++){
@@ -306,42 +261,45 @@ for(let i = 0; i < NewWandsArray.length; i++){
     // MARK: Recipe gen
     //=================================================
 
-    DataArray.push(`recipe ` + WandData.Namespace + `{\n`);
-    DataArray.push(`"type": "minecraft:crafting_shaped",\n`);
+    if(WandData.UseRecipe == true)
+    {
+        DataArray.push(`recipe ` + WandData.Namespace + `{\n`);
+        DataArray.push(`"type": "minecraft:crafting_shaped",\n`);
 
-    // Dynamically generate the pattern section
-    DataArray.push(`"pattern": [\n`);
-    WandData.RecipePattern.forEach((pattern, index) => {
-        DataArray.push(`"${pattern}"` + (index < WandData.RecipePattern.length - 1 ? `,\n` : `\n`));
-    });
-    DataArray.push(`],\n`);
+        // Dynamically generate the pattern section
+        DataArray.push(`"pattern": [\n`);
+        WandData.RecipePattern.forEach((pattern, index) => {
+            DataArray.push(`"${pattern}"` + (index < WandData.RecipePattern.length - 1 ? `,\n` : `\n`));
+        });
+        DataArray.push(`],\n`);
 
-    // Dynamically generate the key section
-    DataArray.push(`"key": {\n`);
-    const keys = Object.keys(WandData.RecipeKey);
-    keys.forEach((key, index) => {
-        DataArray.push(`"${key}": {\n`);
-        DataArray.push(`"item": "${WandData.RecipeKey[key].item}"\n`);
-        DataArray.push(`}` + (index < keys.length - 1 ? `,\n` : `\n`));
-    });
-    DataArray.push(`},\n`);
+        // Dynamically generate the key section
+        DataArray.push(`"key": {\n`);
+        const keys = Object.keys(WandData.RecipeKey);
+        keys.forEach((key, index) => {
+            DataArray.push(`"${key}": {\n`);
+            DataArray.push(`"item": "${WandData.RecipeKey[key].item}"\n`);
+            DataArray.push(`}` + (index < keys.length - 1 ? `,\n` : `\n`));
+        });
+        DataArray.push(`},\n`);
 
-    DataArray.push(`"result": {\n`);
-    DataArray.push(`"id": "minecraft:warped_fungus_on_a_stick",\n`);
-    DataArray.push(`"count": 1,\n`);
-    DataArray.push(`"components":{\n`);
-    DataArray.push(`"item_name":"[{\\"text\\":\\"` + WandData.Name + `\\",\\"italic\\":false,\\"color\\":\\"` + WandData.Color + `\\"}]",\n`);
-    DataArray.push(`"lore": [ ` + WandData.Description.replace(/"/g, '\\"').replace(/'/g, '"') + `,"{\\"text\\":\\"Nightrunner\\",\\"color\\":\\"aqua\\"}"],\n`);
-    DataArray.push(`"custom_model_data": ` + WandData.CustomModelData + `,\n`);
-    DataArray.push(`"custom_data": {\n`);
-    DataArray.push(`"` + WandData.Namespace + `": true,\n`);
-    DataArray.push(`"wand": true\n`);
-    DataArray.push(`},\n`);
-    DataArray.push(`"max_damage": ` + WandData.Durability + `\n`);
-    DataArray.push(`}\n`);
-    DataArray.push(`}\n`);
+        DataArray.push(`"result": {\n`);
+        DataArray.push(`"id": "minecraft:warped_fungus_on_a_stick",\n`);
+        DataArray.push(`"count": 1,\n`);
+        DataArray.push(`"components":{\n`);
+        DataArray.push(`"item_name":"[{\\"text\\":\\"` + WandData.Name + `\\",\\"italic\\":false,\\"color\\":\\"` + WandData.Color + `\\"}]",\n`);
+        DataArray.push(`"lore": [ ` + WandData.Description.replace(/"/g, '\\"').replace(/'/g, '"') + `,"{\\"text\\":\\"Nightrunner\\",\\"color\\":\\"aqua\\"}"],\n`);
+        DataArray.push(`"custom_model_data": ` + WandData.CustomModelData + `,\n`);
+        DataArray.push(`"custom_data": {\n`);
+        DataArray.push(`"` + WandData.Namespace + `": true,\n`);
+        DataArray.push(`"wand": true\n`);
+        DataArray.push(`},\n`);
+        DataArray.push(`"max_damage": ` + WandData.Durability + `\n`);
+        DataArray.push(`}\n`);
+        DataArray.push(`}\n`);
 
-    DataArray.push(`}\n`);
+        DataArray.push(`}\n`);
+    }
 
     //=================================================
     // MARK: Damage Spell

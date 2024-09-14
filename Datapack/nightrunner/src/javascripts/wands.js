@@ -270,17 +270,18 @@ const Sentries = {
     }
 };
 //=================================================
-// MARK: Wands
+// MARK: Wand Template
 //=================================================
-let wooden_wand = {
-    Name: "Wooden Wand",
+const defaultValues = {
+    Name: "Default Wand",
     Color: "white",
-    Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"1"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Damage"}]','[{"color":"dark_green","text":"Damage: "},{"color":"dark_aqua","text":"4"}]','{"color":"gray","text":"(Can be cast for half damage if out of mana.)"}'`,
+    Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"1"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"None"}]','{"color":"gray","text":"No additional info."}'`,
     Cooldown: 8,
     Particle: "minecraft:wax_off",
-    CustomModelData: 1121,
-    Durability: 1059,
-    Namespace: "wooden_wand",
+    CustomModelData: 1000,
+    Durability: 1000,
+    Namespace: "default_namespace",
+    UseRecipe: false,
     RecipePattern: [ " i", "i "],
     RecipeKey: {
         "i": {
@@ -293,23 +294,47 @@ let wooden_wand = {
         ...Custom_attributes,
     },
     MainSpell: {
-        ...spells.Damage,
-        SpellDamage: 4,
+        // Default spell
     },
     SecondarySpell: {},
     Sentry: Sentries.null_sentry,
     compiledData: ""
 };
+function createWand(options) {
+    return {
+        ...defaultValues,
+        ...options,
+    };
+}
+//=================================================
+// MARK: Wands
+//=================================================
+const wooden_wand = createWand({
+    Name: "Wooden Wand",
+    Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"1"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Damage"}]','[{"color":"dark_green","text":"Damage: "},{"color":"dark_aqua","text":"4"}]','{"color":"gray","text":"(Can be cast for half damage if out of mana.)"}'`,
+    CustomModelData: 1121,
+    Durability: 1059,
+    Namespace: "wooden_wand",
+    UseRecipe: true,
+    RecipePattern: [ " i", "i "],
+    RecipeKey: {
+        "i": {
+            "item": "minecraft:stick"
+        }
+    },
+    MainSpell: {
+        ...spells.Damage,
+        SpellDamage: 4,
+    },
+});
 NewWandsArray.push(wooden_wand);
-let stone_wand = {
+const stone_wand = createWand({
     Name: "Stone Wand",
-    Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"1"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Damage"}]','[{"color":"dark_green","text":"Damage: "},{"color":"dark_aqua","text":"5"}]','{"color":"gray","text":"(Can be cast for half damage if out of mana.)"}'`,
-    Cooldown: 8,
-    Particle: "minecraft:wax_off",
     CustomModelData: 1122,
     Durability: 1131,
     Namespace: "stone_wand",
+    UseRecipe: true,
     RecipePattern: [ " y", "i "],
     RecipeKey: {
         "i": {
@@ -319,29 +344,19 @@ let stone_wand = {
             "item": "minecraft:cobblestone"
         }
     },
-    ManaCost: 1,
-    ConsumeManaOnCast: true,
-    Attributes: {
-        ...Custom_attributes,
-    },
     MainSpell: {
         ...spells.Damage,
         SpellDamage: 5,
     },
-    SecondarySpell: {},
-    Sentry: Sentries.null_sentry,
-    compiledData: ""
-};
+});
 NewWandsArray.push(stone_wand);
-let iron_wand = {
+const iron_wand = createWand({
     Name: "Iron Wand",
-    Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"1"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Damage"}]','[{"color":"dark_green","text":"Damage: "},{"color":"dark_aqua","text":"6"}]','{"color":"gray","text":"(Can be cast for half damage if out of mana.)"}'`,
-    Cooldown: 8,
-    Particle: "minecraft:wax_off",
     CustomModelData: 1123,
     Durability: 1250,
     Namespace: "iron_wand",
+    UseRecipe: true,
     RecipePattern: [ " y", "i "],
     RecipeKey: {
         "i": {
@@ -351,29 +366,20 @@ let iron_wand = {
             "item": "minecraft:iron_ingot"
         }
     },
-    ManaCost: 1,
-    ConsumeManaOnCast: true,
-    Attributes: {
-        ...Custom_attributes,
-    },
     MainSpell: {
         ...spells.Damage,
         SpellDamage: 6,
-    },
-    SecondarySpell: {},
-    Sentry: Sentries.null_sentry,
-    compiledData: ""
-};
+    }
+});
 NewWandsArray.push(iron_wand);
-let golden_wand = {
+const golden_wand = createWand({
     Name: "Golden Wand",
-    Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"16"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"1"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Damage"}]','[{"color":"dark_green","text":"Damage: "},{"color":"dark_aqua","text":"11"}]','{"color":"gray","text":"(Can be cast for half damage if out of mana.)"}'`,
     Cooldown: 16,
-    Particle: "minecraft:wax_off",
     CustomModelData: 1124,
     Durability: 1032,
     Namespace: "golden_wand",
+    UseRecipe: true,
     RecipePattern: [ " y", "i "],
     RecipeKey: {
         "i": {
@@ -384,28 +390,18 @@ let golden_wand = {
         }
     },
     ManaCost: 2,
-    ConsumeManaOnCast: true,
-    Attributes: {
-        ...Custom_attributes,
-    },
     MainSpell: {
         ...spells.Damage,
         SpellDamage: 11,
     },
-    SecondarySpell: {},
-    Sentry: Sentries.null_sentry,
-    compiledData: ""
-};
+});
 NewWandsArray.push(golden_wand);
-let diamond_wand = {
+const diamond_wand = createWand({
     Name: "Diamond Wand",
-    Color: "white",
-    Folder: "wands",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"1"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Damage"}]','[{"color":"dark_green","text":"Damage: "},{"color":"dark_aqua","text":"7"}]','{"color":"gray","text":"(Can be cast for half damage if out of mana.)"}'`,
-    Cooldown: 8,
-    Particle: "minecraft:wax_off",
     CustomModelData: 1125,
     Durability: 2561,
+    UseRecipe: true,
     Namespace: "diamond_wand",
     RecipePattern: [ " y", "i "],
     RecipeKey: {
@@ -416,19 +412,11 @@ let diamond_wand = {
             "item": "minecraft:diamond"
         }
     },
-    ManaCost: 1,
-    ConsumeManaOnCast: true,
-    Attributes: {
-        ...Custom_attributes,
-    },
     MainSpell: {
         ...spells.Damage,
         SpellDamage: 7,
     },
-    SecondarySpell: {},
-    Sentry: Sentries.null_sentry,
-    compiledData: ""
-};
+});
 NewWandsArray.push(diamond_wand);
 //=================================================
 // MARK: Staffs
@@ -442,6 +430,7 @@ let wooden_staff = {
     CustomModelData: 1126,
     Durability: 1059,
     Namespace: "wooden_staff",
+    UseRecipe: true,
     RecipePattern: ["  i", " i ", "i  "],
     RecipeKey: {
         "i": {
@@ -476,6 +465,7 @@ let stone_staff = {
     CustomModelData: 1127,
     Durability: 1131,
     Namespace: "stone_staff",
+    UseRecipe: true,
     RecipePattern: ["  y", " i ", "i  "],
     RecipeKey: {
         "i": {
@@ -512,6 +502,7 @@ let iron_staff = {
     CustomModelData: 1128,
     Durability: 1250,
     Namespace: "iron_staff",
+    UseRecipe: true,
     RecipePattern: ["  y", " i ", "i  "],
     RecipeKey: {
         "i": {
@@ -549,6 +540,7 @@ let golden_staff = {
     CustomModelData: 1129,
     Durability: 1032,
     Namespace: "golden_staff",
+    UseRecipe: true,
     RecipePattern: ["  y", " i ", "i  "],
     RecipeKey: {
         "i": {
@@ -586,6 +578,7 @@ let diamond_staff = {
     CustomModelData: 11210,
     Durability: 2561,
     Namespace: "diamond_staff",
+    UseRecipe: true,
     RecipePattern: ["  y", " i ", "i  "],
     RecipeKey: {
         "i": {

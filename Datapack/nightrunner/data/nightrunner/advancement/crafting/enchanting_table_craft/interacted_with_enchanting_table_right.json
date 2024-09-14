@@ -1,0 +1,1 @@
+{"criteria":{"requirement":{"trigger": "minecraft:player_interacted_with_entity","conditions":{"entity":{"type": "minecraft:interaction","nbt": "{Tags:[\"EnchantingTableCraftInteractable\"]}"}}}},"rewards":{"function": "nightrunner:crafting/enchanting_table_craft/right_clicked"}}

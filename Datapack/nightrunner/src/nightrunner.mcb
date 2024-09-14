@@ -1116,6 +1116,11 @@ dir mobs{
     #=================================================
     # Monsters
     dir monsters{
+        <%%
+            // MARK: Compile monster data
+            const { CompiledMonsterData } = require('./javascripts/monsters');
+            emit.mcb(CompiledMonsterData);
+        %%>
         #=================================================
         # Zombie
         function zombie{
@@ -1488,6 +1493,12 @@ tag block air{
     minecraft:campfire
     minecraft:soul_campfire
     minecraft:bamboo
+}
+tag entity_type zombies{
+    minecraft:zombie
+    minecraft:husk
+    minecraft:drowned
+    minecraft:zombie_villager
 }
 #=================================================
 # MARK: Enchantments

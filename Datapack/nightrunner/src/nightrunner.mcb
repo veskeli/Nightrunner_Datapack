@@ -608,9 +608,40 @@ dir items{
             }
             function apply{
                 # reset advancement
-                advancement revoke @s only nightrunner:used_golden_apple
+                advancement revoke @s only nightrunner:items/consumables/golden_apple/used_golden_apple
+
+                # Return if max health is more then 20
+                execute if score @s Nightrunner_MaxHealth matches 20.. run return 1
+
                 # Set the player health to 20
                 set_max_health 20
+            }
+        }
+        dir enchanted_golden_apple{
+            advancement used_enchanted_golden_apple{
+            "criteria": {
+                "requirement": {
+                "trigger": "minecraft:consume_item",
+                "conditions": {
+                    "item": {
+                    "items": "minecraft:enchanted_golden_apple"
+                    }
+                }
+                }
+            },
+            "rewards": {
+                "function": "nightrunner:items/consumables/enchanted_golden_apple/apply"
+            }
+            }
+            function apply{
+                # reset advancement
+                advancement revoke @s only nightrunner:items/consumables/enchanted_golden_apple/used_enchanted_golden_apple
+
+                # Return if max health is more then 22
+                execute if score @s Nightrunner_MaxHealth matches 22.. run return 1
+
+                # Set the player health to 22
+                set_max_health 22
             }
         }
         dir bottle_of_experience_30{
@@ -980,7 +1011,7 @@ dir health_system{
         # Check if the health system is enabled
         execute if score $Nightrunner Nightrunner_UseHealthSystem matches 0 run return 1
         # Set the player max health if score is null
-        execute as @a unless score @s Nightrunner_Health matches ..0 run block setup_health{
+        execute as @a unless score @s Nightrunner_Health matches 0.. run block setup_health{
             # Set the max health
             set_max_health 16
         }
@@ -1052,7 +1083,7 @@ dir health_system{
             execute as @a run execute if score @e[tag=interaction,sort=nearest,limit=1] Nightrunner_GraveID = @s Nightrunner_ID run block{
                 # if player is in spectator mode then teleport to grave and set to survival
                 execute as @s[nbt={playerGameType:3}] run return run function ./revive
-                say @s Revived
+                # say @s Revived
             }
             execute as @a run say @s check
         }
@@ -1196,6 +1227,12 @@ dir testing{
         REPEAT (1,1) {
             summon zombie ~ ~ ~ {Tags:["hometest"]}
         }
+    }
+    function set_health_manual{
+        # Update the max health score
+        scoreboard players set @s Nightrunner_MaxHealth ${max_health}
+        # Update the max health attribute
+        attribute @s minecraft:generic.max_health base set ${max_health}
     }
 }
 #=================================================

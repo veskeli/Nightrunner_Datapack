@@ -48,6 +48,11 @@ function transformName(name) {
     return name.toLowerCase().replace(/\s+/g, '');
 }
 //=================================================
+// MARK: Pre compile
+//=================================================
+// TODO: Add weight check based on type
+// So get all types and add their weight to the total weight and make that variable
+//=================================================
 // MARK: Compile MonsterData
 //=================================================
 let CompiledMonsterData = "";

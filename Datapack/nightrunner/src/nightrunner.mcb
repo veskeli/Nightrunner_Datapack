@@ -36,7 +36,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 10 Wand Durability!
+    welcome 11 Revive him!
 }
 #=================================================
 # MARK: Settings
@@ -83,6 +83,9 @@ dir settings{
             scoreboard players add $Nightrunner_Internal_ID Nightrunner_ID 1
             # Set the player id
             scoreboard players operation @s Nightrunner_ID = $Nightrunner_Internal_ID Nightrunner_ID
+
+            # TEMP: Set the player spell distance
+            scoreboard players set @s Nightrunner_RangedSpellRange 40
 
             execute as @s run function #nightrunner:on_join
         }
@@ -503,6 +506,40 @@ dir items{
                 # Apply temporary health
                 add_temp_health 2 4
             }
+            recipe heartfruit{
+                "type": "minecraft:crafting_shaped",
+                "pattern": [
+                    " i ",
+                    "iSi",
+                    " i "
+                ],
+                "key": {
+                    "i": {
+                        "item": "minecraft:copper_ingot"
+                    },
+                    "S": {
+                        "item": "minecraft:potato"
+                    }
+                },
+                "result": {
+                    "id": "minecraft:poisonous_potato",
+                    "count": 1,
+                    "components":{
+                        "item_name":"[{\"text\":\"Heartfruit\",\"italic\":false}]",
+                        "lore": ["{\"text\":\"A common consumable that grants a temporary heart, up to a maximum of two.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                        "food": {
+                            "nutrition": 0,
+                            "saturation": 0,
+                            "can_always_eat": true,
+                            "eat_seconds": 1
+                        },
+                        "custom_model_data": 1122,
+                        "custom_data": {
+                            "heartfruit": true
+                        }
+                    }
+                }
+            }
         }
         dir heartfruit_plus{
             # Heartfruit Plus: A rarer variant that grants a temporary heart, up to a maximum of three.
@@ -515,6 +552,65 @@ dir items{
                 advancement revoke @s only nightrunner:used_heartfruit_plus
                 # Apply temporary health
                 add_temp_health 3 6
+            }
+            recipe heartfruit_plus{
+                "type": "minecraft:crafting_shaped",
+                "pattern": [
+                    " i ",
+                    "iSi",
+                    " i "
+                ],
+                "key": {
+                    "i": {
+                        "item": "minecraft:gold_ingot"
+                    },
+                    "S": {
+                        "item": "minecraft:potato"
+                    }
+                },
+                "result": {
+                    "id": "minecraft:poisonous_potato",
+                    "count": 1,
+                    "components":{
+                        "item_name":"[{\"text\":\"Heartfruit Plus\",\"italic\":false}]",
+                        "lore": ["{\"text\":\"A rarer variant that grants a temporary heart and a half, up to a maximum of three.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                        "food": {
+                            "nutrition": 0,
+                            "saturation": 0,
+                            "can_always_eat": true,
+                            "eat_seconds": 1
+                        },
+                        "enchantment_glint_override": true,
+                        "rarity": "rare",
+                        "custom_model_data": 1123,
+                        "custom_data": {
+                            "heartfruit_plus": true
+                        }
+                    }
+                }
+            }
+        }
+        dir golden_apple{
+            advancement used_golden_apple{
+            "criteria": {
+                "requirement": {
+                "trigger": "minecraft:consume_item",
+                "conditions": {
+                    "item": {
+                    "items": "minecraft:golden_apple"
+                    }
+                }
+                }
+            },
+            "rewards": {
+                "function": "nightrunner:items/consumables/golden_apple/apply"
+            }
+            }
+            function apply{
+                # reset advancement
+                advancement revoke @s only nightrunner:used_golden_apple
+                # Set the player health to 20
+                set_max_health 20
             }
         }
         dir bottle_of_experience_30{
@@ -993,6 +1089,21 @@ dir health_system{
         # Kill interactables
         kill @e[type=interaction,nbt={Tags:["GraveInteractable"]}]
     }
+    function revive{
+        # set the player as not dead
+        scoreboard players reset @s Nightrunner_CurrentlyDead
+        # Set player to survival
+        gamemode survival @s
+        # Show title with revive message
+        title @s title [{"text":"You have been revived","color":"green"}]
+
+        # Kill graves
+        execute store result storage nightrunner:grave owner.id int 1 run scoreboard players get @s Nightrunner_ID
+        function ./kill_player_graves with storage nightrunner:grave owner
+
+        # TEMP: Set health to 16
+        set_max_health 16
+    }
     dir revive{
         function tick minecraft:tick{
             # Give op the ability to revive themselves and others
@@ -1021,6 +1132,9 @@ dir health_system{
             gamemode survival @s
             # Show title with revive message
             title @s title [{"text":"You have been revived","color":"green"}]
+            # Kill graves
+            execute store result storage nightrunner:grave owner.id int 1 run scoreboard players get @s Nightrunner_ID
+            function ../kill_player_graves with storage nightrunner:grave owner
         }
         function op_revive_all{
             # Execute as dead players

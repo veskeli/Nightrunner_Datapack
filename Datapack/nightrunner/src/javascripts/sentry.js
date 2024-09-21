@@ -1,4 +1,4 @@
-let DefaultSentryCost = 15;
+let DefaultSentryCost = 2;
 module.exports = {
     damage_sentry:{
         Namespace: "Damage",
@@ -24,7 +24,7 @@ module.exports = {
         Namespace: "Wooden",
         Lifetime: 13,
         Target: "#nightrunner:enemy",
-        Distance: 3,
+        Distance: 6,
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 1,
@@ -34,7 +34,7 @@ module.exports = {
         Namespace: "Stone",
         Lifetime: 14,
         Target: "#nightrunner:enemy",
-        Distance: 3,
+        Distance: 7,
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 2,
@@ -44,7 +44,7 @@ module.exports = {
         Namespace: "Iron",
         Lifetime: 16,
         Target: "#nightrunner:enemy",
-        Distance: 5,
+        Distance: 8,
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 3,
@@ -54,7 +54,7 @@ module.exports = {
         Namespace: "Golden",
         Lifetime: 15,
         Target: "#nightrunner:enemy",
-        Distance: 3,
+        Distance: 5,
         DustColor: "0.973,1.000,0.212",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 5,
@@ -64,7 +64,7 @@ module.exports = {
         Namespace: "Diamond",
         Lifetime: 18,
         Target: "#nightrunner:enemy",
-        Distance: 5,
+        Distance: 10,
         DustColor: "1.0,0.0,0.0",
         DisplayBlock: "minecraft:calibrated_sculk_sensor",
         ConcurrentAttacks: 4,

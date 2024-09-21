@@ -900,6 +900,9 @@ dir items{
             }
             }
         }
+    }
+    # MARK: Armor
+    dir armor{
         dir wizard_armor{
             dir wizard_helmet{
                 recipe wizard_helmet{
@@ -910,6 +913,12 @@ dir items{
                         },
                         {
                         "item": "minecraft:leather_helmet"
+                        },
+                        {
+                        "item": "minecraft:leather"
+                        },
+                        {
+                        "item": "minecraft:emerald"
                         }
                     ],
                     "result": {
@@ -943,6 +952,12 @@ dir items{
                         },
                         {
                         "item": "minecraft:leather_chestplate"
+                        },
+                        {
+                        "item": "minecraft:leather"
+                        },
+                        {
+                        "item": "minecraft:emerald"
                         }
                     ],
                     "result": {
@@ -976,6 +991,12 @@ dir items{
                         },
                         {
                         "item": "minecraft:leather_leggings"
+                        },
+                        {
+                        "item": "minecraft:leather"
+                        },
+                        {
+                        "item": "minecraft:emerald"
                         }
                     ],
                     "result": {
@@ -1009,6 +1030,12 @@ dir items{
                         },
                         {
                         "item": "minecraft:leather_boots"
+                        },
+                        {
+                        "item": "minecraft:leather"
+                        },
+                        {
+                        "item": "minecraft:emerald"
                         }
                     ],
                     "result": {
@@ -1051,6 +1078,8 @@ dir items{
             execute as @a[scores={Nightrunner_SpellCooldown=1..}] run scoreboard players remove @s Nightrunner_SpellCooldown 1
             # if the cooldown is 0 then play sound
             execute as @a[scores={Nightrunner_SpellCooldown=1}] at @s run playsound minecraft:item.book.put master @s ~ ~ ~ 1 1
+
+            execute as @a[scores={Nightrunner_SentryCooldown=1..}] run scoreboard players remove @s Nightrunner_SentryCooldown 1
         }
         function tick minecraft:tick{
             # Check if the player used the default warp fungus on a stick and ignore it
@@ -1080,6 +1109,7 @@ dir sentry{
     function load minecraft:load{
         scoreboard objectives add Nightrunner_SentryID minecraft.used:minecraft.warped_fungus_on_a_stick
         scoreboard objectives add Nightrunner_SentryLifetime dummy
+        scoreboard objectives add Nightrunner_SentryCooldown dummy
     }
     clock check_sentry_lifetime 1s{
         execute as @e[type=block_display,tag=sentry] run block{

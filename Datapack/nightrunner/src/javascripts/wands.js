@@ -114,7 +114,7 @@ const spells = {
                 DustColor: "1.0,0.0,0.0",
                 DisplayBlock: "minecraft:calibrated_sculk_sensor",
                 ConcurrentAttacks: 1,
-                ManaCost: 15,
+                ManaCost: 2,
                 Cooldown: 8,
             },
             Stone: {
@@ -125,7 +125,7 @@ const spells = {
                 DustColor: "1.0,0.0,0.0",
                 DisplayBlock: "minecraft:calibrated_sculk_sensor",
                 ConcurrentAttacks: 2,
-                ManaCost: 15,
+                ManaCost: 2,
                 Cooldown: 8,
             },
             Iron: {
@@ -136,7 +136,7 @@ const spells = {
                 DustColor: "1.0,0.0,0.0",
                 DisplayBlock: "minecraft:calibrated_sculk_sensor",
                 ConcurrentAttacks: 3,
-                ManaCost: 15,
+                ManaCost: 2,
                 Cooldown: 8,
             },
             Gold: {
@@ -147,7 +147,7 @@ const spells = {
                 DustColor: "0.973,1.000,0.212",
                 DisplayBlock: "minecraft:calibrated_sculk_sensor",
                 ConcurrentAttacks: 5,
-                ManaCost: 15,
+                ManaCost: 2,
                 Cooldown: 8,
             },
             Diamond: {
@@ -158,7 +158,7 @@ const spells = {
                 DustColor: "1.0,0.0,0.0",
                 DisplayBlock: "minecraft:calibrated_sculk_sensor",
                 ConcurrentAttacks: 4,
-                ManaCost: 15,
+                ManaCost: 2,
                 Cooldown: 8,
             }
         },
@@ -437,7 +437,7 @@ let wooden_staff = {
             "item": "minecraft:stick"
         }
     },
-    ManaCost: 15,
+    ManaCost: 2,
     ConsumeManaOnCast: false,
     Attributes: {
         ...Custom_attributes,
@@ -475,7 +475,7 @@ let stone_staff = {
             "item": "minecraft:cobblestone"
         }
     },
-    ManaCost: 15,
+    ManaCost: 2,
     ConsumeManaOnCast: false,
     Attributes: {
         ...Custom_attributes,
@@ -512,7 +512,7 @@ let iron_staff = {
             "item": "minecraft:iron_ingot"
         }
     },
-    ManaCost: 15,
+    ManaCost: 2,
     ConsumeManaOnCast: false,
     Attributes: {
         ...Custom_attributes,
@@ -550,7 +550,7 @@ let golden_staff = {
             "item": "minecraft:gold_ingot"
         }
     },
-    ManaCost: 15,
+    ManaCost: 2,
     ConsumeManaOnCast: false,
     Attributes: {
         ...Custom_attributes,
@@ -588,7 +588,7 @@ let diamond_staff = {
             "item": "minecraft:diamond"
         }
     },
-    ManaCost: 15,
+    ManaCost: 2,
     ConsumeManaOnCast: false,
     Attributes: {
         ...Custom_attributes,

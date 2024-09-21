@@ -34,6 +34,13 @@ for(let i = 0; i < NewWandsArray.length; i++){
         {
             DataArray.push(ManaStart + value + ' run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]\n')
         }
+
+        // Check if its sentry and Nightrunner_SentryCooldown is active
+        if(WandData.MainSpell.Name == "Summon Sentry")
+        {
+            DataArray.push('execute if score @s Nightrunner_SentryCooldown matches 1.. run return run tellraw @s [{"text":"⚠ ","color":"yellow","bold":true},{"text":"Sentry Cooldown: ","color":"red","bold":true,"italic":true},{"text":"[","color":"gray"},{"score":{"name":"@s","objective":"Nightrunner_SentryCooldown"},"color":"white","bold":true},{"text":"]","color":"gray"},{"text":" still active!","color":"red","italic":true}]\n')
+        }
+
         // Play sound
         if(WandData.MainSpell.Name == "Damage") // Damage spell can be casted without mana but with damage loss
         {
@@ -363,19 +370,33 @@ for(let i = 0; i < NewWandsArray.length; i++){
         // Mana cost
         DataArray.push(`function ./check_mana\n`);
 
+        // Add sentry cooldown
+        DataArray.push(`scoreboard players set @s[gamemode=survival] Nightrunner_SentryCooldown 600\n`); // TODO: Remove hard coded value
+
         // Reset nightrunner mana
         DataArray.push(`scoreboard players reset $Nightrunner Nightrunner_Mana\n`);
 
         DataArray.push(`}\n`);
 
-        // I: Check sentry
-        DataArray.push(`clock check_sentry 20t{\n`);
+        // MARK: Check sentry
+        DataArray.push(`clock clock_check_sentry 60t{\n`);
 
-        DataArray.push(`execute as @e[type=block_display,tag=sentry,tag=` + WandData.Sentry.Namespace + `] run block check_current_sentry{\n`);
+        DataArray.push(`execute as @e[type=block_display,tag=sentry,tag=` + WandData.Sentry.Namespace + `] run block add_sentry_attack{\n`);
         DataArray.push(`execute at @s run execute as @e[distance=..` + WandData.Sentry.Distance + `,type=` + WandData.Sentry.Target + `,limit=` + WandData.Sentry.ConcurrentAttacks + `,sort=nearest] run block summon_fangs{\n`);
         DataArray.push(`execute at @s run summon evoker_fangs ~ ~ ~ {Warmup:0}\n`);
         // TODO: Add correct player UUID
         DataArray.push(`execute as @e[type=evoker_fangs,sort=nearest,limit=1] run data modify entity @s Owner set from entity @p UUID\n`);
+        DataArray.push(`}\n`);
+        DataArray.push(`}\n`);
+
+        DataArray.push(`}\n`);
+
+        // MARK: Sentry slowness
+        DataArray.push(`clock clock_check_sentry_slowness 3t{\n`);
+
+        DataArray.push(`execute as @e[type=block_display,tag=sentry,tag=` + WandData.Sentry.Namespace + `] run block add_sentry_slowness{\n`);
+        DataArray.push(`execute at @s run execute as @e[distance=..` + WandData.Sentry.Distance + `] run block apply_slowness{\n`);
+        DataArray.push(`effect give @s minecraft:slowness 1 0 true\n`);
         DataArray.push(`}\n`);
         DataArray.push(`}\n`);
 

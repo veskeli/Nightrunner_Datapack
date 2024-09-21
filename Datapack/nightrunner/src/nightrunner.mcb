@@ -1120,16 +1120,26 @@ dir health_system{
         # Kill interactables
         kill @e[type=interaction,nbt={Tags:["GraveInteractable"]}]
     }
+    function teleport_to_grave{
+        # Teleport to closest grave macro
+        $execute as @s run tp @s @e[type=block_display,sort=nearest,limit=1,nbt={Tags:["Grave"]},scores={Nightrunner_GraveID=$(id)}]
+    }
     function revive{
         # set the player as not dead
         scoreboard players reset @s Nightrunner_CurrentlyDead
+
+        # Save the grave owner id (for macro functions)
+        execute store result storage nightrunner:grave owner.id int 1 run scoreboard players get @s Nightrunner_ID
+
+        # Teleport to closest grave macro
+        function ./teleport_to_grave with storage nightrunner:grave owner
+
         # Set player to survival
         gamemode survival @s
         # Show title with revive message
         title @s title [{"text":"You have been revived","color":"green"}]
 
-        # Kill graves
-        execute store result storage nightrunner:grave owner.id int 1 run scoreboard players get @s Nightrunner_ID
+        # Kill graves macro
         function ./kill_player_graves with storage nightrunner:grave owner
 
         # TEMP: Set health to 16
@@ -1211,15 +1221,6 @@ dir home{
 # MARK: testing
 #=================================================
 dir testing{
-    function load minecraft:load{
-    }
-    function tick minecraft:tick{
-        execute as @e[type=zombie,tag=hometest,tag=!notdamaged] run block{
-            damage @s 0 magic by @e[type=cow,tag=home,sort=nearest,limit=1]
-            tag @s add notdamaged
-        }
-    }
-
     function summon_home{
         summon cow ~ ~ ~ {Tags:["home"],CustomName:'{"text":"Home","color":"green"}',CustomNameVisible:1b,NoGravity:1b,NoAI:1b,Silent:1b}
     }

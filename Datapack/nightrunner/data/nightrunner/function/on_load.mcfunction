@@ -20,6 +20,6 @@ tellraw @a [{"text": " "}]
 tellraw @a {"text":"Nightrunner loaded!","bold":true,"color":"gold"}
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
-tellraw @a ["",{"text":"Revive him!","color":"aqua"},{"text":" update"}]
-tellraw @a ["",{"text":"(Build "},{"text":"11","underlined":true,"color":"yellow"},{"text":")"}]
+tellraw @a ["",{"text":"Mining skill and Wizard armor!","color":"aqua"},{"text":" update"}]
+tellraw @a ["",{"text":"(Build "},{"text":"12","underlined":true,"color":"yellow"},{"text":")"}]
 tellraw @a [{"text": " "}]

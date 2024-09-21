@@ -36,7 +36,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 11 Revive him!
+    welcome 12 Mining skill and Wizard armor!
 }
 #=================================================
 # MARK: Settings
@@ -900,6 +900,144 @@ dir items{
             }
             }
         }
+        dir wizard_armor{
+            dir wizard_helmet{
+                recipe wizard_helmet{
+                    "type": "minecraft:crafting_shapeless",
+                    "ingredients": [
+                        {
+                        "item": "minecraft:book"
+                        },
+                        {
+                        "item": "minecraft:leather_helmet"
+                        }
+                    ],
+                    "result": {
+                        "id": "minecraft:leather_helmet",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Wizard Helmet\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "minecraft:custom_data": {
+                                "wizard_helmet": true
+                            },
+                            "attribute_modifiers": [
+                                {
+                                    "id": "123e4567-e89b-12d3-a456-426614174001",
+                                    "type": "generic.max_health",
+                                    "amount": 1,
+                                    "operation": "add_value",
+                                    "slot": "head"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+            dir wizard_chestplate{
+                recipe wizard_chestplate{
+                    "type": "minecraft:crafting_shapeless",
+                    "ingredients": [
+                        {
+                        "item": "minecraft:book"
+                        },
+                        {
+                        "item": "minecraft:leather_chestplate"
+                        }
+                    ],
+                    "result": {
+                        "id": "minecraft:leather_chestplate",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Wizard Chestplate\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "minecraft:custom_data": {
+                                "wizard_chestplate": true
+                            },
+                            "attribute_modifiers": [
+                                {
+                                    "id": "123e4567-e89b-12d3-a456-426614174002",
+                                    "type": "generic.max_health",
+                                    "amount": 6,
+                                    "operation": "add_value",
+                                    "slot": "chest"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+            dir wizard_leggings{
+                recipe wizard_leggings{
+                    "type": "minecraft:crafting_shapeless",
+                    "ingredients": [
+                        {
+                        "item": "minecraft:book"
+                        },
+                        {
+                        "item": "minecraft:leather_leggings"
+                        }
+                    ],
+                    "result": {
+                        "id": "minecraft:leather_leggings",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Wizard Leggings\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "minecraft:custom_data": {
+                                "wizard_leggings": true
+                            },
+                            "attribute_modifiers": [
+                                {
+                                    "id": "123e4567-e89b-12d3-a456-426614174003",
+                                    "type": "generic.max_health",
+                                    "amount": 2,
+                                    "operation": "add_value",
+                                    "slot": "legs"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+            dir wizard_boots{
+                recipe wizard_boots{
+                    "type": "minecraft:crafting_shapeless",
+                    "ingredients": [
+                        {
+                        "item": "minecraft:book"
+                        },
+                        {
+                        "item": "minecraft:leather_boots"
+                        }
+                    ],
+                    "result": {
+                        "id": "minecraft:leather_boots",
+                        "count": 1,
+                        "components":{
+                            "item_name":"[{\"text\":\"Wizard Boots\",\"italic\":false}]",
+                            "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                            "minecraft:custom_data": {
+                                "wizard_boots": true
+                            },
+                            "attribute_modifiers": [
+                                {
+                                    "id": "123e4567-e89b-12d3-a456-426614174004",
+                                    "type": "generic.max_health",
+                                    "amount": 1,
+                                    "operation": "add_value",
+                                    "slot": "feet"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+            # diamond helmet to leather helmet 4 health
+            # diamond chestplate to leather chestplate 10 health
+            # diamond leggings to leather leggings 8 health
+            # diamond boots to leather boots 4 health
+        }
     }
     # MARK: Tools
     dir tools{
@@ -1353,6 +1491,101 @@ dir mobs{
             # data merge entity @e[type=creeper,tag=!nightmare,limit=1] {ExplosionRadius:5,Tags:["nightmare"]}
         }
 
+    }
+}
+#=================================================
+# MARK: Skill system
+#=================================================
+dir skills{
+    function load minecraft:load{
+        # Mining skill trackers
+        scoreboard objectives add Nightrunner_MiningSkillPoints dummy
+        scoreboard objectives add Nightrunner_MiningSkillLevel dummy
+    }
+    function tick minecraft:tick{
+        execute as @a run function ./mining_skill/check
+    }
+    dir mining_skill{
+        <%%
+            let compiledData = "";
+            MineScores = [];
+            MineScores.push("coal_ore");
+            MineScores.push("iron_ore");
+            MineScores.push("copper_ore");
+            MineScores.push("gold_ore");
+            MineScores.push("redstone_ore");
+            MineScores.push("emerald_ore");
+            MineScores.push("lapis_ore");
+            MineScores.push("diamond_ore");
+            MineScores.push("nether_gold_ore");
+            MineScores.push("nether_quartz_ore");
+            MineScores.push("deepslate_coal_ore");
+            MineScores.push("deepslate_iron_ore");
+            MineScores.push("deepslate_copper_ore");
+            MineScores.push("deepslate_gold_ore");
+            MineScores.push("deepslate_redstone_ore");
+            MineScores.push("deepslate_emerald_ore");
+            MineScores.push("deepslate_lapis_ore");
+            MineScores.push("deepslate_diamond_ore");
+            MineScores.push("ancient_debris");
+
+            compiledData += `function load minecraft:load{\n`;
+            for(let i = 0; i < MineScores.length; i++){ // Loop through all the mining scores
+                compiledData += ``;
+                compiledData += `scoreboard objectives add Nightrunner_MiningSkill_${MineScores[i]} minecraft.mined:minecraft.${MineScores[i]}\n`;
+            }
+            compiledData += `}\n`;
+
+            compiledData += `function reset_scores{\n`;
+            for(let i = 0; i < MineScores.length; i++){ // Loop through all the mining scores
+                compiledData += ``;
+                compiledData += `scoreboard players reset @s Nightrunner_MiningSkill_${MineScores[i]}\n`;
+            }
+            compiledData += `}\n`;
+
+            compiledData += `function check{\n`;
+            for(let i = 0; i < MineScores.length; i++){ // Loop through all the mining scores
+                compiledData += ``;
+                compiledData += `execute as @s run execute if score @s Nightrunner_MiningSkill_${MineScores[i]} matches 1.. run scoreboard players add @s Nightrunner_MiningSkillPoints 1\n`;
+            }
+            // Reset all the detection scores
+            compiledData += `function ./reset_scores\n`;
+
+            compiledData += `execute if score @s[scores={Nightrunner_MiningSkillLevel=101..}] Nightrunner_MiningSkillPoints matches 100.. run function ./level_up\n`;
+            compiledData += `execute if score @s Nightrunner_MiningSkillLevel matches 101.. run return 1\n`;
+            compiledData += `execute if score @s[scores={Nightrunner_MiningSkillLevel=51..}] Nightrunner_MiningSkillPoints matches 20.. run function ./level_up\n`;
+            compiledData += `execute if score @s Nightrunner_MiningSkillLevel matches 51.. run return 1\n`;
+            compiledData += `execute if score @s[scores={Nightrunner_MiningSkillLevel=11..}] Nightrunner_MiningSkillPoints matches 10.. run function ./level_up\n`;
+            compiledData += `execute if score @s Nightrunner_MiningSkillLevel matches 11.. run return 1\n`;
+            compiledData += `execute if score @s Nightrunner_MiningSkillPoints matches 4.. run function ./level_up\n`;
+
+            compiledData += `}\n`;
+
+            emit.mcb(compiledData);
+
+        %%>
+        function level_up{
+            # add a level
+            scoreboard players add @s Nightrunner_MiningSkillLevel 1
+            # reset the points
+            scoreboard players reset @s Nightrunner_MiningSkillPoints
+            # play level up sound
+            execute at @s run playsound minecraft:entity.player.levelup player @a ~ ~ ~ 0.5 0.8
+            # update the player attributes
+            execute as @s run function ./set_mining_skill_attributes
+            # show level up message
+            tellraw @s [{"text":"Mining Skill Leveled Up! ","color":"green","bold":true,"italic":true},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MiningSkillLevel"}},{"text":"]","color":"yellow"}]
+        }
+        function set_mining_skill_attributes{
+            execute store result storage nightrunner:mining_skill attribute.amount float 0.5 run scoreboard players get @s Nightrunner_MiningSkillLevel
+            execute as @s run function ./add_mining_attributes with storage nightrunner:mining_skill attribute
+        }
+        function add_mining_attributes{
+            # Reset the mining attributes
+            attribute @s minecraft:player.mining_efficiency modifier remove n_miningskill
+            # Add the mining attributes
+            $attribute @s minecraft:player.mining_efficiency modifier add n_miningskill $(amount) add_value
+        }
     }
 }
 #=================================================

@@ -1,0 +1,21 @@
+# Generated with MC-Build
+
+scoreboard players reset @s Nightrunner_MiningSkill_coal_ore
+scoreboard players reset @s Nightrunner_MiningSkill_iron_ore
+scoreboard players reset @s Nightrunner_MiningSkill_copper_ore
+scoreboard players reset @s Nightrunner_MiningSkill_gold_ore
+scoreboard players reset @s Nightrunner_MiningSkill_redstone_ore
+scoreboard players reset @s Nightrunner_MiningSkill_emerald_ore
+scoreboard players reset @s Nightrunner_MiningSkill_lapis_ore
+scoreboard players reset @s Nightrunner_MiningSkill_diamond_ore
+scoreboard players reset @s Nightrunner_MiningSkill_nether_gold_ore
+scoreboard players reset @s Nightrunner_MiningSkill_nether_quartz_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_coal_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_iron_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_copper_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_gold_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_redstone_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_emerald_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_lapis_ore
+scoreboard players reset @s Nightrunner_MiningSkill_deepslate_diamond_ore
+scoreboard players reset @s Nightrunner_MiningSkill_ancient_debris

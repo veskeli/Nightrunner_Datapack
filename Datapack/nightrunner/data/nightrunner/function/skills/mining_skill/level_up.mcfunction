@@ -14,6 +14,18 @@ tellraw @s [{"text":"Mining Skill Leveled Up! ","color":"green","bold":true,"ita
 scoreboard players operation @s Nightrunner_MiningLevelModulus = @s Nightrunner_MiningSkillLevel
 scoreboard players set $Nightrunner Nightrunner_MiningLevelModulus 5
 scoreboard players operation @s Nightrunner_MiningLevelModulus %= $Nightrunner Nightrunner_MiningLevelModulus
-#execute if score @s Nightrunner_MiningLevelModulus matches 0 run tag @s add broadcaster
+execute if score @s Nightrunner_MiningLevelModulus matches 0 run tag @s add broadcaster
 execute if score @s Nightrunner_MiningLevelModulus matches 0 run tellraw @a[tag=!broadcaster] [{"selector":"@s"},{"text":" has leveled up their Mining Skill! Now at ","color":"green"},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MiningSkillLevel"},"color":"yellow"},{"text":"]","color":"yellow"}]
 execute if score @s Nightrunner_MiningLevelModulus matches 0 run tag @s remove broadcaster
+# Milestone lvl 50
+execute if score @s Nightrunner_MiningSkillLevel matches 50 run function nightrunner:skills/mining_skill/generated/0
+# Update attributes if milestone is reached (If player gets the level or higher)
+execute if score @s Nightrunner_MiningSkillLevel matches 50.. run function nightrunner:skills/mining_skill/generated/1
+# Update attributes if milestone is not reached (If player loses the level)
+execute if score @s Nightrunner_MiningSkillLevel matches ..49 run function nightrunner:skills/mining_skill/generated/2
+# Milestone lvl 200
+execute if score @s Nightrunner_MiningSkillLevel matches 200 run function nightrunner:skills/mining_skill/generated/3
+# Update attributes if milestone is reached (If player gets the level or higher)
+execute if score @s Nightrunner_MiningSkillLevel matches 200.. run function nightrunner:skills/mining_skill/generated/4
+# Update attributes if milestone is not reached (If player loses the level)
+execute if score @s Nightrunner_MiningSkillLevel matches ..199 run function nightrunner:skills/mining_skill/generated/5

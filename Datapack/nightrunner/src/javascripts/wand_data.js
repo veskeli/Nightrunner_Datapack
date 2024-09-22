@@ -65,10 +65,10 @@ for(let i = 0; i < NewWandsArray.length; i++){
         let RangeAddAmount = 15;
         for(let i = 0; i < LeatherArmor.length; i++)
         {
-            DataArray.push('execute as @s if entity @s[nbt={Inventory:[{Slot:' + (100 + i) + 'b,id:"minecraft:' + LeatherArmor[i] + '"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange ' + RangeAddAmount + '\n');
+            //DataArray.push('execute as @s if entity @s[nbt={Inventory:[{Slot:' + (100 + i) + 'b,id:"minecraft:' + LeatherArmor[i] + '"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange ' + RangeAddAmount + '\n');
         }
         // tell spell range
-        DataArray.push(`tellraw @s [{"text":"Spell range: ","color":"aqua"},{"score":{"name":"$Nightrunner","objective":"Nightrunner_RangedSpellRange"}}]\n`);
+        // DataArray.push(`tellraw @s [{"text":"Spell range: ","color":"aqua"},{"score":{"name":"$Nightrunner","objective":"Nightrunner_RangedSpellRange"}}]\n`);
 
         // Reset effect cooldown
         DataArray.push(`scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown\n`);

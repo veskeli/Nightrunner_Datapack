@@ -413,7 +413,7 @@ dir items{
         scoreboard objectives add Nightrunner_SpellCooldown dummy
         scoreboard objectives add Nightrunner_Weak_Use dummy
     }
-    # MARK: Magic
+    # MARK: Magic (inside items)
     function magic_tick minecraft:tick{
         # check if player has xp mana
         execute as @a[scores={Nightrunner_ManaXP=1..}] run block{
@@ -1688,6 +1688,10 @@ dir skills{
             execute if score @s Nightrunner_MiningSkillLevel matches 100.. run block{
                 effect give @s minecraft:speed 4 0 true
             }
+            # If level is more then 125 then add small speed boost
+            execute if score @s Nightrunner_MiningSkillLevel matches 125.. run execute if predicate nightrunner:10change run block{
+                add_temp_health 2 2
+            }
         }
         # MARK: Mining skill Level up
         function level_up{
@@ -1735,6 +1739,15 @@ dir skills{
                 title @s times 20 140 20
                 tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
                 tellraw @s [{"text":"You now gain a temporary speed boost when mining ore!","color":"green"}]
+            }
+
+            # Milestone lvl 125
+            execute if score @s Nightrunner_MiningSkillLevel matches 125 run block{
+                title @s title {"text":"🎉 Milestone Achieved! 🎉","color":"gold"}
+                title @s subtitle {"text":"10% chance to gain a temporary heart when mining ore!","color":"green"}
+                title @s times 20 140 20
+                tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
+                tellraw @s [{"text":"You now have a 10% chance to gain a temporary heart when mining ore!","color":"green"}]
             }
 
             # Milestone lvl 200

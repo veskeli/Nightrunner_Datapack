@@ -3,6 +3,9 @@ template add_temp_health{
         # Store current health
         execute as @s store result score @s Nightrunner_CheckCurrentAbsorptionAmount run data get entity @s AbsorptionAmount
 
+        # Before adding if the player has more then max then return
+        execute if score @s Nightrunner_CheckCurrentAbsorptionAmount matches <%max_addition%>.. run return 1
+
         # Add temp_health on top of the current temp health
         scoreboard players add @s Nightrunner_CheckCurrentAbsorptionAmount <%temp_health%>
 
@@ -21,5 +24,8 @@ template add_temp_health{
         effect clear @s minecraft:absorption
         # Set the player score to the correct amount
         scoreboard players operation @s Nightrunner_Absorption = @s Nightrunner_CheckCurrentAbsorptionAmount
+
+        # Play the sound
+        execute at @s run playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.3 1.5
     }
 }

@@ -8,7 +8,7 @@ execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a
 scoreboard players set @s Nightrunner_SpellCooldown 8
 scoreboard players reset @s Nightrunner_Item_Ray_steps
 scoreboard players reset $Nightrunner Nightrunner_Item_Ray_steps
-execute as @s run scoreboard players operation $Nightrunner Nightrunner_RangedSpellRange = @s Nightrunner_RangedSpellRange
+execute as @s run scoreboard players operation $Nightrunner Nightrunner_Item_Ray_steps = @s Nightrunner_RangedSpellRange
 scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown
 tag @s add raycasting
 execute anchored eyes positioned ^ ^ ^ store result score @s Nightrunner_Item_Ray_Return run function nightrunner:items/tools/diamond_staff/raycast_offhand

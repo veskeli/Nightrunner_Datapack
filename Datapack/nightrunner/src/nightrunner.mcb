@@ -36,7 +36,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 12 Mining skill and Wizard armor!
+    welcome 13 Magic Skill & Magic Rebalance
 }
 #=================================================
 # MARK: Settings
@@ -401,6 +401,7 @@ dir items{
 
         scoreboard objectives add Nightrunner_Mana dummy
         scoreboard objectives add Nightrunner_ManaMax dummy
+        scoreboard objectives add Nightrunner_ManaMaxBase dummy
         scoreboard objectives add Nightrunner_ManaXP xp
         scoreboard objectives add Nightrunner_ManaTemp dummy
 
@@ -412,6 +413,7 @@ dir items{
         scoreboard objectives add Nightrunner_SpellCooldown dummy
         scoreboard objectives add Nightrunner_Weak_Use dummy
     }
+    # MARK: Magic
     function magic_tick minecraft:tick{
         # check if player has xp mana
         execute as @a[scores={Nightrunner_ManaXP=1..}] run block{
@@ -428,6 +430,36 @@ dir items{
             execute if score @s Nightrunner_Mana > @s Nightrunner_ManaMax run scoreboard players operation @s Nightrunner_Mana = @s Nightrunner_ManaMax
         }
     }
+    # TODO: move this
+    function add_mana{
+        # Add mana macro
+        $execute as @s run scoreboard players add @s Nightrunner_Mana $(amount)
+        # clamp mana
+        execute if score @s Nightrunner_Mana > @s Nightrunner_ManaMax run scoreboard players operation @s Nightrunner_Mana = @s Nightrunner_ManaMax
+    }
+    recipe mana_efficiency{
+        "type": "minecraft:crafting_shapeless",
+        "category": "misc",
+        "ingredients": [
+            {
+            "item": "minecraft:emerald"
+            },
+            {
+            "item": "minecraft:book"
+            },
+            {
+            "item": "minecraft:golden_apple"
+            }
+        ],
+        "result": {
+            "id": "minecraft:enchanted_book",
+            "components": {
+            "minecraft:enchantments": {
+                "nightrunner:mana_efficiency": 1
+            }
+            }
+        }
+        }
     dir forge_core{
         # Forge Core: A fundamental component essential for all cauldron crafting recipes
         # Uses music disc mall as a base
@@ -1093,9 +1125,10 @@ dir items{
     dir tools{
         function on_join nightrunner:on_join{
             scoreboard players set @s Nightrunner_RangedSpellRange 50
-            scoreboard players set @s Nightrunner_RangedSpellRangeDefault 50
+            scoreboard players set @s Nightrunner_RangedSpellRangeDefault 35
             scoreboard players set @s Nightrunner_Mana 20
             scoreboard players set @s Nightrunner_ManaMax 20
+            scoreboard players set @s Nightrunner_ManaMaxBase 20
         }
         clock spell_cooldown 0.1s{
             # Cool down the Nightrunner_SpellCooldown
@@ -1116,17 +1149,18 @@ dir items{
 
             # Check the distance
             # TODO: Optimise this
+            # MARK: Check distance for wands
             execute as @a run block check_distance{
                 execute as @s run scoreboard players operation @s Nightrunner_RangedSpellRange = @s Nightrunner_RangedSpellRangeDefault
-                execute as @s if entity @s[nbt={Inventory:[{Slot:100b,id:"minecraft:leather_boots"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
-                execute as @s if entity @s[nbt={Inventory:[{Slot:101b,id:"minecraft:leather_leggings"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
-                execute as @s if entity @s[nbt={Inventory:[{Slot:102b,id:"minecraft:leather_chestplate"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
-                execute as @s if entity @s[nbt={Inventory:[{Slot:103b,id:"minecraft:leather_helmet"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
-                # Wizard armor
-                #execute as @s if entity @s[nbt={Inventory:[{Slot:100b,id:"minecraft:leather_boots"},components:{"minecraft:custom_data":{wizard_boots}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
-                #execute as @s if entity @s[nbt={Inventory:[{Slot:101b,id:"minecraft:leather_leggings"},components:{"minecraft:custom_data":{wizard_leggings}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
-                #execute as @s if entity @s[nbt={Inventory:[{Slot:102b,id:"minecraft:leather_chestplate"},components:{"minecraft:custom_data":{wizard_chestplate}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
-                #execute as @s if entity @s[nbt={Inventory:[{Slot:103b,id:"minecraft:leather_helmet"},components:{"minecraft:custom_data":{wizard_helmet}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 7
+                execute as @s if entity @s[nbt={Inventory:[{Slot:100b,id:"minecraft:leather_boots"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 2
+                execute as @s if entity @s[nbt={Inventory:[{Slot:101b,id:"minecraft:leather_leggings"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 2
+                execute as @s if entity @s[nbt={Inventory:[{Slot:102b,id:"minecraft:leather_chestplate"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 2
+                execute as @s if entity @s[nbt={Inventory:[{Slot:103b,id:"minecraft:leather_helmet"}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 2
+                # Wizard armor @s[nbt={Inventory:[{id:"minecraft:leather_boots",Slot:100b,components:{"minecraft:custom_data":{wizard_boots:1b}}}]}]
+                execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_boots",Slot:100b,components:{"minecraft:custom_data":{wizard_boots:1b}}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 5
+                execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_leggings",Slot:101b,components:{"minecraft:custom_data":{wizard_leggings:1b}}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 5
+                execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_chestplate",Slot:102b,components:{"minecraft:custom_data":{wizard_chestplate:1b}}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 5
+                execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_helmet",Slot:103b,components:{"minecraft:custom_data":{wizard_helmet:1b}}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 5
             }
         }
         function show_cooldown_bar{
@@ -1568,8 +1602,14 @@ dir skills{
     function load minecraft:load{
         # Mining skill trackers
         scoreboard objectives add Nightrunner_MiningSkillPoints dummy
+        scoreboard objectives add Nightrunner_MiningSkillPointsLastUpdate dummy
         scoreboard objectives add Nightrunner_MiningSkillLevel dummy
         scoreboard objectives add Nightrunner_MiningLevelModulus dummy
+        # Magic skill trackers
+        scoreboard objectives add Nightrunner_MagicSkillPoints dummy
+        scoreboard objectives add Nightrunner_MagicSkillPointsLastUpdate dummy
+        scoreboard objectives add Nightrunner_MagicSkillLevel dummy
+        scoreboard objectives add Nightrunner_MagicLevelModulus dummy
     }
     function tick minecraft:tick{
         execute as @a run function ./mining_skill/check
@@ -1620,6 +1660,13 @@ dir skills{
             // Reset all the detection scores
             compiledData += `function ./reset_scores\n`;
 
+            // If player dont have any points on last point update then set it to 0
+            compiledData += `execute unless score @s Nightrunner_MiningSkillPointsLastUpdate matches 0.. run scoreboard players set @s Nightrunner_MiningSkillPointsLastUpdate 0\n`;
+
+            // When player collected new points
+            compiledData += `execute if score @s Nightrunner_MiningSkillPointsLastUpdate < @s Nightrunner_MiningSkillPoints run function ./collected_points\n`;
+
+            // Points to levels
             compiledData += `execute if score @s[scores={Nightrunner_MiningSkillLevel=101..}] Nightrunner_MiningSkillPoints matches 100.. run function ./level_up\n`;
             compiledData += `execute if score @s Nightrunner_MiningSkillLevel matches 101.. run return 1\n`;
             compiledData += `execute if score @s[scores={Nightrunner_MiningSkillLevel=51..}] Nightrunner_MiningSkillPoints matches 20.. run function ./level_up\n`;
@@ -1633,12 +1680,23 @@ dir skills{
             emit.mcb(compiledData);
 
         %%>
+        function collected_points{
+            # Update the last update points
+            scoreboard players operation @s Nightrunner_MiningSkillPointsLastUpdate = @s Nightrunner_MiningSkillPoints
+
+            # If level is more then 100 then add small speed boost
+            execute if score @s Nightrunner_MiningSkillLevel matches 100.. run block{
+                effect give @s minecraft:speed 4 0 true
+            }
+        }
         # MARK: Mining skill Level up
         function level_up{
             # add a level
             scoreboard players add @s Nightrunner_MiningSkillLevel 1
             # reset the points
             scoreboard players reset @s Nightrunner_MiningSkillPoints
+            # reset the last update points
+            scoreboard players set @s Nightrunner_MiningSkillPointsLastUpdate 0
             # play level up sound
             execute at @s run playsound minecraft:entity.player.levelup player @a ~ ~ ~ 0.5 0.8
             # update the player attributes
@@ -1670,6 +1728,15 @@ dir skills{
                 attribute @s minecraft:player.block_interaction_range modifier remove n_mining_skill_milestone_50
             }
 
+            # Milestone lvl 100
+            execute if score @s Nightrunner_MiningSkillLevel matches 100 run block{
+                title @s title {"text":"🎉 Milestone Achieved! 🎉","color":"gold"}
+                title @s subtitle {"text":"Temporary speed boost when mining ore!","color":"green"}
+                title @s times 20 140 20
+                tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
+                tellraw @s [{"text":"You now gain a temporary speed boost when mining ore!","color":"green"}]
+            }
+
             # Milestone lvl 200
             execute if score @s Nightrunner_MiningSkillLevel matches 200 run block{
                 title @s title {"text":"🎉 Milestone Reached! 🎉","color":"gold"}
@@ -1697,6 +1764,78 @@ dir skills{
             attribute @s minecraft:player.mining_efficiency modifier remove n_miningskill
             # Add the mining attributes
             $attribute @s minecraft:player.mining_efficiency modifier add n_miningskill $(amount) add_value
+        }
+    }
+    dir magic_skill{
+        function load minecraft:load{
+            scoreboard objectives add Nightrunner_WizardArmorSetBonus dummy
+        }
+        function check minecraft:tick{
+            # Check if the player used the bell
+            execute as @a if score @s Nightrunner_MagicSkillPoints matches 1.. run block check_magic{
+                # execute the magic skill function
+                function ./collected_points
+
+                # Check level up
+                execute if score @s[scores={Nightrunner_MagicSkillLevel=11..}] Nightrunner_MagicSkillPoints matches 20.. run function ./level_up
+                execute if score @s Nightrunner_MagicSkillLevel matches 11.. run return 1
+                execute if score @s[scores={Nightrunner_MagicSkillLevel=51..}] Nightrunner_MagicSkillPoints matches 50.. run function ./level_up
+                execute if score @s Nightrunner_MagicSkillLevel matches 51.. run return 1
+                execute if score @s[scores={Nightrunner_MagicSkillLevel=101..}] Nightrunner_MagicSkillPoints matches 100.. run function ./level_up
+                execute if score @s Nightrunner_MagicSkillLevel matches 101.. run return 1
+                execute if score @s Nightrunner_MagicSkillPoints matches 10.. run function ./level_up
+
+                # MARK: Check Max mana
+                execute as @a run block mana_check{
+                    # Make sure player has base max mana
+                    execute unless score @s Nightrunner_ManaMaxBase matches 0.. run scoreboard players set @s Nightrunner_ManaMaxBase 20
+
+                    # Add base to max mana
+                    execute as @s run scoreboard players operation @s Nightrunner_ManaMax = @s Nightrunner_ManaMaxBase
+                    # Check wizard armor bonus
+                    execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_boots",Slot:100b,components:{"minecraft:custom_data":{wizard_boots:1b}}}]}] run scoreboard players add @s Nightrunner_ManaMax 5
+                    execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_leggings",Slot:101b,components:{"minecraft:custom_data":{wizard_leggings:1b}}}]}] run scoreboard players add @s Nightrunner_ManaMax 5
+                    execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_chestplate",Slot:102b,components:{"minecraft:custom_data":{wizard_chestplate:1b}}}]}] run scoreboard players add @s Nightrunner_ManaMax 5
+                    execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_helmet",Slot:103b,components:{"minecraft:custom_data":{wizard_helmet:1b}}}]}] run scoreboard players add @s Nightrunner_ManaMax 5
+
+                    # Check wizard armor set bonus
+                    scoreboard players set @s Nightrunner_WizardArmorSetBonus 0
+                    execute if entity @s[nbt={Inventory:[{id:"minecraft:leather_boots",Slot:100b,components:{"minecraft:custom_data":{wizard_boots:1b}}}]}] run scoreboard players add @s Nightrunner_WizardArmorSetBonus 1
+                    execute if entity @s[nbt={Inventory:[{id:"minecraft:leather_leggings",Slot:101b,components:{"minecraft:custom_data":{wizard_leggings:1b}}}]}] run scoreboard players add @s Nightrunner_WizardArmorSetBonus 1
+                    execute if entity @s[nbt={Inventory:[{id:"minecraft:leather_chestplate",Slot:102b,components:{"minecraft:custom_data":{wizard_chestplate:1b}}}]}] run scoreboard players add @s Nightrunner_WizardArmorSetBonus 1
+                    execute if entity @s[nbt={Inventory:[{id:"minecraft:leather_helmet",Slot:103b,components:{"minecraft:custom_data":{wizard_helmet:1b}}}]}] run scoreboard players add @s Nightrunner_WizardArmorSetBonus 1
+
+                    # Apply wizard armor set bonus
+                    execute as @s if score @s Nightrunner_WizardArmorSetBonus matches 4.. run scoreboard players add @s Nightrunner_ManaMax 5
+                }
+            }
+        }
+        clock wizard_armor_mana_regen 60s{
+            execute as @a run execute if score @s Nightrunner_WizardArmorSetBonus matches 4.. run block{
+                function nightrunner:items/add_mana {"amount":1}
+                execute at @s run playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.1 2
+            }
+        }
+        function collected_points{
+        }
+        function level_up{
+            # add a level
+            scoreboard players add @s Nightrunner_MagicSkillLevel 1
+            # reset the points
+            scoreboard players reset @s Nightrunner_MagicSkillPoints
+            # reset the last update points
+            scoreboard players set @s Nightrunner_MagicSkillPointsLastUpdate 0
+            # play level up sound
+            execute at @s run playsound minecraft:entity.player.levelup player @a ~ ~ ~ 0.5 0.8
+            # show level up message
+            tellraw @s [{"text":"Magic Skill Leveled Up! ","color":"green","bold":true,"italic":true},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MagicSkillLevel"}},{"text":"]","color":"yellow"}]
+            # broadcast the magic skill
+            scoreboard players operation @s Nightrunner_MagicLevelModulus = @s Nightrunner_MagicSkillLevel
+            scoreboard players set $Nightrunner Nightrunner_MagicLevelModulus 5
+            scoreboard players operation @s Nightrunner_MagicLevelModulus %= $Nightrunner Nightrunner_MagicLevelModulus
+            execute if score @s Nightrunner_MagicLevelModulus matches 0 run tag @s add broadcaster
+            execute if score @s Nightrunner_MagicLevelModulus matches 0 run tellraw @a[tag=!broadcaster] [{"selector":"@s"},{"text":" has leveled up their Magic Skill! Now at ","color":"green"},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MagicSkillLevel"},"color":"yellow"},{"text":"]","color":"yellow"}]
+            execute if score @s Nightrunner_MagicLevelModulus matches 0 run tag @s remove broadcaster
         }
     }
 }
@@ -1990,6 +2129,7 @@ tag block air{
     minecraft:campfire
     minecraft:soul_campfire
     minecraft:bamboo
+    minecraft:torch
 }
 tag entity_type zombies{
     minecraft:zombie

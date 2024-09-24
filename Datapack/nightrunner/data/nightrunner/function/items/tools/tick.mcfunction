@@ -8,4 +8,5 @@ execute as @a[nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1
 execute as @a[nbt={Inventory:[{id:"minecraft:warped_fungus_on_a_stick",Slot:-106b,components:{"minecraft:custom_data":{wand:1b}}}]}] run function nightrunner:items/tools/show_cooldown_bar
 # Check the distance
 # TODO: Optimise this
+# MARK: Check distance for wands
 execute as @a run function nightrunner:items/tools/check_distance

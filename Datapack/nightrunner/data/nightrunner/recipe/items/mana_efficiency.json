@@ -1,0 +1,1 @@
+{"type": "minecraft:crafting_shapeless","category": "misc","ingredients": [{"item": "minecraft:emerald"},{"item": "minecraft:book"},{"item": "minecraft:golden_apple"}],"result":{"id": "minecraft:enchanted_book","components":{"minecraft:enchantments":{"nightrunner:mana_efficiency": 1}}}}

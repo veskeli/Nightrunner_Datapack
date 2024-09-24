@@ -20,6 +20,8 @@ execute as @s run execute if score @s Nightrunner_MiningSkill_deepslate_lapis_or
 execute as @s run execute if score @s Nightrunner_MiningSkill_deepslate_diamond_ore matches 1.. run scoreboard players add @s Nightrunner_MiningSkillPoints 1
 execute as @s run execute if score @s Nightrunner_MiningSkill_ancient_debris matches 1.. run scoreboard players add @s Nightrunner_MiningSkillPoints 1
 function nightrunner:skills/mining_skill/reset_scores
+execute unless score @s Nightrunner_MiningSkillPointsLastUpdate matches 0.. run scoreboard players set @s Nightrunner_MiningSkillPointsLastUpdate 0
+execute if score @s Nightrunner_MiningSkillPointsLastUpdate < @s Nightrunner_MiningSkillPoints run function nightrunner:skills/mining_skill/collected_points
 execute if score @s[scores={Nightrunner_MiningSkillLevel=101..}] Nightrunner_MiningSkillPoints matches 100.. run function nightrunner:skills/mining_skill/level_up
 execute if score @s Nightrunner_MiningSkillLevel matches 101.. run return 1
 execute if score @s[scores={Nightrunner_MiningSkillLevel=51..}] Nightrunner_MiningSkillPoints matches 20.. run function nightrunner:skills/mining_skill/level_up

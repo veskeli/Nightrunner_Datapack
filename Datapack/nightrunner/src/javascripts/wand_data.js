@@ -138,6 +138,7 @@ for(let i = 0; i < NewWandsArray.length; i++){
     DataArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":3}}}}}] run execute if predicate nightrunner:` + `50change` + ` run return run ` + TakeHalfMana + `\n`);
 
     // Default
+    DataArray.push('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players add @s Nightrunner_MagicSkillPoints 1\n');
     DataArray.push('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana ' + WandData.ManaCost + '\n');
 
     DataArray.push(`}\n`);
@@ -331,7 +332,12 @@ for(let i = 0; i < NewWandsArray.length; i++){
         DataArray.push(`}\n`);
 
         // Deal damage
-        DataArray.push(`damage @s ` + WandData.MainSpell.SpellDamage + ` minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]\n`);
+        DataArray.push(`tag @s add DamagedEntity\n`); // add tag to the entity
+        DataArray.push(`damage @s ` + WandData.MainSpell.SpellDamage + ` minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]\n`); // Damage entity
+        // Check if its dead
+        DataArray.push(`execute if entity @s[nbt={Health:0.0f}] run execute as @a[limit=1,tag=raycasting,sort=nearest] run function nightrunner:items/add_mana {"amount":1}\n`);
+        DataArray.push(`execute if entity @s[nbt={Health:0.0f}] run execute as @a[limit=1,tag=raycasting,sort=nearest] run execute at @s run playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.1 2\n`);
+        DataArray.push(`tag @s remove DamagedEntity\n`); // Remove the tag
         DataArray.push(`playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.4\n`);
         DataArray.push(`effect give @s slowness 1 1 true\n`);
 

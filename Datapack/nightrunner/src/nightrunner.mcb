@@ -36,7 +36,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 13 Magic Skill & Magic Rebalance
+    welcome 14 Magic Rebalance!
 }
 #=================================================
 # MARK: Settings

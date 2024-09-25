@@ -20,6 +20,6 @@ tellraw @a [{"text": " "}]
 tellraw @a {"text":"Nightrunner loaded!","bold":true,"color":"gold"}
 tellraw @a [{"text": " "}]
 tellraw @a [{"text": " "}]
-tellraw @a ["",{"text":"Magic Skill & Magic Rebalance","color":"aqua"},{"text":" update"}]
-tellraw @a ["",{"text":"(Build "},{"text":"13","underlined":true,"color":"yellow"},{"text":")"}]
+tellraw @a ["",{"text":"Magic Rebalance!","color":"aqua"},{"text":" update"}]
+tellraw @a ["",{"text":"(Build "},{"text":"14","underlined":true,"color":"yellow"},{"text":")"}]
 tellraw @a [{"text": " "}]

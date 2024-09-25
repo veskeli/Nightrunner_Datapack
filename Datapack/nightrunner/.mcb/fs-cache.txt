@@ -1,4 +1,4 @@
-data/nightrunner/function/on_load.mcfunction:5ce2428234f3c63f0593a648f89e5dba1a21d03e
+data/nightrunner/function/on_load.mcfunction:bf0a417b859eadbc3317412ff73cc7a1f312fc0f
 data/nightrunner/function/settings/load.mcfunction:22e576b546dce0370e3f7bd0ac2f45a7bfacaa8a
 data/nightrunner/function/settings/first_time.mcfunction:955a9edfd29f4de2c250269b4ed5022c8c764fcf
 data/nightrunner/function/settings/settings.mcfunction:d9bdc1aab03555067276fa5f423a2bcdac1c174a

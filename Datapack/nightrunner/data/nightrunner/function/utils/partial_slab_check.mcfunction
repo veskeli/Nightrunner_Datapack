@@ -2,7 +2,6 @@
 
 # If double slab then return
 execute if block ~ ~ ~ #minecraft:slabs[type=double] run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
-scoreboard players set #100 nightrunner.internal 100
 execute store result score .y nightrunner.internal run data get entity @s Pos[1] 100
 scoreboard players operation .y nightrunner.internal %= #100 nightrunner.internal
 # If the block is a top slab

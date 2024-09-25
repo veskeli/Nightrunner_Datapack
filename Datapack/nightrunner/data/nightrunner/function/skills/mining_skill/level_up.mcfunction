@@ -11,7 +11,7 @@ execute at @s run playsound minecraft:entity.player.levelup player @a ~ ~ ~ 0.5 
 # update the player attributes
 execute as @s run function nightrunner:skills/mining_skill/set_mining_skill_attributes
 # show level up message
-tellraw @s [{"text":"Mining Skill Leveled Up! ","color":"green","bold":true,"italic":true},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MiningSkillLevel"}},{"text":"]","color":"yellow"}]
+tellraw @s [{"text":"⚒ Mining Skill Leveled Up! ","color":"green","bold":true,"italic":true},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MiningSkillLevel"}},{"text":"]","color":"yellow"}]
 # broadcast the mining skill
 scoreboard players operation @s Nightrunner_MiningLevelModulus = @s Nightrunner_MiningSkillLevel
 scoreboard players set $Nightrunner Nightrunner_MiningLevelModulus 5

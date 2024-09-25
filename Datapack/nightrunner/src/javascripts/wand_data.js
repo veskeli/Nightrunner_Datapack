@@ -61,14 +61,6 @@ for(let i = 0; i < NewWandsArray.length; i++){
 
         // Set spell range
         DataArray.push(`execute as @s run scoreboard players operation $Nightrunner Nightrunner_Item_Ray_steps = @s Nightrunner_RangedSpellRange\n`);
-        let LeatherArmor = ['leather_boots', 'leather_leggings', 'leather_chestplate', 'leather_helmet'];
-        let RangeAddAmount = 15;
-        for(let i = 0; i < LeatherArmor.length; i++)
-        {
-            //DataArray.push('execute as @s if entity @s[nbt={Inventory:[{Slot:' + (100 + i) + 'b,id:"minecraft:' + LeatherArmor[i] + '"}]}] run scoreboard players add $Nightrunner Nightrunner_RangedSpellRange ' + RangeAddAmount + '\n');
-        }
-        // tell spell range
-        // DataArray.push(`tellraw @s [{"text":"Spell range: ","color":"aqua"},{"score":{"name":"$Nightrunner","objective":"Nightrunner_RangedSpellRange"}}]\n`);
 
         // Reset effect cooldown
         DataArray.push(`scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown\n`);
@@ -137,15 +129,6 @@ for(let i = 0; i < NewWandsArray.length; i++){
     // Mana efficiency 3
     DataArray.push(`execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..},nbt={SelectedItem:{id:"minecraft:warped_fungus_on_a_stick",count:1,components:{"minecraft:custom_data":{wand:true},"minecraft:enchantments":{levels:{"nightrunner:mana_efficiency":3}}}}}] run execute if predicate nightrunner:` + `50change` + ` run return run ` + TakeHalfMana + `\n`);
 
-    // Magic skill points
-    if(WandData.MainSpell.Name == "Damage")
-    {
-        DataArray.push('execute if predicate nightrunner:50change run execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players add @s Nightrunner_MagicSkillPoints 1\n');
-    }
-    else
-    {
-        DataArray.push('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players add @s Nightrunner_MagicSkillPoints 1\n');
-    }
     // Default
     DataArray.push('execute as @s[gamemode=!creative,scores={Nightrunner_Mana=1..}] run scoreboard players remove @s Nightrunner_Mana ' + WandData.ManaCost + '\n');
 
@@ -338,19 +321,22 @@ for(let i = 0; i < NewWandsArray.length; i++){
         DataArray.push(`damage @s ` + halfDamage + ` minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]\n`);
         DataArray.push(`playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.1\n`);
         DataArray.push(`effect give @s slowness 1 1 true\n`);
-        // Magic skill points. Only 50% of the time if no mana was used
-        DataArray.push('execute if predicate nightrunner:50change run execute as @a[limit=1,tag=raycasting,sort=nearest,gamemode=!creative] run scoreboard players add @s Nightrunner_MagicSkillPoints 1\n');
-        DataArray.push(`}\n`);
 
+        // Magic skill points. if no mana was used
+        let halfDamageSkillPoints = Math.floor(halfDamage);
+        DataArray.push('execute as @a[limit=1,tag=raycasting,sort=nearest,gamemode=!creative] run scoreboard players add @s Nightrunner_MagicSkillPoints ' + halfDamageSkillPoints + '\n');
+        DataArray.push(`}\n`);
         // If mana was used, add skill point
-        DataArray.push('execute as @a[limit=1,tag=raycasting,sort=nearest,gamemode=!creative] run scoreboard players add @s Nightrunner_MagicSkillPoints 1\n');
+        DataArray.push('execute as @a[limit=1,tag=raycasting,sort=nearest,gamemode=!creative] run scoreboard players add @s Nightrunner_MagicSkillPoints ' + WandData.MainSpell.SpellDamage + '\n');
+
         // Deal damage
-        DataArray.push(`tag @s add DamagedEntity\n`); // add tag to the entity
         DataArray.push(`damage @s ` + WandData.MainSpell.SpellDamage + ` minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]\n`); // Damage entity
         // Check if its dead
-        DataArray.push(`execute if entity @s[nbt={Health:0.0f}] run execute as @a[limit=1,tag=raycasting,sort=nearest] run function nightrunner:items/add_mana {"amount":1}\n`);
-        DataArray.push(`execute if entity @s[nbt={Health:0.0f}] run execute as @a[limit=1,tag=raycasting,sort=nearest] run execute at @s run playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.1 2\n`);
-        DataArray.push(`tag @s remove DamagedEntity\n`); // Remove the tag
+        DataArray.push(`execute if entity @s[nbt={Health:0.0f}] run execute as @a[limit=1,tag=raycasting,sort=nearest] run block entity_died_from_damage{\n`);
+        //DataArray.push(`function nightrunner:items/add_mana {"amount":1}\n`);
+        //DataArray.push(`execute at @s run playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.1 2\n`);
+        DataArray.push('scoreboard players add @s Nightrunner_MagicSkillPoints 20\n'); // Add skill points on kill
+        DataArray.push(`}\n`);
         DataArray.push(`playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.4\n`);
         DataArray.push(`effect give @s slowness 1 1 true\n`);
 
@@ -388,6 +374,10 @@ for(let i = 0; i < NewWandsArray.length; i++){
 
         // Mana cost
         DataArray.push(`function ./check_mana\n`);
+
+        // Skill points
+        let sentrySkillPoints = WandData.Sentry.ConcurrentAttacks * 4;
+        DataArray.push('execute as @a[limit=1,tag=raycasting,sort=nearest,gamemode=!creative] run scoreboard players add @s Nightrunner_MagicSkillPoints ' + sentrySkillPoints + '\n');
 
         // Add sentry cooldown
         DataArray.push(`scoreboard players set @s[gamemode=survival] Nightrunner_SentryCooldown 600\n`); // TODO: Remove hard coded value

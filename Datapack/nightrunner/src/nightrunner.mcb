@@ -419,13 +419,20 @@ dir items{
         execute as @a[scores={Nightrunner_ManaXP=1..}] run block{
             # reset mana xp
             scoreboard players operation @s Nightrunner_ManaTemp += @s Nightrunner_ManaXP
-            scoreboard players reset @s Nightrunner_ManaXP
-
-            execute if score @s Nightrunner_ManaTemp matches 100.. run block{
-                scoreboard players remove @s Nightrunner_ManaTemp 100
-                scoreboard players add @s Nightrunner_Mana 1
+            # if we got mana/xp then give retaliation points to nearby players (if we stole someones mana)
+            scoreboard players set #2 Nightrunner_ManaTemp 2
+            scoreboard players operation .retaliation Nightrunner_ManaTemp = @s Nightrunner_ManaXP
+            scoreboard players operation .retaliation Nightrunner_ManaTemp /= #2 Nightrunner_ManaTemp
+            execute as @s at @s run execute as @a[distance=..35,scores={Nightrunner_MagicSkillLevel=20..}] run block{
+                scoreboard players operation @s Nightrunner_ManaTemp += .retaliation Nightrunner_ManaTemp
             }
 
+            scoreboard players reset @s Nightrunner_ManaXP
+
+        }
+        execute as @a run execute if score @s Nightrunner_ManaTemp matches 250.. run block{
+            scoreboard players remove @s Nightrunner_ManaTemp 250
+            scoreboard players add @s Nightrunner_Mana 1
             # clamp mana
             execute if score @s Nightrunner_Mana > @s Nightrunner_ManaMax run scoreboard players operation @s Nightrunner_Mana = @s Nightrunner_ManaMax
         }
@@ -611,16 +618,19 @@ dir items{
             recipe heartfruit_plus{
                 "type": "minecraft:crafting_shaped",
                 "pattern": [
-                    " i ",
+                    " x ",
                     "iSi",
                     " i "
                 ],
                 "key": {
                     "i": {
-                        "item": "minecraft:gold_ingot"
+                        "item": "minecraft:copper_ingot"
                     },
                     "S": {
                         "item": "minecraft:potato"
+                    },
+                    "x": {
+                        "item": "minecraft:gold_nugget"
                     }
                 },
                 "result": {
@@ -1470,12 +1480,6 @@ dir testing{
             summon zombie ~ ~ ~ {Tags:["hometest"]}
         }
     }
-    function set_health_manual{
-        # Update the max health score
-        scoreboard players set @s Nightrunner_MaxHealth ${max_health}
-        # Update the max health attribute
-        attribute @s minecraft:generic.max_health base set ${max_health}
-    }
 }
 #=================================================
 # MARK: Mobs
@@ -1614,6 +1618,27 @@ dir skills{
     function tick minecraft:tick{
         execute as @a run function ./mining_skill/check
     }
+    function print_skills{
+        execute as @a run block print_my_skills{
+            # Mining Skill Level
+            tellraw @s [{"text":"⚒ Mining Skill Level: ","color":"green","bold":true},{"score":{"name":"@s","objective":"Nightrunner_MiningSkillLevel"},"color":"yellow","bold":true}]
+
+            # Mining Milestone Bonuses
+            tellraw @s [{"text":"Mining Milestone Bonuses:","color":"gold"}]
+            execute if score @s Nightrunner_MiningSkillLevel matches 50.. run tellraw @s [{"text":"- Reach distance increased by +0.25 blocks (Level 50)","color":"yellow"}]
+            execute if score @s Nightrunner_MiningSkillLevel matches 100.. run tellraw @s [{"text":"- Temporary speed boost when mining ore (Level 100)","color":"yellow"}]
+            execute if score @s Nightrunner_MiningSkillLevel matches 125.. run tellraw @s [{"text":"- 10% chance for temporary heart when mining ore (Level 125)","color":"yellow"}]
+            execute if score @s Nightrunner_MiningSkillLevel matches 200.. run tellraw @s [{"text":"- Reach distance +0.25 blocks & enchant with grindstone (Level 200)","color":"yellow"}]
+
+            # Magic Skill Level
+            tellraw @s [{"text":"✨ Magic Skill Level: ","color":"light_purple","bold":true},{"score":{"name":"@s","objective":"Nightrunner_MagicSkillLevel"},"color":"yellow","bold":true}]
+
+            # Magic Milestone Bonuses
+            tellraw @s [{"text":"Magic Milestone Bonuses:","color":"gold"}]
+            execute if score @s Nightrunner_MagicSkillLevel matches 20.. run tellraw @s [{"text":"- Receive half mana when nearby players pick it up (Level 20)","color":"yellow"}]
+
+        }
+    }
     dir mining_skill{
         <%%
             let compiledData = "";
@@ -1706,7 +1731,7 @@ dir skills{
             # update the player attributes
             execute as @s run function ./set_mining_skill_attributes
             # show level up message
-            tellraw @s [{"text":"Mining Skill Leveled Up! ","color":"green","bold":true,"italic":true},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MiningSkillLevel"}},{"text":"]","color":"yellow"}]
+            tellraw @s [{"text":"⚒ Mining Skill Leveled Up! ","color":"green","bold":true,"italic":true},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MiningSkillLevel"}},{"text":"]","color":"yellow"}]
             # broadcast the mining skill
             scoreboard players operation @s Nightrunner_MiningLevelModulus = @s Nightrunner_MiningSkillLevel
             scoreboard players set $Nightrunner Nightrunner_MiningLevelModulus 5
@@ -1718,14 +1743,14 @@ dir skills{
             # Milestone lvl 50
             execute if score @s Nightrunner_MiningSkillLevel matches 50 run block{
                 title @s title {"text":"🎉 Milestone Achieved! 🎉","color":"gold"}
-                title @s subtitle {"text":"+0.5 blocks reach distance!","color":"green"}
+                title @s subtitle {"text":"+0.25 blocks reach distance!","color":"green"}
                 title @s times 20 140 20
                 tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
-                tellraw @s [{"text":"+0.5 block reach distance","color":"green"}]
+                tellraw @s [{"text":"+0.25 block reach distance","color":"green"}]
             }
             # Update attributes if milestone is reached (If player gets the level or higher)
             execute if score @s Nightrunner_MiningSkillLevel matches 50.. run block{
-                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_50 0.5 add_value
+                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_50 0.25 add_value
             }
             # Update attributes if milestone is not reached (If player loses the level)
             execute if score @s Nightrunner_MiningSkillLevel matches ..49 run block{
@@ -1753,15 +1778,15 @@ dir skills{
             # Milestone lvl 200
             execute if score @s Nightrunner_MiningSkillLevel matches 200 run block{
                 title @s title {"text":"🎉 Milestone Reached! 🎉","color":"gold"}
-                title @s subtitle {"text":"+0.5 blocks reach distance & enchant tools with grindstone!","color":"green"}
+                title @s subtitle {"text":"+0.25 blocks reach distance & enchant tools with grindstone!","color":"green"}
                 title @s times 20 140 20
                 tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
-                tellraw @s [{"text":"+0.5 block reach distance","color":"green"}]
+                tellraw @s [{"text":"+0.25 block reach distance","color":"green"}]
                 tellraw @s [{"text":"You can enchant tools using a grindstone!","color":"green"}]
             }
             # Update attributes if milestone is reached (If player gets the level or higher)
             execute if score @s Nightrunner_MiningSkillLevel matches 200.. run block{
-                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_200 0.5 add_value
+                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_200 0.25 add_value
             }
             # Update attributes if milestone is not reached (If player loses the level)
             execute if score @s Nightrunner_MiningSkillLevel matches ..199 run block{
@@ -1790,13 +1815,13 @@ dir skills{
                 function ./collected_points
 
                 # Check level up
-                execute if score @s[scores={Nightrunner_MagicSkillLevel=11..}] Nightrunner_MagicSkillPoints matches 20.. run function ./level_up
+                execute if score @s[scores={Nightrunner_MagicSkillLevel=11..}] Nightrunner_MagicSkillPoints matches 120.. run function ./level_up
                 execute if score @s Nightrunner_MagicSkillLevel matches 11.. run return 1
-                execute if score @s[scores={Nightrunner_MagicSkillLevel=51..}] Nightrunner_MagicSkillPoints matches 50.. run function ./level_up
+                execute if score @s[scores={Nightrunner_MagicSkillLevel=51..}] Nightrunner_MagicSkillPoints matches 250.. run function ./level_up
                 execute if score @s Nightrunner_MagicSkillLevel matches 51.. run return 1
-                execute if score @s[scores={Nightrunner_MagicSkillLevel=101..}] Nightrunner_MagicSkillPoints matches 100.. run function ./level_up
+                execute if score @s[scores={Nightrunner_MagicSkillLevel=101..}] Nightrunner_MagicSkillPoints matches 400.. run function ./level_up
                 execute if score @s Nightrunner_MagicSkillLevel matches 101.. run return 1
-                execute if score @s Nightrunner_MagicSkillPoints matches 10.. run function ./level_up
+                execute if score @s Nightrunner_MagicSkillPoints matches 50.. run function ./level_up
 
                 # MARK: Check Max mana
                 execute as @a run block mana_check{
@@ -1841,7 +1866,7 @@ dir skills{
             # play level up sound
             execute at @s run playsound minecraft:entity.player.levelup player @a ~ ~ ~ 0.5 0.8
             # show level up message
-            tellraw @s [{"text":"Magic Skill Leveled Up! ","color":"green","bold":true,"italic":true},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MagicSkillLevel"}},{"text":"]","color":"yellow"}]
+            tellraw @s [{"text":"✨ Magic Skill Leveled Up! ","color":"light_purple","bold":true,"italic":true},{"text":"[Lvl ","color":"aqua"},{"score":{"name":"@s","objective":"Nightrunner_MagicSkillLevel"}},{"text":"]","color":"aqua"}]
             # broadcast the magic skill
             scoreboard players operation @s Nightrunner_MagicLevelModulus = @s Nightrunner_MagicSkillLevel
             scoreboard players set $Nightrunner Nightrunner_MagicLevelModulus 5
@@ -1849,6 +1874,15 @@ dir skills{
             execute if score @s Nightrunner_MagicLevelModulus matches 0 run tag @s add broadcaster
             execute if score @s Nightrunner_MagicLevelModulus matches 0 run tellraw @a[tag=!broadcaster] [{"selector":"@s"},{"text":" has leveled up their Magic Skill! Now at ","color":"green"},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MagicSkillLevel"},"color":"yellow"},{"text":"]","color":"yellow"}]
             execute if score @s Nightrunner_MagicLevelModulus matches 0 run tag @s remove broadcaster
+
+            # Milestone lvl 20
+            execute if score @s Nightrunner_MagicSkillLevel matches 20 run block{
+                title @s title {"text":"🎉 Milestone Achieved! 🎉","color":"gold"}
+                title @s subtitle {"text":"When a nearby player picks up mana, you receive half of it!","color":"light_purple"}
+                title @s times 20 140 20
+                tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
+                tellraw @s [{"text":"When a nearby player picks up mana, you receive half of it!","color":"light_purple"}]
+            }
         }
     }
 }
@@ -1945,6 +1979,12 @@ dir utils{
         scoreboard players set .z nightrunner.internal 100
         scoreboard players operation .x nightrunner.internal = #z nightrunner.internal
         scoreboard players operation .z nightrunner.internal -= #x nightrunner.internal
+    }
+    function set_health_manual{
+        # Update the max health score
+        $scoreboard players set @s Nightrunner_MaxHealth $(max_health)
+        # Update the max health attribute
+        $attribute @s minecraft:generic.max_health base set $(max_health)
     }
 }
 #=================================================
@@ -2250,6 +2290,7 @@ tag block air{
     minecraft:melon_stem
     minecraft:pumpkin_stem
     #minecraft:trapdoors
+    minecraft:cobweb
     #nightrunner:partial
 }
 tag block partial{

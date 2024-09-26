@@ -19,6 +19,12 @@ for(let i = 0; i < NewWandsArray.length; i++){
         // Reset Nightrunner Mana
         DataArray.push('scoreboard players reset $Nightrunner Nightrunner_Mana\n');
 
+        // Check if wand uses confirmation
+        if(WandData.SpellConfirmation == true)
+        {
+            DataArray.push('execute as @s run execute if score @s ' + WandData.SpellConfirmationScoreboard + ' matches 1 run return run function ./spell_confirmation\n');
+        }
+
         // Check if cooldown is active
         DataArray.push('execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1\n')
 
@@ -61,6 +67,11 @@ for(let i = 0; i < NewWandsArray.length; i++){
 
         // Set spell range
         DataArray.push(`execute as @s run scoreboard players operation $Nightrunner Nightrunner_Item_Ray_steps = @s Nightrunner_RangedSpellRange\n`);
+        if(WandData.SpellDistanceMultiplier != 1)
+        {
+            DataArray.push(`scoreboard players set #operation Nightrunner_Item_Ray_steps ` + WandData.SpellDistanceMultiplier + `\n`);
+            DataArray.push(`scoreboard players operation $Nightrunner Nightrunner_Item_Ray_steps *= #operation Nightrunner_Item_Ray_steps\n`);
+        }
 
         // Reset effect cooldown
         DataArray.push(`scoreboard players reset $NightrunnerCooldown Nightrunner_EffectCooldown\n`);
@@ -115,6 +126,10 @@ for(let i = 0; i < NewWandsArray.length; i++){
     //=================================================
     // Reduce mana (not in creative mode)
     DataArray.push(`function check_mana{\n`);
+
+    // If the mana is over max mana limit clamp it
+    DataArray.push(`execute if score @s Nightrunner_Mana > @s Nightrunner_ManaMax run scoreboard players operation @s Nightrunner_Mana = @s Nightrunner_ManaMax\n`);
+
     let halfMana = Math.floor(WandData.ManaCost / 2);
     if(halfMana < 1) halfMana = 0; // Prevent negative mana cost
     let TakeHalfMana = `scoreboard players remove @s Nightrunner_Mana ` + halfMana;
@@ -348,7 +363,7 @@ for(let i = 0; i < NewWandsArray.length; i++){
     // MARK: Summon Sentry
     //=================================================
 
-    if(WandData.Sentry.Namespace != "Null")
+    if(WandData.Sentry.Namespace != "null")
     {
         // I: Summon sentry
         DataArray.push(`function summon_sentry{\n`);
@@ -430,9 +445,12 @@ for(let i = 0; i < NewWandsArray.length; i++){
         DataArray.push(`}\n`);
 
         // I: hit block
-        DataArray.push(`function hit_block{\n`);
-        DataArray.push(`function ./summon_sentry\n`);
-        DataArray.push(`}\n`);
+        if(WandData.MainSpell.Name == "Summon Sentry")
+        {
+            DataArray.push(`function hit_block{\n`);
+            DataArray.push(`function ./summon_sentry\n`);
+            DataArray.push(`}\n`);
+        }
     }
     //=================================================
     // MARK: Heal Spell

@@ -96,11 +96,7 @@ const spells = {
         Name: "Raycast",
         HitType: HitType.ALL,
         Lore: [
-            [{"text": "Spell: ","color": "light_purple"}, {"text": "Raycast","color": "gold"}],
-            [{"text": "Damage: ","color": "dark_green"}, {"text": "1","color": "dark_aqua"}],
-            [{"text": "Mana cost: ","color": "dark_green"}, {"text": "1","color": "dark_aqua"}],
-            [{"text": "Cooldown: ","color": "dark_green"}, {"text": "8","color": "dark_aqua"}],
-            [{"text": "(Can be cast for half damage if out of mana.)","color": "gray"}]
+            [{"text": "","color": "light_purple"}, {"text": "","color": "gold"}]
         ],
     },
     SummonSentry: {
@@ -189,7 +185,7 @@ const Custom_attributes = {
 let DefaultSentryCost = 15;
 const Sentries = {
     null_sentry: {
-        Namespace: "Null",
+        Namespace: "null",
         Lifetime: 0,
         Target: "player",
         Distance: 0,
@@ -296,6 +292,9 @@ const defaultValues = {
     MainSpell: {
         // Default spell
     },
+    SpellDistanceMultiplier: 1,
+    SpellConfirmation: false,
+    SpellConfirmationScoreboard: "null",
     SecondarySpell: {},
     Sentry: Sentries.null_sentry,
     compiledData: ""
@@ -421,7 +420,7 @@ NewWandsArray.push(diamond_wand);
 //=================================================
 // MARK: Staffs
 //=================================================
-let wooden_staff = {
+let wooden_staff = createWand({
     Name: "Wooden Staff",
     Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"15"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Summon sentry"}]','[{"color":"dark_green","text":"Sentry attack: "},{"color":"dark_aqua","text":"Evoker Fang"}]','[{"color":"dark_green","text":"Evoker fang damage: "},{"color":"dark_aqua","text":"6"}]','[{"color":"dark_green","text":"Concurrent attacks: "},{"color":"dark_aqua","text":"1"}]','""','{"color":"gray","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":"2 Attack Damage"}','{"color":"dark_green","italic":false,"text":"1.5 Attack Speed"}','""'`,
@@ -453,10 +452,10 @@ let wooden_staff = {
     },
     Sentry: Sentries.wooden_sentry,
     compiledData: ""
-};
+});
 NewWandsArray.push(wooden_staff);
 
-let stone_staff = {
+let stone_staff = createWand({
     Name: "Stone Staff",
     Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"15"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Summon sentry"}]','[{"color":"dark_green","text":"Sentry attack: "},{"color":"dark_aqua","text":"Evoker Fang"}]','[{"color":"dark_green","text":"Evoker fang damage: "},{"color":"dark_aqua","text":"6"}]','[{"color":"dark_green","text":"Concurrent attacks: "},{"color":"dark_aqua","text":"2"}]','""','{"color":"gray","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":"3 Attack Damage"}','{"color":"dark_green","italic":false,"text":"1.5 Attack Speed"}','""'`,
@@ -491,9 +490,9 @@ let stone_staff = {
     },
     Sentry: Sentries.stone_sentry,
     compiledData: ""
-};
+});
 NewWandsArray.push(stone_staff);
-let iron_staff = {
+let iron_staff = createWand({
     Name: "Iron Staff",
     Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"15"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Summon sentry"}]','[{"color":"dark_green","text":"Sentry attack: "},{"color":"dark_aqua","text":"Evoker Fang"}]','[{"color":"dark_green","text":"Evoker fang damage: "},{"color":"dark_aqua","text":"6"}]','[{"color":"dark_green","text":"Concurrent attacks: "},{"color":"dark_aqua","text":"3"}]','""','{"color":"gray","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":"4 Attack Damage"}','{"color":"dark_green","italic":false,"text":"1.5 Attack Speed"}','""'`,
@@ -528,10 +527,10 @@ let iron_staff = {
     },
     Sentry: Sentries.iron_sentry,
     compiledData: ""
-};
+});
 NewWandsArray.push(iron_staff);
 
-let golden_staff = {
+let golden_staff = createWand({
     Name: "Golden Staff",
     Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"15"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Summon sentry"}]','[{"color":"dark_green","text":"Sentry attack: "},{"color":"dark_aqua","text":"Evoker Fang"}]','[{"color":"dark_green","text":"Evoker fang damage: "},{"color":"dark_aqua","text":"6"}]','[{"color":"dark_green","text":"Concurrent attacks: "},{"color":"dark_aqua","text":"5"}]','""','{"color":"gray","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":"3 Attack Damage"}','{"color":"dark_green","italic":false,"text":"1.5 Attack Speed"}','""'`,
@@ -566,10 +565,10 @@ let golden_staff = {
     },
     Sentry: Sentries.golden_sentry,
     compiledData: ""
-};
+});
 NewWandsArray.push(golden_staff);
 
-let diamond_staff = {
+let diamond_staff = createWand({
     Name: "Diamond Staff",
     Color: "white",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"15"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Summon sentry"}]','[{"color":"dark_green","text":"Sentry attack: "},{"color":"dark_aqua","text":"Evoker Fang"}]','[{"color":"dark_green","text":"Evoker fang damage: "},{"color":"dark_aqua","text":"6"}]','[{"color":"dark_green","text":"Concurrent attacks: "},{"color":"dark_aqua","text":"4"}]','""','{"color":"gray","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":"5 Attack Damage"}','{"color":"dark_green","italic":false,"text":"1.5 Attack Speed"}','""'`,
@@ -604,7 +603,85 @@ let diamond_staff = {
     },
     Sentry: Sentries.diamond_sentry,
     compiledData: ""
-};
+});
 NewWandsArray.push(diamond_staff);
+// MARK: Support wands
+let boulder_wand = createWand({
+    Name: "Boulder Wand",
+    Color: "white",
+    Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"15"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Summon sentry"}]','[{"color":"dark_green","text":"Sentry attack: "},{"color":"dark_aqua","text":"Evoker Fang"}]','[{"color":"dark_green","text":"Evoker fang damage: "},{"color":"dark_aqua","text":"6"}]','[{"color":"dark_green","text":"Concurrent attacks: "},{"color":"dark_aqua","text":"1"}]','""','{"color":"gray","italic":false,"text":"When in Main Hand:"}','{"color":"dark_green","italic":false,"text":"2 Attack Damage"}','{"color":"dark_green","italic":false,"text":"1.5 Attack Speed"}','""'`,
+    Cooldown: 8,
+    Particle: "minecraft:wax_on",
+    CustomModelData: 11211,
+    Durability: 1059,
+    Namespace: "boulder_wand",
+    UseRecipe: false,
+    RecipePattern: ["  y", " i ", "i  "],
+    RecipeKey: {
+        "i": {
+            "item": "minecraft:stick"
+        },
+        "y": {
+            "item": "minecraft:cobblestone"
+        }
+    },
+    ManaCost: 2,
+    ConsumeManaOnCast: false,
+    Attributes: {
+        ...Custom_attributes,
+        Use: true,
+        GiveLiteral: `,attribute_modifiers={modifiers:[{id:"attack_damage",type:"generic.attack_damage",amount:1,operation:"add_value",slot:"mainhand"},{id:"attack_speed",type:"generic.attack_speed",amount:-2.5,operation:"add_value",slot:"mainhand"}],show_in_tooltip:false}`,
+        RecipeLiteral: `,"attribute_modifiers":{"modifiers":[{"id":"attack_damage","type":"generic.attack_damage","amount":1,"operation":"add_value","slot":"mainhand"},{"id":"attack_speed","type":"generic.attack_speed","amount":-2.5,"operation":"add_value","slot":"mainhand"}],"show_in_tooltip":false}`
+    },
+    MainSpell: {
+        ...spells.Raycast,
+    },
+    SecondarySpell: {
+        ...spells.Raycast,
+    },
+    SpellDistanceMultiplier: 3,
+    compiledData: ""
+});
+NewWandsArray.push(boulder_wand);
+// Pearl wand
+let pearl_wand = createWand({
+    Name: "Pearl Wand",
+    Color: "aqua",
+    Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"5"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Teleport to location you can see"}]','[{"color":"light_purple","text":"Range: "},{"color":"gold","text":"3x"}]','""'`,
+    Cooldown: 8,
+    Particle: "minecraft:wax_on",
+    CustomModelData: 1122,
+    Durability: 1059,
+    Namespace: "pearl_wand",
+    UseRecipe: true,
+    RecipePattern: ["  y", " i ", "i  "],
+    RecipeKey: {
+        "i": {
+            "item": "minecraft:stick"
+        },
+        "y": {
+            "item": "minecraft:ender_pearl"
+        }
+    },
+    ManaCost: 5,
+    ConsumeManaOnCast: false,
+    Attributes: {
+        ...Custom_attributes,
+        Use: true,
+        GiveLiteral: ``,
+        RecipeLiteral: ``
+    },
+    MainSpell: {
+        ...spells.Raycast,
+    },
+    SecondarySpell: {
+        ...spells.Raycast,
+    },
+    SpellDistanceMultiplier: 3,
+    SpellConfirmation: true,
+    SpellConfirmationScoreboard: "Nightrunner_PearlWandWaitingForTeleport",
+    compiledData: ""
+});
+NewWandsArray.push(pearl_wand);
 
 module.exports = { NewWandsArray, HitType, spells, Custom_attributes };

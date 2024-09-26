@@ -10,3 +10,9 @@ execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_boots",Slot:10
 execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_leggings",Slot:101b,components:{"minecraft:custom_data":{wizard_leggings:1b}}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 5
 execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_chestplate",Slot:102b,components:{"minecraft:custom_data":{wizard_chestplate:1b}}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 5
 execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_helmet",Slot:103b,components:{"minecraft:custom_data":{wizard_helmet:1b}}}]}] run scoreboard players add @s Nightrunner_RangedSpellRange 5
+# Every 5 levels of magic skill raise the range by 1
+scoreboard players set #5 Nightrunner_MagicSkillLevel 5
+execute as @s run scoreboard players operation #operation Nightrunner_RangedSpellRange = @s Nightrunner_MagicSkillLevel
+execute as @s run scoreboard players operation #operation Nightrunner_RangedSpellRange /= #5 Nightrunner_MagicSkillLevel
+# Add the result to the range
+execute as @s run scoreboard players operation @s Nightrunner_RangedSpellRange += #operation Nightrunner_RangedSpellRange

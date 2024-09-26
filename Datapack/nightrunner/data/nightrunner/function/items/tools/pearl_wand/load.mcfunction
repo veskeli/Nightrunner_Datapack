@@ -1,0 +1,5 @@
+# Generated with MC-Build
+
+scoreboard objectives add Nightrunner_PearlWandMarkerTimer dummy
+scoreboard objectives add Nightrunner_PearlWandWaitingForTeleport dummy
+scoreboard objectives add Nightrunner_PearlWandID dummy

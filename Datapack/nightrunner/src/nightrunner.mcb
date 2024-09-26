@@ -1329,6 +1329,42 @@ dir items{
                 emit.mcb(WandsArray[i].compiledData);
             }
         %%>
+
+
+        # MARK: Glider
+        dir gliders{
+            function glide{
+                effect give @s[nbt={OnGround:0b}] minecraft:slow_falling 1 0 true
+            }
+            recipe glider{
+                "type": "minecraft:crafting_shapeless",
+                "ingredients": [
+                    {
+                    "item": "minecraft:paper"
+                    },
+                    {
+                    "item": "minecraft:leather_helmet"
+                    },
+                    {
+                    "item": "minecraft:leather"
+                    }
+                ],
+                "result": {
+                    "id": "minecraft:poisonous_potato",
+                    "count": 1,
+                    "components":{
+                        "item_name":"[{\"text\":\"Basic Glider\",\"italic\":false}]",
+                        "lore": ["{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                        "minecraft:custom_data": {
+                            "basic_glider": true
+                        },
+                        "minecraft:enchantments": {
+                            "nightrunner:gliding": 1
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 #=================================================
@@ -2560,6 +2596,37 @@ enchantment damage_item_on_attack{
         "effect": {
           "type": "minecraft:summon_entity",
           "entity": "minecraft:boat"
+        }
+      }
+    ]
+  }
+}
+enchantment gliding{
+  "description": "Gliding",
+  "supported_items": [
+    "minecraft:poisonous_potato"
+  ],
+  "weight": 1,
+  "max_level": 1,
+  "min_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "max_cost": {
+    "base": 0,
+    "per_level_above_first": 0
+  },
+  "anvil_cost": 0,
+  "slots": [
+    "mainhand",
+    "offhand"
+  ],
+  "effects": {
+    "minecraft:tick": [
+      {
+        "effect": {
+          "type": "minecraft:run_function",
+          "function": "nightrunner:items/tools/gliders/glide"
         }
       }
     ]

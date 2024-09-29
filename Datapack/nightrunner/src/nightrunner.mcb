@@ -347,7 +347,6 @@ dir crafting{
             # Check if the player placed a lectern
             execute as @a[scores={Nightrunner_enchanting_tableUpgradePlaced=1..}] run block enchanting_table_check2{
                 scoreboard players reset @s Nightrunner_enchanting_tableUpgradePlaced
-                say placed
                 execute as @e[type=item_frame,nbt={Tags:["spellbinder"],Item:{}}] run block{
                     # Check if its on top of a lectern
                     execute at @s run execute if block ~ ~-0.5 ~ minecraft:enchanting_table run return run block{
@@ -1187,7 +1186,11 @@ dir items{
             }
         }
         function show_cooldown_bar{
+            # If waiting for confirmation (pearl wand)
+            execute as @s[scores={Nightrunner_PearlWandWaitingForTeleport=1..}] run return run title @s actionbar [{"text":"✦ ","color":"gold","bold":true},{"text":"Cast again to teleport ","color":"light_purple"},{"text":"[","color":"white"},{"score":{"name":"@s","objective":"Nightrunner_PearlWandMarkerTimer"},"color":"gold"},{"text":"]","color":"white"},{"text":" | ","color":"white"},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"},"color":"gold"},{"text":"/","color":"white"},{"score":{"name":"@s","objective":"Nightrunner_ManaMax"},"color":"gold"},{"text":" | ","color":"white"},{"text":"Distance: ","color":"light_purple"},{"score":{"name":"@s","objective":"Nightrunner_RangedSpellRange"},"color":"gold"},{"text":" ✦","color":"gold","bold":true}]
+            # Normal
             execute as @s[scores={Nightrunner_SpellCooldown=0}] run title @s actionbar [{"text":"✦ ","color":"gold","bold":true},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"},"color":"gold"},{"text":"/","color":"white"},{"score":{"name":"@s","objective":"Nightrunner_ManaMax"},"color":"gold"},{"text":" | ","color":"white"},{"text":"Distance: ","color":"light_purple"},{"score":{"name":"@s","objective":"Nightrunner_RangedSpellRange"},"color":"gold"},{"text":" ✦","color":"gold","bold":true}]
+            # If Cooldown is active
             execute as @s[scores={Nightrunner_SpellCooldown=1..}] run title @s actionbar [{"text":"✦ ","color":"gold","bold":true},{"text":"Mana: ","color":"green"},{"score":{"name":"@s","objective":"Nightrunner_Mana"}},{"text":" | ","color":"white"},{"text":"Cooldown: ","color":"aqua"},{"score":{"name":"@s","objective":"Nightrunner_SpellCooldown"}},{"text":" | ","color":"white"},{"text":"Distance: ","color":"light_purple"},{"score":{"name":"@s","objective":"Nightrunner_RangedSpellRange"},"color":"gold"},{"text":" ✦","color":"gold","bold":true}]
         }
         # boulder wand
@@ -1274,16 +1277,21 @@ dir items{
                 summon marker ~ ~1.25 ~-0.5 {Tags:["pearl_wand_marker","pearl_wand_marker_0","spawned"]}
                 playsound minecraft:entity.player.teleport master @s ~ ~-1 ~0.5 0.5 1
                 execute as @a[sort=nearest,limit=1,tag=raycasting] at @s run playsound minecraft:block.note_block.bell master @s ~ ~ ~ 1 1
+                execute as @a[sort=nearest,limit=1,tag=raycasting] run scoreboard players set @s Nightrunner_PearlWandMarkerTimer 60
                 execute as @e[type=marker,tag=pearl_wand_marker_0] run block{
                      scoreboard players add @s Nightrunner_PearlWandMarkerTimer 60
                      scoreboard players operation @s Nightrunner_PearlWandID = @a[sort=nearest,limit=1,tag=raycasting] Nightrunner_ID
                      scoreboard players set @a[sort=nearest,limit=1,tag=raycasting] Nightrunner_PearlWandWaitingForTeleport 1
+                     # Pre play the particle effects (For immidiate feedback)
+                     execute at @s run function ./particle_effects
                 }
             }
             clock pearl_wand_effect 15t{
                 execute as @e[type=marker,tag=pearl_wand_marker] at @s run function nightrunner:items/tools/pearl_wand/particle_effects
             }
             clock pearl_wand_cooldown 0.1s{
+                # Reduce cooldown for players (for showing the time left)
+                execute as @a[scores={Nightrunner_PearlWandMarkerTimer=1..}] run scoreboard players remove @s Nightrunner_PearlWandMarkerTimer 1
                 # Reduce cooldown
                 execute as @e[type=marker,tag=pearl_wand_marker,scores={Nightrunner_PearlWandMarkerTimer=1..}] run scoreboard players remove @s Nightrunner_PearlWandMarkerTimer 1
                 # Remove the marker if the timer is 0
@@ -2095,7 +2103,7 @@ dir utils{
         # Slab check
         execute if block ~ ~ ~ #minecraft:slabs as @e[type=marker,tag=partial_check] run block partial_slab_check{
             # If double slab then return
-            execute if block ~ ~ ~ #minecraft:slabs[type=double] run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
+            execute if block ~ ~ ~ #minecraft:slabs[type=double] run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
 
             execute store result score .y nightrunner.internal run data get entity @s Pos[1] 100
             scoreboard players operation .y nightrunner.internal %= #100 nightrunner.internal
@@ -2104,9 +2112,9 @@ dir utils{
             execute store result score .slab nightrunner.internal if block ~ ~ ~ #minecraft:slabs[type=bottom]
 
             # If the block is a bottom slab
-            execute if score .slab nightrunner.internal matches 1 if score .y nightrunner.internal matches ..50 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
+            execute if score .slab nightrunner.internal matches 1 if score .y nightrunner.internal matches ..50 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
             # If the block is a top slab
-            execute if score .slab nightrunner.internal matches 0 if score .y nightrunner.internal matches 49.. run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
+            execute if score .slab nightrunner.internal matches 0 if score .y nightrunner.internal matches 49.. run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
         }
         # Stairs check
         execute if block ~ ~ ~ #minecraft:stairs as @e[type=marker,tag=partial_check] run block partial_stairs_check{
@@ -2137,7 +2145,7 @@ dir utils{
             execute if score #type nighrunner.internal matches 1 if score .y nightrunner.internal matches ..55 run scoreboard players set #bool nightrunner.internal 1
             execute if score #type nighrunner.internal matches 0 if score .y nightrunner.internal matches 45.. run scoreboard players set #bool nightrunner.internal 1
 
-            execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
+            execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
         }
         # Door check
         execute if block ~ ~ ~ #minecraft:doors as @e[type=marker,tag=partial_check] run block partial_door_check{
@@ -2159,7 +2167,48 @@ dir utils{
             execute if block ~ ~ ~ #minecraft:doors[hinge=right,open=true] if score .z nightrunner.internal matches 75.. run scoreboard players set #bool nightrunner.internal 1
             execute if block ~ ~ ~ #minecraft:doors[open=false] if score .x nightrunner.internal matches ..25 run scoreboard players set #bool nightrunner.internal 1
 
-            execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
+            execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
+        }
+        # Trapdoor check
+        execute if block ~ ~ ~ #minecraft:trapdoors as @e[type=marker,tag=partial_check] run block partial_trapdoor_check{
+            # Get position
+            execute store result score #x nightrunner.internal run data get entity @s Pos[0] 100
+            execute store result score .y nightrunner.internal run data get entity @s Pos[1] 100
+            execute store result score #z nightrunner.internal run data get entity @s Pos[2] 100
+            # Convert to local position
+            scoreboard players operation #x nightrunner.internal %= #100 nightrunner.internal
+            scoreboard players operation .y nightrunner.internal %= #100 nightrunner.internal
+            scoreboard players operation #z nightrunner.internal %= #100 nightrunner.internal
+            scoreboard players set #bool nightrunner.internal 0
+            # Rotation handler
+            scoreboard players operation .x nightrunner.internal = #x nightrunner.internal
+            scoreboard players operation .z nightrunner.internal = #z nightrunner.internal
+            execute if block ~ ~ ~ #minecraft:trapdoors[facing=north] run function ./rotate_90
+            execute if block ~ ~ ~ #minecraft:trapdoors[facing=west] run function ./rotate_180
+            execute if block ~ ~ ~ #minecraft:trapdoors[facing=south] run function ./rotate_270
+
+            # If open
+            execute if block ~ ~ ~ #minecraft:trapdoors[open=true] run return run block{
+                # Check local position
+                execute if score .x nightrunner.internal matches ..25 run scoreboard players set #bool nightrunner.internal 1
+
+                # If bool is true then return
+                execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
+            }
+
+            # If top trapdoor
+            execute store result score .trapdoor nightrunner.internal if block ~ ~ ~ #minecraft:trapdoors[half=bottom]
+
+            # If the block is a bottom slab
+            execute if score .trapdoor nightrunner.internal matches 1 if score .y nightrunner.internal matches ..20 run return run block{
+                scoreboard players set #bool nightrunner.internal 1
+                scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
+            }
+            # If the block is a top slab
+            execute if score .trapdoor nightrunner.internal matches 0 if score .y nightrunner.internal matches 80.. run return run block{
+                scoreboard players set #bool nightrunner.internal 1
+                scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1
+            }
         }
         kill @e[type=marker,tag=partial_check,sort=nearest,limit=1]
     }
@@ -2498,15 +2547,18 @@ tag block air{
     minecraft:wheat
     minecraft:melon_stem
     minecraft:pumpkin_stem
-    #minecraft:trapdoors
     minecraft:cobweb
     #minecraft:fences
+    minecraft:wall_torch
+    minecraft:ladder
+    #minecraft:fence_gates
     #nightrunner:partial
 }
 tag block partial{
     #minecraft:slabs
     #minecraft:stairs
     #minecraft:doors
+    #minecraft:trapdoors
 }
 tag entity_type zombies{
     minecraft:zombie

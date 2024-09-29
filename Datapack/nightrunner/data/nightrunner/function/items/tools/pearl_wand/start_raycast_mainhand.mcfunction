@@ -5,7 +5,7 @@ execute as @s run execute if score @s Nightrunner_PearlWandWaitingForTeleport ma
 execute if score @s Nightrunner_SpellCooldown matches 1.. run return 1
 execute if score @s[gamemode=!creative] Nightrunner_Mana matches ..4 run return run tellraw @s [{"text":"Not enough mana!","color":"red"}]
 execute at @s run playsound minecraft:entity.illusioner.prepare_mirror master @a ~ ~ ~ 0.3 2
-scoreboard players set @s Nightrunner_SpellCooldown 8
+scoreboard players set @s Nightrunner_SpellCooldown 12
 scoreboard players reset @s Nightrunner_Item_Ray_steps
 scoreboard players reset $Nightrunner Nightrunner_Item_Ray_steps
 execute as @s run scoreboard players operation $Nightrunner Nightrunner_Item_Ray_steps = @s Nightrunner_RangedSpellRange

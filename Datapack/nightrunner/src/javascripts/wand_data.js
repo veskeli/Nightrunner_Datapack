@@ -184,7 +184,10 @@ for(let i = 0; i < NewWandsArray.length; i++){
             DataArray.push('execute unless block ~ ~ ~ #nightrunner:air run function ./hit_block\n');
         }
         // If no hit
+        DataArray.push('scoreboard players set #bool nightrunner.internal 0\n');
         DataArray.push('execute positioned ^ ^ ^ rotated ~ ~ run execute if block ~ ~ ~ #nightrunner:partial run function nightrunner:utils/partial_check\n');
+        //DataArray.push('execute if score #bool nightrunner.internal matches 1 run function ./hit_block\n'); // If partial block was hit
+        DataArray.push(`execute if score $Nightrunner Nightrunner_Item_Ray_steps matches -1 run function ./hit_block\n`);
         DataArray.push('execute unless block ~ ~ ~ #nightrunner:air run return 2\n');
 
         // If raycast range is reached particle

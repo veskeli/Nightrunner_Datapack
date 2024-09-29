@@ -16,4 +16,4 @@ execute if block ~ ~ ~ #minecraft:doors[facing=south] run function nightrunner:u
 execute if block ~ ~ ~ #minecraft:doors[hinge=left,open=true] if score .z nightrunner.internal matches ..25 run scoreboard players set #bool nightrunner.internal 1
 execute if block ~ ~ ~ #minecraft:doors[hinge=right,open=true] if score .z nightrunner.internal matches 75.. run scoreboard players set #bool nightrunner.internal 1
 execute if block ~ ~ ~ #minecraft:doors[open=false] if score .x nightrunner.internal matches ..25 run scoreboard players set #bool nightrunner.internal 1
-execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
+execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1

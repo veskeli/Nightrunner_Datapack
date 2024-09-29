@@ -26,4 +26,4 @@ execute if block ~ ~ ~ #minecraft:stairs[shape=outer_right] if score .z nightrun
 execute store result score #type nighrunner.internal if block ~ ~ ~ #minecraft:stairs[half=bottom]
 execute if score #type nighrunner.internal matches 1 if score .y nightrunner.internal matches ..55 run scoreboard players set #bool nightrunner.internal 1
 execute if score #type nighrunner.internal matches 0 if score .y nightrunner.internal matches 45.. run scoreboard players set #bool nightrunner.internal 1
-execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps 0
+execute if score #bool nightrunner.internal matches 1 run return run scoreboard players set $Nightrunner Nightrunner_Item_Ray_steps -1

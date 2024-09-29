@@ -648,7 +648,7 @@ let pearl_wand = createWand({
     Name: "Pearl Wand",
     Color: "aqua",
     Description: `'[{"color":"green","text":"Cooldown: "},{"color":"aqua","text":"8"}]','[{"color":"green","text":"Mana cost: "},{"color":"aqua","text":"5"}]','[{"color":"light_purple","text":"Spell: "},{"color":"gold","text":"Teleport to location you can see"}]','[{"color":"light_purple","text":"Range: "},{"color":"gold","text":"3x"}]','""'`,
-    Cooldown: 8,
+    Cooldown: 12,
     Particle: "minecraft:wax_on",
     CustomModelData: 1122,
     Durability: 1059,

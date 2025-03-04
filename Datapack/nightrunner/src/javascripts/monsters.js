@@ -37,6 +37,11 @@ MonsterData.push({
     Name: "Default Skeleton",
     Type: "skeleton",
 });
+MonsterData.push({
+    ...DefaultMonsterData,
+    Name: "Zombified Piglin",
+    Type: "zombified_piglin",
+});
 //=================================================
 // MARK: Helper function
 //=================================================

@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " # ",
+        "#i#",
+        "e#e"
+    ],
+    "key": {
+        "#": {
+            "item": "create:zinc_ingot"
+        },
+        "i": {
+            "item": "create:cardboard_block"
+        },
+        "e": {
+            "item": "minecraft:redstone"
+        }
+    },
+    "result": {
+        "id": "create:packager",
+        "count": 1
+    }
+}

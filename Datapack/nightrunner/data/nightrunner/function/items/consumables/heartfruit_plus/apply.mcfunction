@@ -6,11 +6,11 @@ advancement revoke @s only nightrunner:used_heartfruit_plus
 # Store current health
 execute as @s store result score @s Nightrunner_CheckCurrentAbsorptionAmount run data get entity @s AbsorptionAmount
 # Before adding if the player has more then max then return
-execute if score @s Nightrunner_CheckCurrentAbsorptionAmount matches 6.. run return 1
+execute if score @s Nightrunner_CheckCurrentAbsorptionAmount matches 8.. run return 1
 # Add temp_health on top of the current temp health
-scoreboard players add @s Nightrunner_CheckCurrentAbsorptionAmount 3
+scoreboard players add @s Nightrunner_CheckCurrentAbsorptionAmount 4
 # Check if the new temp health is higher than the max_addition
-execute if score @s Nightrunner_CheckCurrentAbsorptionAmount matches 6.. run scoreboard players set @s Nightrunner_CheckCurrentAbsorptionAmount 6
+execute if score @s Nightrunner_CheckCurrentAbsorptionAmount matches 8.. run scoreboard players set @s Nightrunner_CheckCurrentAbsorptionAmount 8
 # Give the player lvl 100 absorption effect
 effect give @s minecraft:absorption 1 100 true
 # Set the players max absorption to the correct amount

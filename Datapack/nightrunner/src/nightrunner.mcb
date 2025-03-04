@@ -607,6 +607,72 @@ dir items{
                     }
                 }
             }
+            recipe heartfruit2{
+                "type": "minecraft:crafting_shaped",
+                "pattern": [
+                    "i",
+                    "S"
+                ],
+                "key": {
+                    "i": {
+                        "item": "minecraft:gold_ingot"
+                    },
+                    "S": {
+                        "item": "minecraft:crimson_fungus"
+                    }
+                },
+                "result": {
+                    "id": "minecraft:poisonous_potato",
+                    "count": 1,
+                    "components":{
+                        "item_name":"[{\"text\":\"Heartfruit\",\"italic\":false}]",
+                        "lore": ["{\"text\":\"A common consumable that grants a temporary heart, up to a maximum of two.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                        "food": {
+                            "nutrition": 0,
+                            "saturation": 0,
+                            "can_always_eat": true,
+                            "eat_seconds": 1
+                        },
+                        "custom_model_data": 1122,
+                        "custom_data": {
+                            "heartfruit": true
+                        }
+                    }
+                }
+            }
+            recipe heartfruit3{
+                "type": "minecraft:crafting_shaped",
+                "pattern": [
+                    "i",
+                    "S"
+                ],
+                "key": {
+                    "i": {
+                        "item": "minecraft:gold_ingot"
+                    },
+                    "S": {
+                        "item": "minecraft:warped_fungus"
+                    }
+                },
+                "result": {
+                    "id": "minecraft:poisonous_potato",
+                    "count": 1,
+                    "components":{
+                        "item_name":"[{\"text\":\"Heartfruit\",\"italic\":false}]",
+                        "lore": ["{\"text\":\"A common consumable that grants a temporary heart, up to a maximum of two.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
+                        "food": {
+                            "nutrition": 0,
+                            "saturation": 0,
+                            "can_always_eat": true,
+                            "eat_seconds": 1
+                        },
+                        "custom_model_data": 1122,
+                        "custom_data": {
+                            "heartfruit": true
+                        }
+                    }
+                }
+            }
         }
         dir heartfruit_plus{
             # Heartfruit Plus: A rarer variant that grants a temporary heart, up to a maximum of three.
@@ -618,7 +684,7 @@ dir items{
                 # reset advancement
                 advancement revoke @s only nightrunner:used_heartfruit_plus
                 # Apply temporary health
-                add_temp_health 3 6
+                add_temp_health 4 8
             }
             recipe heartfruit_plus{
                 "type": "minecraft:crafting_shaped",
@@ -1908,6 +1974,31 @@ dir skills{
                 add_temp_health 2 2
             }
         }
+        clock attribute_clock_check 1s{
+             execute as @a run function nightrunner:skills/mining_skill/handle_per_player_attribute_check
+        }
+        function handle_per_player_attribute_check{
+            # update the player attributes
+            execute as @s run function ./set_mining_skill_attributes
+
+            # Update attributes if milestone is reached (If player gets the level or higher)
+            execute if score @s Nightrunner_MiningSkillLevel matches 50.. run block{
+                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_50 0.25 add_value
+            }
+            # Update attributes if milestone is not reached (If player loses the level)
+            execute if score @s Nightrunner_MiningSkillLevel matches ..49 run block{
+                attribute @s minecraft:player.block_interaction_range modifier remove n_mining_skill_milestone_50
+            }
+
+            # Update attributes if milestone is reached (If player gets the level or higher)
+            execute if score @s Nightrunner_MiningSkillLevel matches 200.. run block{
+                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_200 0.25 add_value
+            }
+            # Update attributes if milestone is not reached (If player loses the level)
+            execute if score @s Nightrunner_MiningSkillLevel matches ..199 run block{
+                attribute @s minecraft:player.block_interaction_range modifier remove n_mining_skill_milestone_200
+            }
+        }
         # MARK: Mining skill Level up
         function level_up{
             # add a level
@@ -1938,14 +2029,6 @@ dir skills{
                 tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
                 tellraw @s [{"text":"+0.25 block reach distance","color":"green"}]
             }
-            # Update attributes if milestone is reached (If player gets the level or higher)
-            execute if score @s Nightrunner_MiningSkillLevel matches 50.. run block{
-                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_50 0.25 add_value
-            }
-            # Update attributes if milestone is not reached (If player loses the level)
-            execute if score @s Nightrunner_MiningSkillLevel matches ..49 run block{
-                attribute @s minecraft:player.block_interaction_range modifier remove n_mining_skill_milestone_50
-            }
 
             # Milestone lvl 100
             execute if score @s Nightrunner_MiningSkillLevel matches 100 run block{
@@ -1974,17 +2057,9 @@ dir skills{
                 tellraw @s [{"text":"+0.25 block reach distance","color":"green"}]
                 tellraw @s [{"text":"You can enchant tools using a grindstone!","color":"green"}]
             }
-            # Update attributes if milestone is reached (If player gets the level or higher)
-            execute if score @s Nightrunner_MiningSkillLevel matches 200.. run block{
-                attribute @s minecraft:player.block_interaction_range modifier add n_mining_skill_milestone_200 0.25 add_value
-            }
-            # Update attributes if milestone is not reached (If player loses the level)
-            execute if score @s Nightrunner_MiningSkillLevel matches ..199 run block{
-                attribute @s minecraft:player.block_interaction_range modifier remove n_mining_skill_milestone_200
-            }
         }
         function set_mining_skill_attributes{
-            execute store result storage nightrunner:mining_skill attribute.amount float 0.2 run scoreboard players get @s Nightrunner_MiningSkillLevel
+            execute store result storage nightrunner:mining_skill attribute.amount float 0.02 run scoreboard players get @s Nightrunner_MiningSkillLevel
             execute as @s run function ./add_mining_attributes with storage nightrunner:mining_skill attribute
         }
         function add_mining_attributes{
@@ -2469,6 +2544,10 @@ tag entity_type not_mob_create_support{
     create:gantry_contraption
     create:seat
     create:super_glue
+}
+tag block nethershroom{
+    minecraft:crimson_fungus
+    minecraft:warped_fungus
 }
 tag block air{
     minecraft:air

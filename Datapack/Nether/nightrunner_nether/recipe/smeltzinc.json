@@ -1,0 +1,11 @@
+{
+    "type": "minecraft:smelting",
+    "ingredient": {
+        "item": "minecraft:basalt"
+    },
+    "result": {
+        "id": "create:zinc_nugget"
+    },
+    "experience": 0.05,
+    "cookingtime": 50
+}

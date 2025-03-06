@@ -7,3 +7,4 @@ damage @s 7 minecraft:magic by @a[limit=1,tag=raycasting,sort=nearest]
 execute if entity @s[nbt={Health:0.0f}] run execute as @a[limit=1,tag=raycasting,sort=nearest] run function nightrunner:items/tools/diamond_wand/apply_spell_damage/entity_died_from_damage
 playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.4
 effect give @s slowness 1 1 true
+execute if score @a[limit=1,tag=raycasting,sort=nearest] Nightrunner_MagicSkillLevel matches 50.. run effect give @s slowness 2 1 true

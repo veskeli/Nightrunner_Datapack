@@ -18,4 +18,4 @@ execute if score @s Nightrunner_MagicLevelModulus matches 0 run tag @s add broad
 execute if score @s Nightrunner_MagicLevelModulus matches 0 run tellraw @a[tag=!broadcaster] [{"selector":"@s"},{"text":" has leveled up their Magic Skill! Now at ","color":"green"},{"text":"[Lvl ","color":"yellow"},{"score":{"name":"@s","objective":"Nightrunner_MagicSkillLevel"},"color":"yellow"},{"text":"]","color":"yellow"}]
 execute if score @s Nightrunner_MagicLevelModulus matches 0 run tag @s remove broadcaster
 # Milestone lvl 20
-execute if score @s Nightrunner_MagicSkillLevel matches 20 run function nightrunner:skills/magic_skill/generated/2
+execute if score @s Nightrunner_MagicSkillLevel matches 20 run function nightrunner:skills/magic_skill/generated/7

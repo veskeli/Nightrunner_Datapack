@@ -1,5 +1,6 @@
 # Generated with MC-Build
 
+# MARK: Mining milestone
 # update the player attributes
 execute as @s run function nightrunner:skills/mining_skill/set_mining_skill_attributes
 # Update attributes if milestone is reached (If player gets the level or higher)

@@ -167,17 +167,33 @@ for(let i = 0; i < NewWandsArray.length; i++){
             switch(WandData.MainSpell.Name)
             {
                 case "Damage":
-                    DataArray.push(ExecuteAsRaycast + ' run function ./spell_damage\n');
+                    // Particle
+                    DataArray.push(ExecuteAsRaycast + ' run particle minecraft:flame ~ ~ ~ 0.01 0.01 0.01 0.01 10 force\n');
+                    // Damage
+                    DataArray.push(ExecuteAsRaycast + ' run return run function ./spell_damage\n');
                     break;
                 default:
-                    DataArray.push(ExecuteAsRaycast + ' run function ./hit_entity\n');
+                    DataArray.push(ExecuteAsRaycast + ' run return run function ./hit_entity\n');
                     break;
             }
             // Return if hit entity
             DataArray.push(ExecuteAsRaycast +' run return 1\n');
 
-            // If hit enetity but hit block
-            DataArray.push('execute unless block ~ ~ ~ #nightrunner:air run particle minecraft:cloud ~ ~ ~ 0 0 0 0.02 1 force\n');
+            // If hit type is entity but hit block
+            switch(WandData.MainSpell.Name)
+            {
+                case "Damage":
+                    DataArray.push('execute unless block ~ ~ ~ #nightrunner:air run particle minecraft:flame ~ ~ ~ 0.1 0.1 0.1 0.05 50 force\n');
+                    // Do damage to all close entities
+                    DataArray.push('execute unless block ~ ~ ~ #nightrunner:air run execute as @e[distance=..1.5,tag=!raycasting,type=!#nightrunner:not_mob] run block apply_area_spell_damage{\n');
+                    DataArray.push('scoreboard players set $Nightrunner Nightrunner_Weak_Use 1\n');
+                    DataArray.push('execute as @s run function ./spell_damage\n');
+                    DataArray.push('}\n');
+                    break;
+                default:
+                    DataArray.push('execute unless block ~ ~ ~ #nightrunner:air run particle minecraft:cloud ~ ~ ~ 0 0 0 0.02 1 force\n');
+                    break;
+            }
         }
         else // If hit block
         {
@@ -187,11 +203,24 @@ for(let i = 0; i < NewWandsArray.length; i++){
         DataArray.push('scoreboard players set #bool nightrunner.internal 0\n');
         DataArray.push('execute positioned ^ ^ ^ rotated ~ ~ run execute if block ~ ~ ~ #nightrunner:partial run function nightrunner:utils/partial_check\n');
         //DataArray.push('execute if score #bool nightrunner.internal matches 1 run function ./hit_block\n'); // If partial block was hit
+
+        // Handle no hit
+        switch(WandData.MainSpell.Name)
+        {
+            case "Damage":
+                DataArray.push('execute if score $Nightrunner Nightrunner_Item_Ray_steps matches ..0 run particle minecraft:flame ~ ~ ~ 0.1 0.1 0.1 0.05 50 force\n');
+                // Do damage to all close entities
+                DataArray.push('execute if score $Nightrunner Nightrunner_Item_Ray_steps matches ..0 run execute as @e[distance=..1.5,tag=!raycasting,type=!#nightrunner:not_mob] run function ./apply_area_spell_damage\n');
+                break;
+            default:
+                DataArray.push(`execute if score $Nightrunner Nightrunner_Item_Ray_steps matches -1 run function ./hit_block\n`);
+
+                // If raycast range is reached particle
+                DataArray.push(`execute if score $Nightrunner Nightrunner_Item_Ray_steps matches ..0 run particle minecraft:cloud ~ ~ ~ 0 0 0 0.02 1 force\n`);
+                break;
+        }
         DataArray.push(`execute if score $Nightrunner Nightrunner_Item_Ray_steps matches -1 run function ./hit_block\n`);
         DataArray.push('execute unless block ~ ~ ~ #nightrunner:air run return 2\n');
-
-        // If raycast range is reached particle
-        DataArray.push(`execute if score $Nightrunner Nightrunner_Item_Ray_steps matches ..0 run particle minecraft:cloud ~ ~ ~ 0 0 0 0.02 1 force\n`);
 
         // If raycast range is reached return
         DataArray.push(`execute if score $Nightrunner Nightrunner_Item_Ray_steps matches ..0 run return 3\n`);
@@ -357,6 +386,9 @@ for(let i = 0; i < NewWandsArray.length; i++){
         DataArray.push(`}\n`);
         DataArray.push(`playsound minecraft:entity.arrow.hit player @a ~ ~ ~ 0.4 0.4\n`);
         DataArray.push(`effect give @s slowness 1 1 true\n`);
+
+        // If magic level is over 50, add slowness with 2 seconds
+        DataArray.push(`execute if score @a[limit=1,tag=raycasting,sort=nearest] Nightrunner_MagicSkillLevel matches 50.. run effect give @s slowness 2 1 true\n`);
 
         DataArray.push(`}\n`);
         DataArray.push(`}\n`);

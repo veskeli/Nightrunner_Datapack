@@ -14,5 +14,8 @@ execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:leather_helmet",Slot:1
 scoreboard players set #5 Nightrunner_MagicSkillLevel 5
 execute as @s run scoreboard players operation #operation Nightrunner_RangedSpellRange = @s Nightrunner_MagicSkillLevel
 execute as @s run scoreboard players operation #operation Nightrunner_RangedSpellRange /= #5 Nightrunner_MagicSkillLevel
+# 100 lvl milestone | 2x range
+scoreboard players set #100 Nightrunner_MagicSkillLevel 2
+execute as @s if score @s Nightrunner_MagicSkillLevel matches 100.. run scoreboard players operation @s Nightrunner_RangedSpellRange *= #100 Nightrunner_MagicSkillLevel
 # Add the result to the range
 execute as @s run scoreboard players operation @s Nightrunner_RangedSpellRange += #operation Nightrunner_RangedSpellRange

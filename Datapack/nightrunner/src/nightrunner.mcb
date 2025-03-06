@@ -36,7 +36,7 @@ function on_load minecraft:load{
     # Show the welcome message
     #=================================================
     # Show the welcome message (Takes build number [int] and update message [raw])
-    welcome 14 Magic Rebalance!
+    welcome 15 More Magic!
 }
 #=================================================
 # MARK: Settings
@@ -586,72 +586,6 @@ dir items{
                     },
                     "S": {
                         "item": "minecraft:potato"
-                    }
-                },
-                "result": {
-                    "id": "minecraft:poisonous_potato",
-                    "count": 1,
-                    "components":{
-                        "item_name":"[{\"text\":\"Heartfruit\",\"italic\":false}]",
-                        "lore": ["{\"text\":\"A common consumable that grants a temporary heart, up to a maximum of two.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                        "food": {
-                            "nutrition": 0,
-                            "saturation": 0,
-                            "can_always_eat": true,
-                            "eat_seconds": 1
-                        },
-                        "custom_model_data": 1122,
-                        "custom_data": {
-                            "heartfruit": true
-                        }
-                    }
-                }
-            }
-            recipe heartfruit2{
-                "type": "minecraft:crafting_shaped",
-                "pattern": [
-                    "i",
-                    "S"
-                ],
-                "key": {
-                    "i": {
-                        "item": "minecraft:gold_ingot"
-                    },
-                    "S": {
-                        "item": "minecraft:crimson_fungus"
-                    }
-                },
-                "result": {
-                    "id": "minecraft:poisonous_potato",
-                    "count": 1,
-                    "components":{
-                        "item_name":"[{\"text\":\"Heartfruit\",\"italic\":false}]",
-                        "lore": ["{\"text\":\"A common consumable that grants a temporary heart, up to a maximum of two.\"}","{\"text\":\"Nightrunner\",\"color\":\"aqua\"}"],
-                        "food": {
-                            "nutrition": 0,
-                            "saturation": 0,
-                            "can_always_eat": true,
-                            "eat_seconds": 1
-                        },
-                        "custom_model_data": 1122,
-                        "custom_data": {
-                            "heartfruit": true
-                        }
-                    }
-                }
-            }
-            recipe heartfruit3{
-                "type": "minecraft:crafting_shaped",
-                "pattern": [
-                    "i",
-                    "S"
-                ],
-                "key": {
-                    "i": {
-                        "item": "minecraft:gold_ingot"
-                    },
-                    "S": {
-                        "item": "minecraft:warped_fungus"
                     }
                 },
                 "result": {
@@ -1247,6 +1181,11 @@ dir items{
                 scoreboard players set #5 Nightrunner_MagicSkillLevel 5
                 execute as @s run scoreboard players operation #operation Nightrunner_RangedSpellRange = @s Nightrunner_MagicSkillLevel
                 execute as @s run scoreboard players operation #operation Nightrunner_RangedSpellRange /= #5 Nightrunner_MagicSkillLevel
+
+                # 100 lvl milestone | 2x range
+                scoreboard players set #100 Nightrunner_MagicSkillLevel 2
+                execute as @s if score @s Nightrunner_MagicSkillLevel matches 100.. run scoreboard players operation @s Nightrunner_RangedSpellRange *= #100 Nightrunner_MagicSkillLevel
+
                 # Add the result to the range
                 execute as @s run scoreboard players operation @s Nightrunner_RangedSpellRange += #operation Nightrunner_RangedSpellRange
             }
@@ -1330,7 +1269,7 @@ dir items{
                 tag @s add teleporting
                 execute as @e[type=marker,tag=pearl_wand_marker_0] run block{
                     execute at @s run tp @a[tag=teleporting,gamemode=creative,limit=1] ~ ~-1 ~0.5
-                    execute at @s run execute if score @a[tag=teleporting,gamemode=survival,limit=1] Nightrunner_Mana matches 5.. run tp @a[tag=teleporting,limit=1] ~ ~-1 ~0.5
+                    execute at @s run execute if score @a[tag=teleporting,gamemode=survival,limit=1,sort=nearest] Nightrunner_Mana matches 5.. run tp @a[tag=teleporting,limit=1,sort=nearest] ~ ~-1 ~0.5
                     execute if score @a[tag=teleporting,gamemode=survival,limit=1] Nightrunner_Mana matches 5.. run playsound minecraft:entity.player.teleport master @a ~ ~ ~ 1 1
                     execute if score @a[tag=teleporting,gamemode=survival,limit=1] Nightrunner_Mana matches 5.. run scoreboard players remove @a[tag=teleporting,limit=1] Nightrunner_Mana 5
                     execute unless score @a[tag=teleporting,gamemode=survival,limit=1] Nightrunner_Mana matches 5.. run tellraw @a[tag=teleporting,limit=1] {"text":"Not enough mana","color":"red"}
@@ -1891,7 +1830,14 @@ dir skills{
 
             # Magic Milestone Bonuses
             tellraw @s [{"text":"Magic Milestone Bonuses:","color":"gold"}]
+            # 20 Receive half mana when nearby players pick it up
             execute if score @s Nightrunner_MagicSkillLevel matches 20.. run tellraw @s [{"text":"- Receive half mana when nearby players pick it up (Level 20)","color":"yellow"}]
+            # 50 Apply 1 additional second of slowness to foes when hit with magic damage
+            execute if score @s Nightrunner_MagicSkillLevel matches 50.. run tellraw @s [{"text":"- Apply 1 additional second of slowness to foes when hit with magic damage (Level 50)","color":"yellow"}]
+            # 75 Natural mana regeneration
+            execute if score @s Nightrunner_MagicSkillLevel matches 75.. run tellraw @s [{"text":"- Natural mana regeneration (Level 75)","color":"yellow"}]
+            # 100 2x range for magic attacks
+            execute if score @s Nightrunner_MagicSkillLevel matches 100.. run tellraw @s [{"text":"- 2x range for magic attacks (Level 100)","color":"yellow"}]
 
         }
     }
@@ -1978,6 +1924,8 @@ dir skills{
              execute as @a run function nightrunner:skills/mining_skill/handle_per_player_attribute_check
         }
         function handle_per_player_attribute_check{
+            # MARK: Mining milestone
+
             # update the player attributes
             execute as @s run function ./set_mining_skill_attributes
 
@@ -2115,7 +2063,7 @@ dir skills{
                 scoreboard players set #5 Nightrunner_MagicSkillLevel 25
                 execute as @s run scoreboard players operation #operation Nightrunner_ManaMax = @s Nightrunner_MagicSkillLevel
                 execute as @s run scoreboard players operation #operation Nightrunner_ManaMax /= #5 Nightrunner_MagicSkillLevel
-                # Add the result to the range
+                # Add the result to the max mana
                 execute as @s run scoreboard players operation @s Nightrunner_ManaMax += #operation Nightrunner_ManaMax
 
                 # If iron armor is equipped then remove mana (3 each)
@@ -2129,11 +2077,44 @@ dir skills{
                 execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:diamond_chestplate",Slot:102b}]}] run scoreboard players remove @s Nightrunner_ManaMax 5
                 execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:diamond_helmet",Slot:103b}]}] run scoreboard players remove @s Nightrunner_ManaMax 5
             }
+
+            # Milestone lvl 50 | +1 seconds slowness on hit
+            execute if score @s Nightrunner_MagicSkillLevel matches 50 run block{
+                title @s title {"text":"🎉 Milestone Achieved! 🎉","color":"gold"}
+                title @s subtitle {"text":"+1 seconds slowness on hit","color":"light_purple"}
+                title @s times 20 140 20
+                tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
+                tellraw @s [{"text":"+1 seconds slowness on hit when using damage spell","color":"light_purple"}]
+            }
+
+            # Milestone lvl 75 | Natural Mana Regeneration
+            execute if score @s Nightrunner_MagicSkillLevel matches 75 run block{
+                title @s title {"text":"🎉 Milestone Achieved! 🎉","color":"gold"}
+                title @s subtitle {"text":"Natural Mana Regeneration","color":"light_purple"}
+                title @s times 20 140 20
+                tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
+                tellraw @s [{"text":"Natural Mana Regeneration (+1 mana per 60s)","color":"light_purple"}]
+            }
+
+            # Milestone lvl 100 | Double mana regen | 2x Wand distance
+            execute if score @s Nightrunner_MagicSkillLevel matches 100 run block{
+                title @s title {"text":"🎉 Milestone Achieved! 🎉","color":"gold"}
+                title @s subtitle {"text":"2x Wand distance","color":"light_purple"}
+                title @s times 20 140 20
+                tellraw @s [{"text":"🎉 Milestone Reached! 🎉","color":"gold","bold":true}]
+                tellraw @s [{"text":"2x Wand distance","color":"light_purple"}]
+            }
         }
         clock wizard_armor_mana_regen 60s{
             execute as @a run execute if score @s Nightrunner_WizardArmorSetBonus matches 4.. run block{
                 function nightrunner:items/add_mana {"amount":1}
                 execute at @s run playsound minecraft:entity.player.levelup master @s ~ ~ ~ 0.1 2
+            }
+        }
+        clock natural_mana_regen 60s{
+            # Check if the player has the milestone
+            execute as @a run execute if score @s Nightrunner_MagicSkillLevel matches 75.. run block{
+                function nightrunner:items/add_mana {"amount":1}
             }
         }
         function collected_points{

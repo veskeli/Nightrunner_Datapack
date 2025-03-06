@@ -21,7 +21,7 @@ execute as @s if score @s Nightrunner_WizardArmorSetBonus matches 4.. run scoreb
 scoreboard players set #5 Nightrunner_MagicSkillLevel 25
 execute as @s run scoreboard players operation #operation Nightrunner_ManaMax = @s Nightrunner_MagicSkillLevel
 execute as @s run scoreboard players operation #operation Nightrunner_ManaMax /= #5 Nightrunner_MagicSkillLevel
-# Add the result to the range
+# Add the result to the max mana
 execute as @s run scoreboard players operation @s Nightrunner_ManaMax += #operation Nightrunner_ManaMax
 # If iron armor is equipped then remove mana (3 each)
 execute as @s if entity @s[nbt={Inventory:[{id:"minecraft:iron_boots",Slot:100b}]}] run scoreboard players remove @s Nightrunner_ManaMax 3
